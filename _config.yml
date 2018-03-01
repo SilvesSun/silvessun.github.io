@@ -78,6 +78,6 @@ theme: jacman
 ## Docs: https://hexo.io/docs/deployment.html
 deploy: 
   type:  git
-  repository: https://github.com/SilvesSun/SilvesSun.github.io.git
+  repository: git@github.com:SilvesSun/SilvesSun.github.io.git
   branch: master
   name: 2498256234@qq.com
