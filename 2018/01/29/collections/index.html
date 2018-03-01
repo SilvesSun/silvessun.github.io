@@ -1,0 +1,606 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>collections | 封圣剑客的家</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="SK">
+    
+
+    
+    <meta name="description" content="Python 在内置的数据类型的基础上, 在collections模块中提供了几个额外的数据类型. 分别是  defaultdict namedtuple deque Counter UserDict UserList UserString OrderedDict ChainMap  defaultdict重点关注这一句:  The first argument provides the init">
+<meta name="keywords" content="collections,build-in module">
+<meta property="og:type" content="article">
+<meta property="og:title" content="collections">
+<meta property="og:url" content="https://sksun.com.cn/2018/01/29/collections/index.html">
+<meta property="og:site_name" content="封圣剑客的家">
+<meta property="og:description" content="Python 在内置的数据类型的基础上, 在collections模块中提供了几个额外的数据类型. 分别是  defaultdict namedtuple deque Counter UserDict UserList UserString OrderedDict ChainMap  defaultdict重点关注这一句:  The first argument provides the init">
+<meta property="og:updated_time" content="2018-01-29T09:59:09.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="collections">
+<meta name="twitter:description" content="Python 在内置的数据类型的基础上, 在collections模块中提供了几个额外的数据类型. 分别是  defaultdict namedtuple deque Counter UserDict UserList UserString OrderedDict ChainMap  defaultdict重点关注这一句:  The first argument provides the init">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="封圣剑客的家" title="封圣剑客的家"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="封圣剑客的家">封圣剑客的家</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/01/29/collections/" title="collections" itemprop="url">collections</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="SK" target="_blank" itemprop="author">SK</a>
+		
+  <p class="article-time">
+    <time datetime="2018-01-29T09:55:13.000Z" itemprop="datePublished"> Published 2018-01-29</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#defaultdict"><span class="toc-number">1.</span> <span class="toc-text">defaultdict</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#namedtuple"><span class="toc-number">2.</span> <span class="toc-text">namedtuple</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#deque"><span class="toc-number">3.</span> <span class="toc-text">deque</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Counter"><span class="toc-number">4.</span> <span class="toc-text">Counter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OrderedDict"><span class="toc-number">5.</span> <span class="toc-text">OrderedDict</span></a></li></ol>
+		
+		</div>
+		
+		<p>Python 在内置的数据类型的基础上, 在collections模块中提供了几个额外的数据类型. 分别是</p>
+<ul>
+<li>defaultdict</li>
+<li>namedtuple</li>
+<li>deque</li>
+<li>Counter</li>
+<li>UserDict</li>
+<li>UserList</li>
+<li>UserString</li>
+<li>OrderedDict</li>
+<li>ChainMap</li>
+</ul>
+<h2 id="defaultdict"><a href="#defaultdict" class="headerlink" title="defaultdict"></a>defaultdict</h2><p>重点关注这一句:</p>
+<blockquote>
+<p>The first argument provides the initial value for the default_factory attribute; it defaults to None. All remaining arguments are treated the same as if they were passed to the dict constructor, including keyword arguments.</p>
+</blockquote>
+<p>defaultdict 的第一个参数为默认的工厂方法. 使用示例:<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s = [(<span class="string">'yellow'</span>, <span class="number">1</span>), (<span class="string">'blue'</span>, <span class="number">2</span>), (<span class="string">'yellow'</span>, <span class="number">3</span>), (<span class="string">'blue'</span>, <span class="number">4</span>), (<span class="string">'red'</span>, <span class="number">1</span>)]</span><br><span class="line">d = defaultdict(list)</span><br><span class="line"><span class="keyword">for</span> k, v <span class="keyword">in</span> s:</span><br><span class="line">    d[k].append(v)</span><br></pre></td></tr></table></figure></p>
+<p>输出</p>
+<blockquote>
+<p>defaultdict(<class 'list'="">, {‘yellow’: [1, 3], ‘blue’: [2, 4], ‘red’: [1]})</class></p>
+</blockquote>
+<p>另一个常见的用法是, 当对一个键进行嵌套赋值时, 会触发keyError异常。 defaultdict可以解决这个问题</p>
+<p><strong>Question</strong></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = &#123;&#125;</span><br><span class="line">s[<span class="string">'a'</span>][<span class="string">'b'</span>] = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>输出</p>
+<blockquote>
+<p>KeyError: ‘a’</p>
+</blockquote>
+<p><strong>Solution</strong><br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d = <span class="keyword">lambda</span>: collections.defaultdict(d)</span><br><span class="line">s = d()</span><br><span class="line">s[<span class="string">'a'</span>][<span class="string">'b'</span>] = <span class="string">'c'</span></span><br><span class="line">print(s)</span><br></pre></td></tr></table></figure></p>
+<p>输出</p>
+<blockquote>
+<p>defaultdict(&lt;function <lambda> at 0x0000000002072E18&gt;, {‘a’: defaultdict(&lt;function <lambda> at 0x0000000002072E18&gt;, {‘b’: ‘c’})})</lambda></lambda></p>
+</blockquote>
+<h2 id="namedtuple"><a href="#namedtuple" class="headerlink" title="namedtuple"></a>namedtuple</h2><p>把元组变成一个针对简单任务的容器。你不必使用整数索引来访问一个namedtuples的数据。你可以像字典(dict)一样访问namedtuples，但namedtuples是不可变的。</p>
+<p>签名:<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">namedtuple</span><span class="params">(typename, field_names, *, verbose=False, rename=False, module=None)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>一个命名元组(namedtuple)有两个必需的参,它们是元组名称和字段名称</p>
+<p>使用namedtuple的好处是可以使用名称来访问, 同时可以将其转换为字典</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">Animal = namedtuple(<span class="string">'Animal'</span>, <span class="string">'name age'</span>)</span><br><span class="line">dog = Animal(<span class="string">'Husky'</span>, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">print(dog.age)</span><br><span class="line"></span><br><span class="line"><span class="comment"># convert to dict</span></span><br><span class="line">print(dog._asdict())</span><br></pre></td></tr></table></figure>
+<p>输出:</p>
+<blockquote>
+<p>5</p>
+<p>OrderedDict([(‘name’, ‘Husky’), (‘age’, 5)])</p>
+</blockquote>
+<p><strong>Question</strong><br>现在有一txt文件, 分别对应商品的名称, 尺码, 价格, 数量. 然后将每一条记录构建为namedtuple</p>
+<p><strong>Answer</strong><br>在工作中遇到这个问题的情景是涉及到的字段很多, 接近50个. 这种情况下如果用索引来读取信息会显得繁琐且容易出错. 换成namedtuple可以优美的解决问题</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出所有的字段</span></span><br><span class="line">headers = [<span class="string">'name'</span>, <span class="string">'size'</span>, <span class="string">'price'</span>, <span class="string">'qty'</span>]</span><br><span class="line"><span class="comment"># 构建一个namedtuple</span></span><br><span class="line"></span><br><span class="line">Row = namedtuple(<span class="string">'Row'</span>, headers)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 然后每一个读取到的值就可以构建为可以类似属性访问的操作了</span></span><br><span class="line"><span class="keyword">with</span> open(filename, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    reader = f.readlines()</span><br><span class="line">    <span class="keyword">for</span> i, data_str <span class="keyword">in</span> enumerate(reader):</span><br><span class="line">        data_list = data_str.split(<span class="string">'|'</span>)</span><br><span class="line">        data = Row._make(data_list)</span><br><span class="line"></span><br><span class="line">        print(data.name)</span><br></pre></td></tr></table></figure>
+<p>这里的_make()的作用是</p>
+<blockquote>
+<p>‘Make a new named tuple object from a sequence or iterable.’</p>
+</blockquote>
+<h2 id="deque"><a href="#deque" class="headerlink" title="deque"></a>deque</h2><p>双端队列.</p>
+<h2 id="Counter"><a href="#Counter" class="headerlink" title="Counter"></a>Counter</h2><p>计数器, 可以针对某项数据进行计数.</p>
+<h2 id="OrderedDict"><a href="#OrderedDict" class="headerlink" title="OrderedDict"></a>OrderedDict</h2><p>Python中的字典本身是无序的, 当需要保持字典有序的时候, 可以使用OrderedDict</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Python/">Python</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/collections/">collections</a><a href="/tags/build-in-module/">build-in module</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://sksun.com.cn/2018/01/29/collections/" data-title="collections | 封圣剑客的家" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/01/29/SQLAlchemy框架结构/" title="SQLAlchemy">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SQLAlchemy</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#defaultdict"><span class="toc-number">1.</span> <span class="toc-text">defaultdict</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#namedtuple"><span class="toc-number">2.</span> <span class="toc-text">namedtuple</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#deque"><span class="toc-number">3.</span> <span class="toc-text">deque</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Counter"><span class="toc-number">4.</span> <span class="toc-text">Counter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OrderedDict"><span class="toc-number">5.</span> <span class="toc-text">OrderedDict</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python模块/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python模块/" title="Python模块">Python模块<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/实用工具/" title="实用工具">实用工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux环境配置/" title="linux环境配置">linux环境配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLAlchemy/" title="SQLAlchemy">SQLAlchemy<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/collections/" title="collections">collections<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python扩展/" title="Python扩展">Python扩展<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python基础/" title="Python基础">Python基础<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/lxml/" title="lxml">lxml<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/xml/" title="xml">xml<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟环境/" title="虚拟环境">虚拟环境<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/build-in-module/" title="build-in module">build-in module<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,SK. <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/SilvesSun" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="SK">SK</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-108732611-2', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

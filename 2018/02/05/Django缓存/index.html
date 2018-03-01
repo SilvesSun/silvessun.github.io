@@ -1,0 +1,602 @@
+
+ <!DOCTYPE HTML>
+<html >
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Django缓存 | 封圣剑客的家</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="SK">
+    
+
+    
+    <meta name="description" content="什么是缓存Web缓存是指一个Web资源（如html页面，图片，js，数据等）存在于Web服务器和客户端（浏览器）之间的副本。缓存会根据进来的请求保存输出内容的副本；当下一个请求来到的时候，如果是相同的URL，缓存会根据缓存机制决定是直接使用副本响应访问请求，还是向源服务器再次发送请求。比较常见的就是浏览器会缓存访问过网站的网页，当再次访问这个URL地址的时候，如果网页没有更新，就不会再次下载网页，">
+<meta name="keywords" content="Django,缓存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django缓存">
+<meta property="og:url" content="https://sksun.com.cn/2018/02/05/Django缓存/index.html">
+<meta property="og:site_name" content="封圣剑客的家">
+<meta property="og:description" content="什么是缓存Web缓存是指一个Web资源（如html页面，图片，js，数据等）存在于Web服务器和客户端（浏览器）之间的副本。缓存会根据进来的请求保存输出内容的副本；当下一个请求来到的时候，如果是相同的URL，缓存会根据缓存机制决定是直接使用副本响应访问请求，还是向源服务器再次发送请求。比较常见的就是浏览器会缓存访问过网站的网页，当再次访问这个URL地址的时候，如果网页没有更新，就不会再次下载网页，">
+<meta property="og:updated_time" content="2018-02-05T07:17:56.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django缓存">
+<meta name="twitter:description" content="什么是缓存Web缓存是指一个Web资源（如html页面，图片，js，数据等）存在于Web服务器和客户端（浏览器）之间的副本。缓存会根据进来的请求保存输出内容的副本；当下一个请求来到的时候，如果是相同的URL，缓存会根据缓存机制决定是直接使用副本响应访问请求，还是向源服务器再次发送请求。比较常见的就是浏览器会缓存访问过网站的网页，当再次访问这个URL地址的时候，如果网页没有更新，就不会再次下载网页，">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="封圣剑客的家" title="封圣剑客的家"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="封圣剑客的家">封圣剑客的家</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/05/Django缓存/" title="Django缓存" itemprop="url">Django缓存</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="SK" target="_blank" itemprop="author">SK</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-05T06:47:41.000Z" itemprop="datePublished"> Published 2018-02-05</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是缓存"><span class="toc-number">1.</span> <span class="toc-text">什么是缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存的作用"><span class="toc-number">2.</span> <span class="toc-text">缓存的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存的类型"><span class="toc-number">3.</span> <span class="toc-text">缓存的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Django的缓存"><span class="toc-number">4.</span> <span class="toc-text">Django的缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设定缓存"><span class="toc-number">4.1.</span> <span class="toc-text">设定缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存缓存"><span class="toc-number">4.2.</span> <span class="toc-text">内存缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据库缓存"><span class="toc-number">4.3.</span> <span class="toc-text">数据库缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#创建缓存表"><span class="toc-number">4.3.1.</span> <span class="toc-text">创建缓存表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多数据库"><span class="toc-number">4.3.2.</span> <span class="toc-text">多数据库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件系统缓存"><span class="toc-number">4.4.</span> <span class="toc-text">文件系统缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地内存缓存"><span class="toc-number">4.5.</span> <span class="toc-text">本地内存缓存</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="什么是缓存"><a href="#什么是缓存" class="headerlink" title="什么是缓存"></a>什么是缓存</h2><p>Web缓存是指一个Web资源（如html页面，图片，js，数据等）存在于Web服务器和客户端（浏览器）之间的副本。缓存会根据进来的请求保存输出内容的副本；当下一个请求来到的时候，如果是相同的URL，缓存会根据缓存机制决定是直接使用副本响应访问请求，还是向源服务器再次发送请求。比较常见的就是浏览器会缓存访问过网站的网页，当再次访问这个URL地址的时候，如果网页没有更新，就不会再次下载网页，而是直接使用本地缓存的网页。只有当网站明确标识资源已经更新，浏览器才会再次下载网页</p>
+<h2 id="缓存的作用"><a href="#缓存的作用" class="headerlink" title="缓存的作用"></a>缓存的作用</h2><p>缓存的目的是为了避免重复的计算, 特别是对一些比较耗时间, 资源的运算. 使用缓存可以减少网络带宽消耗, 降低服务器压力, 减少网络延迟, 加快网页的打开速度.</p>
+<h2 id="缓存的类型"><a href="#缓存的类型" class="headerlink" title="缓存的类型"></a>缓存的类型</h2><ul>
+<li>数据库缓存</li>
+<li>服务器端缓存<ul>
+<li>代理服务器缓存</li>
+<li>CDN缓存</li>
+</ul>
+</li>
+<li>浏览器端缓存</li>
+<li>Web应用层缓存</li>
+</ul>
+<h2 id="Django的缓存"><a href="#Django的缓存" class="headerlink" title="Django的缓存"></a>Django的缓存</h2><p>Django提供了一个稳定的缓存系统让你缓存动态页面的结果，这样在接下来有相同的请求就可以直接使用缓存中的数据，避免不必要的重复计算。 另外Django还提供了不同粒度数据的缓存，例如： 你可以缓存整个页面，也可以缓存某个部分，甚至缓存整个网站。</p>
+<h3 id="设定缓存"><a href="#设定缓存" class="headerlink" title="设定缓存"></a>设定缓存</h3><p>使用缓存首先需要一些基本的设定工作, 需要告诉Django缓存的数据应该放在哪里, 在文件系统中, 在数据库中还是直接在内存中. Django的缓存设置是setting.py中的 CACHES的BACKEND. 相关的默认代码<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django.core.cache.backends.locmem.LocMemCache'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>CACHES设置必须配置‘default’缓存；还可以指定任何数量的附加高速缓存。如果您正在使用本地内存高速缓存之外的其他高速缓存后端，或者需要定义多个高速缓存，这就需要添加其他高速缓存项。</p>
+<p>可用的高速缓存选项有:</p>
+<ul>
+<li>‘django.core.cache.backends.db.DatabaseCache’</li>
+<li>‘django.core.cache.backends.dummy.DummyCache’</li>
+<li>‘django.core.cache.backends.filebased.FileBasedCache’</li>
+<li>‘django.core.cache.backends.locmem.LocMemCache’</li>
+<li>‘django.core.cache.backends.memcached.MemcachedCache’</li>
+<li>‘django.core.cache.backends.memcached.PyLibMCCache’</li>
+</ul>
+<h3 id="内存缓存"><a href="#内存缓存" class="headerlink" title="内存缓存"></a>内存缓存</h3><p>Memcached是迄今为止可用于Django的最快，最有效的缓存类型，Memcached是完全基于内存的缓存框架</p>
+<p>在安装了Memcached本身之后，你将需要安装Memcached Python绑定，它没有直接和Django绑定</p>
+<p>需要在Django中使用 Memcached 时</p>
+<ul>
+<li>将 BACKEND 设置为django.core.cache.backends.memcached.MemcachedCache 或者 django.core.cache.backends.memcached.PyLibMCCache (取决于你所选绑定memcached的方式)</li>
+<li>将 LOCATION 设置为 ip:port 值，ip 是 Memcached 守护进程的ip地址， port 是Memcached 运行的端口。或者设置为 unix:path 值，path 是 Memcached Unix socket file的路径.</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CACHES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django.core.cache.backends.memcached.MemcachedCache'</span>,</span><br><span class="line">        <span class="string">'LOCATION'</span>: <span class="string">'127.0.0.1:11211'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Memcached 可以让几个服务器的缓存共享, 这意味着可以在多台服务器上运行 Memcached 服务, 这些程序会将这几个机器当做同一个缓存.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CACHES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django.core.cache.backends.memcached.MemcachedCache'</span>,</span><br><span class="line">        <span class="string">'LOCATION'</span>: [</span><br><span class="line">            <span class="string">'172.19.26.240:11211'</span>,</span><br><span class="line">            <span class="string">'172.19.26.242:11211'</span>,</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的例子中就共享了两个缓存</p>
+<h3 id="数据库缓存"><a href="#数据库缓存" class="headerlink" title="数据库缓存"></a>数据库缓存</h3><p>设置<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CACHES = &#123;</span><br><span class="line">    <span class="string">'default'</span>: &#123;</span><br><span class="line">        <span class="string">'BACKEND'</span>: <span class="string">'django.core.cache.backends.db.DatabaseCache'</span>,</span><br><span class="line">        <span class="string">'LOCATION'</span>: <span class="string">'my_cache_table'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>指定缓存为django.core.cache.backends.db.DatabaseCache, 同时指定缓存位置为my_cache_table表</p>
+<h4 id="创建缓存表"><a href="#创建缓存表" class="headerlink" title="创建缓存表"></a>创建缓存表</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python manage.py createcachetable</span><br></pre></td></tr></table></figure>
+<p>这将在你的数据库中创建一个Django的基于数据库缓存系统预期的特定格式的数据表。表名会从 LOCATION中获得。</p>
+<h4 id="多数据库"><a href="#多数据库" class="headerlink" title="多数据库"></a>多数据库</h4><p>如果在多数据库的情况下使用数据库缓存，还必须为数据库缓存表设置路由说明</p>
+<p>例如, 下面的路由会分配所有缓存读操作到 cache_replica， 和所有写操作到cache_primary. 缓存表只会同步到 cache_primary:<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CacheRouter</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="string">"""A router to control all database cache operations"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_read</span><span class="params">(self, model, **hints)</span>:</span></span><br><span class="line">        <span class="string">"All cache read operations go to the replica"</span></span><br><span class="line">        <span class="keyword">if</span> model._meta.app_label == <span class="string">'django_cache'</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'cache_replica'</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_write</span><span class="params">(self, model, **hints)</span>:</span></span><br><span class="line">        <span class="string">"All cache write operations go to primary"</span></span><br><span class="line">        <span class="keyword">if</span> model._meta.app_label == <span class="string">'django_cache'</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">'cache_primary'</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">allow_migrate</span><span class="params">(self, db, app_label, model_name=None, **hints)</span>:</span></span><br><span class="line">        <span class="string">"Only install the cache model on primary"</span></span><br><span class="line">        <span class="keyword">if</span> app_label == <span class="string">'django_cache'</span>:</span><br><span class="line">            <span class="keyword">return</span> db == <span class="string">'cache_primary'</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="文件系统缓存"><a href="#文件系统缓存" class="headerlink" title="文件系统缓存"></a>文件系统缓存</h3><h3 id="本地内存缓存"><a href="#本地内存缓存" class="headerlink" title="本地内存缓存"></a>本地内存缓存</h3>  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Django/">Django</a>►<a class="article-category-link" href="/categories/Django/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Django/">Django</a><a href="/tags/缓存/">缓存</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="https://sksun.com.cn/2018/02/05/Django缓存/" data-title="Django缓存 | 封圣剑客的家" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/02/23/Linux修改命令提示符/" title="Linux修改命令提示符">
+  <strong>上一篇：</strong><br/>
+  <span>
+  Linux修改命令提示符</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/02/05/解决Windows MySQL-python安装不成功的简单方法/"  title="解决Windows MySQL-python安装不成功的简单方法">
+ <strong>下一篇：</strong><br/> 
+ <span>解决Windows MySQL-python安装不成功的简单方法
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是缓存"><span class="toc-number">1.</span> <span class="toc-text">什么是缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存的作用"><span class="toc-number">2.</span> <span class="toc-text">缓存的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存的类型"><span class="toc-number">3.</span> <span class="toc-text">缓存的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Django的缓存"><span class="toc-number">4.</span> <span class="toc-text">Django的缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设定缓存"><span class="toc-number">4.1.</span> <span class="toc-text">设定缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存缓存"><span class="toc-number">4.2.</span> <span class="toc-text">内存缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据库缓存"><span class="toc-number">4.3.</span> <span class="toc-text">数据库缓存</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#创建缓存表"><span class="toc-number">4.3.1.</span> <span class="toc-text">创建缓存表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#多数据库"><span class="toc-number">4.3.2.</span> <span class="toc-text">多数据库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#文件系统缓存"><span class="toc-number">4.4.</span> <span class="toc-text">文件系统缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#本地内存缓存"><span class="toc-number">4.5.</span> <span class="toc-text">本地内存缓存</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python模块/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python模块/" title="Python模块">Python模块<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/实用工具/" title="实用工具">实用工具<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/linux环境配置/" title="linux环境配置">linux环境配置<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/SQLAlchemy/" title="SQLAlchemy">SQLAlchemy<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/collections/" title="collections">collections<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python扩展/" title="Python扩展">Python扩展<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python基础/" title="Python基础">Python基础<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/lxml/" title="lxml">lxml<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/xml/" title="xml">xml<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟环境/" title="虚拟环境">虚拟环境<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/build-in-module/" title="build-in module">build-in module<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,SK. <br/>
+			This is my blog.</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		<a href="https://github.com/SilvesSun" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="SK">SK</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-108732611-2', 'auto');  
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
