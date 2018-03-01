@@ -63,7 +63,7 @@
 				<h1 class="site-name"><a href="/" title="封圣剑客的家">封圣剑客的家</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
 			</a></div>
 			<nav class="animated">
 				<ul>
@@ -79,7 +79,7 @@
  					
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
-						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
 						<input type="hidden" name="q" value="site:sksun.com.cn">
 					</form>
 					
@@ -102,14 +102,14 @@
 		<a href="/about" title="SK" target="_blank" itemprop="author">SK</a>
 		
   <p class="article-time">
-    <time datetime="2018-01-29T10:04:01.000Z" itemprop="datePublished"> 发表于 2018-01-29</time>
+    <time datetime="2018-01-29T10:04:01.000Z" itemprop="datePublished"> Published 2018-01-29</time>
     
   </p>
 </header>
 	<div class="article-content">
 		
 		<div id="toc" class="toc-article">
-			<strong class="toc-title">文章目录</strong>
+			<strong class="toc-title">Contents</strong>
 		
 			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#数据库抽象面临的挑战"><span class="toc-number">1.</span> <span class="toc-text">数据库抽象面临的挑战</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLAlchemy解决数据库抽象的方法"><span class="toc-number">1.1.</span> <span class="toc-text">SQLAlchemy解决数据库抽象的方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#核心层和ORM层"><span class="toc-number">2.</span> <span class="toc-text">核心层和ORM层</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#改良DBAPI"><span class="toc-number">3.</span> <span class="toc-text">改良DBAPI</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#the-Dialect-System"><span class="toc-number">3.1.</span> <span class="toc-text">the Dialect System</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DBAPI多样性问题的解决"><span class="toc-number">3.2.</span> <span class="toc-text">DBAPI多样性问题的解决</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#模式定义-scheme-defination"><span class="toc-number">4.</span> <span class="toc-text">模式定义(scheme defination)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SQL表达式"><span class="toc-number">5.</span> <span class="toc-text">SQL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#表达式树"><span class="toc-number">5.1.</span> <span class="toc-text">表达式树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python操作符"><span class="toc-number">5.2.</span> <span class="toc-text">Python操作符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译"><span class="toc-number">5.3.</span> <span class="toc-text">编译</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用ORM映射类"><span class="toc-number">6.</span> <span class="toc-text">使用ORM映射类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#传统式和声明式的对比"><span class="toc-number">6.1.</span> <span class="toc-text">传统式和声明式的对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#映射剖析"><span class="toc-number">6.2.</span> <span class="toc-text">映射剖析</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#查询和加载行为"><span class="toc-number">7.</span> <span class="toc-text">查询和加载行为</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Session-Identity-Map"><span class="toc-number">8.</span> <span class="toc-text">Session/Identity Map</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开发历史"><span class="toc-number">8.1.</span> <span class="toc-text">开发历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session概览"><span class="toc-number">8.2.</span> <span class="toc-text">Session概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State-Tracking"><span class="toc-number">8.3.</span> <span class="toc-text">State Tracking</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#工作单元"><span class="toc-number">9.</span> <span class="toc-text">工作单元</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#历史"><span class="toc-number">9.1.</span> <span class="toc-text">历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拓扑排序"><span class="toc-number">9.2.</span> <span class="toc-text">拓扑排序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结论"><span class="toc-number">10.</span> <span class="toc-text">结论</span></a></li></ol>
 		
@@ -281,22 +281,22 @@
 
 
 </div>  
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
   <div id="toc" class="toc-aside">
-  <strong class="toc-title">文章目录</strong>
+  <strong class="toc-title">Contents</strong>
  
  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#数据库抽象面临的挑战"><span class="toc-number">1.</span> <span class="toc-text">数据库抽象面临的挑战</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLAlchemy解决数据库抽象的方法"><span class="toc-number">1.1.</span> <span class="toc-text">SQLAlchemy解决数据库抽象的方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#核心层和ORM层"><span class="toc-number">2.</span> <span class="toc-text">核心层和ORM层</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#改良DBAPI"><span class="toc-number">3.</span> <span class="toc-text">改良DBAPI</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#the-Dialect-System"><span class="toc-number">3.1.</span> <span class="toc-text">the Dialect System</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DBAPI多样性问题的解决"><span class="toc-number">3.2.</span> <span class="toc-text">DBAPI多样性问题的解决</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#模式定义-scheme-defination"><span class="toc-number">4.</span> <span class="toc-text">模式定义(scheme defination)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SQL表达式"><span class="toc-number">5.</span> <span class="toc-text">SQL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#表达式树"><span class="toc-number">5.1.</span> <span class="toc-text">表达式树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python操作符"><span class="toc-number">5.2.</span> <span class="toc-text">Python操作符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译"><span class="toc-number">5.3.</span> <span class="toc-text">编译</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用ORM映射类"><span class="toc-number">6.</span> <span class="toc-text">使用ORM映射类</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#传统式和声明式的对比"><span class="toc-number">6.1.</span> <span class="toc-text">传统式和声明式的对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#映射剖析"><span class="toc-number">6.2.</span> <span class="toc-text">映射剖析</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#查询和加载行为"><span class="toc-number">7.</span> <span class="toc-text">查询和加载行为</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Session-Identity-Map"><span class="toc-number">8.</span> <span class="toc-text">Session/Identity Map</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开发历史"><span class="toc-number">8.1.</span> <span class="toc-text">开发历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Session概览"><span class="toc-number">8.2.</span> <span class="toc-text">Session概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State-Tracking"><span class="toc-number">8.3.</span> <span class="toc-text">State Tracking</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#工作单元"><span class="toc-number">9.</span> <span class="toc-text">工作单元</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#历史"><span class="toc-number">9.1.</span> <span class="toc-text">历史</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拓扑排序"><span class="toc-number">9.2.</span> <span class="toc-text">拓扑排序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结论"><span class="toc-number">10.</span> <span class="toc-text">结论</span></a></li></ol>
  
   </div>
 
 <div id="asidepart">
-<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
 <aside class="clearfix">
 
   
 <div class="categorieslist">
-	<p class="asidetitle">分类</p>
+	<p class="asidetitle">Categories</p>
 		<ul>
 		
 		  
@@ -312,15 +312,7 @@
 		  
 		
 		  
-			<li><a href="/categories/Python/" title="Python">Python<sup>5</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Python模块/Python/" title="Python">Python<sup>1</sup></a></li>
-		  
-		
-		  
-			<li><a href="/categories/Python模块/" title="Python模块">Python模块<sup>1</sup></a></li>
+			<li><a href="/categories/Python/" title="Python">Python<sup>6</sup></a></li>
 		  
 		
 		  
@@ -345,7 +337,7 @@
 
   
 <div class="tagslist">
-	<p class="asidetitle">标签</p>
+	<p class="asidetitle">Tags</p>
 		<ul class="clearfix">
 		
 			
@@ -354,14 +346,6 @@
 		
 			
 				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/build-in-module/" title="build-in module">build-in module<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/Django/" title="Django">Django<sup>1</sup></a></li>
 			
 		
 			
@@ -377,7 +361,15 @@
 			
 		
 			
-				<li><a href="/tags/缓存/" title="缓存">缓存<sup>1</sup></a></li>
+				<li><a href="/tags/build-in-module/" title="build-in module">build-in module<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python扩展/" title="Python扩展">Python扩展<sup>1</sup></a></li>
 			
 		
 			
@@ -401,7 +393,11 @@
 			
 		
 			
-				<li><a href="/tags/Python扩展/" title="Python扩展">Python扩展<sup>1</sup></a></li>
+				<li><a href="/tags/Python模块i/" title="Python模块i">Python模块i<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -409,7 +405,7 @@
 
 
   <div class="linkslist">
-  <p class="asidetitle">友情链接</p>
+  <p class="asidetitle">Links</p>
     <ul>
         
     </ul>
@@ -658,7 +654,7 @@ ga('send', 'pageview');
 <!-- Totop Begin -->
 
 	<div id="totop">
-	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
 	</div>
 	<script src="/js/totop.js"></script>
 
