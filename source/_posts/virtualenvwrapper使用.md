@@ -6,7 +6,7 @@ tags:
 - 包管理
 categories:
 - Python
-- 实用工具
+- tools
 ---
 
 virtualenvwrapper是一个用来管理Python虚拟环境的virtualenv的扩展管理包, 它将所有的虚拟环境整合到用户的根目录下的ENS文件夹中(以Windows)为例. 从而可以方便的实现虚拟环境的切换, 删除, 复制, 安装虚拟环境.
