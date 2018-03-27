@@ -4,9 +4,9 @@ date: 2018-03-13 11:05:10
 tags:
  - MySQL
  - 优化
- categories:
- - 读书笔记
- - 高性能MySQL
+categories:
+  - 读书笔记
+  - 高性能MySQL
 ---
 
 ## 优化的数据类型
@@ -30,7 +30,7 @@ TINYINT, SMALLINT, MEDIAINT, INT, BIGINT, 分别使用8, 16, 24, 32, 64位存储
 
 ### 字符串类型
 #### VARCHAR & CHAR
-这两种字符串类型在磁盘和内存中的存储方式依据存储引擎的不同而不同, 下面的套路基于Innodb 或者MyISAM
+这两种字符串类型在磁盘和内存中的存储方式依据存储引擎的不同而不同, 下面的内容基于Innodb 或者MyISAM
 
 ##### varchar
 - varchar用于存储可变长字符串, 它比定长类型更节省空间.
