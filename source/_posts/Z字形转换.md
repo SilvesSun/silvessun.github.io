@@ -48,11 +48,11 @@ size = numRows * 2 - 2
 所需要的方块数为
 ```py
 count = -1
-    length = len(s)
-    if length % size == 0:
-        count = length / size
-    else:
-        count = length / size + 1
+length = len(s)
+if length % size == 0:
+    count = length / size
+else:
+    count = length / size + 1
 ```
 
 对于上图中的第三个方块, 因为缺少两个元素 , 可以用两个空格表示. 同样需要注意的是, 在每个方块的第二部分是逆序的. 按照这个规则, 字母的排列代码如下:
