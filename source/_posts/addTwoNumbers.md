@@ -70,9 +70,6 @@ class Solution(object):
 
 ```
 
-上面这种解法直观, 但是耗时较长.
-![解法1耗时](http://p3euxxfa8.bkt.clouddn.com/runtime1.png)
-
 然后在LeetCode上Python的最优解法是, 整体思路是在遍历的过程中就将节点构建出来
 ```Python
 class Solution(object):

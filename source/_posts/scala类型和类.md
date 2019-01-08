@@ -42,3 +42,5 @@ res16: Boolean = true
 scala> typeOf[List[Int]] == typeOf[List[String]]
 res17: Boolean = false
 ```
+
+

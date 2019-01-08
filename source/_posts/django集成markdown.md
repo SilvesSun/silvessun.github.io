@@ -41,7 +41,7 @@ python manage.py migrate
 ```
 
 到这步基本的设置就完成了, 在后台编辑博客可以看到的界面如下:
-![](http://p3euxxfa8.bkt.clouddn.com/a453617d942078f97dd676b48c5bb2d4.png)
+![](http://blogsk.oss-us-west-1.aliyuncs.com/django.png)
 
 ### 后端生成html文本
 在后台书写完成的博客, 需要在前端页面中展示. 将markdown生成对应的html页面的插件也很多. 这里选用[mistune](https://github.com/lepture/mistune)

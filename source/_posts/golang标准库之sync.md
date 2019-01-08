@@ -8,7 +8,7 @@ categories:
 - golang学习
 ---
 
-![go图标](http://p3euxxfa8.bkt.clouddn.com//18-6-26/73283110.jpg)
+![go图标](http://blogsk.oss-us-west-1.aliyuncs.com/golang.png)
 
 今天学习golang标准库中的sync包.
 

@@ -9,8 +9,6 @@ categories:
 - redis
 ---
 
-![](http://p3euxxfa8.bkt.clouddn.com//18-9-4/97767057.jpg)
-
 此文基于[Using Redis as an LRU cache](https://redis.io/topics/lru-cache)
 
 当 redis 作为缓存使用时, 当有内存限制的时候, 添加数据的时候, 需要淘汰一部分旧的数据. 
