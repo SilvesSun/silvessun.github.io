@@ -133,3 +133,9 @@ ENTRYPOINT command param1 param2 (shell form)
 ## USER
 
 为接下来的Dockerfile 指令指定用户
+
+## WORKDIR 
+## ARG
+
+指定了用户在docker build --build-arg <varname>=<value>时可以使用的参数
+
