@@ -1,0 +1,715 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>多线程 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="线程的状态线程可以分为以下几种状态:  新建  要使用一个线程, 首先要创建一个线程. 完成创建的线程就进入可执行的状态. Runnable 进入此状态的线程还并未开始运行,一旦CPU分配时间片给这个线程后,该线程才正式的开始运行 running 线程正式开始运行,在运行过程中线程可能会进入阻塞的状态,即Blocked Blocked 在该状态下,线程暂停运行,解除阻塞后,线程会进入Runnabl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多线程">
+<meta property="og:url" content="http://sksun.com.cn/2018/09/19/多线程/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="线程的状态线程可以分为以下几种状态:  新建  要使用一个线程, 首先要创建一个线程. 完成创建的线程就进入可执行的状态. Runnable 进入此状态的线程还并未开始运行,一旦CPU分配时间片给这个线程后,该线程才正式的开始运行 running 线程正式开始运行,在运行过程中线程可能会进入阻塞的状态,即Blocked Blocked 在该状态下,线程暂停运行,解除阻塞后,线程会进入Runnabl">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://i.imgur.com/YkYsPRL.jpg">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.291Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="多线程">
+<meta name="twitter:description" content="线程的状态线程可以分为以下几种状态:  新建  要使用一个线程, 首先要创建一个线程. 完成创建的线程就进入可执行的状态. Runnable 进入此状态的线程还并未开始运行,一旦CPU分配时间片给这个线程后,该线程才正式的开始运行 running 线程正式开始运行,在运行过程中线程可能会进入阻塞的状态,即Blocked Blocked 在该状态下,线程暂停运行,解除阻塞后,线程会进入Runnabl">
+<meta name="twitter:image" content="https://i.imgur.com/YkYsPRL.jpg">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/19/多线程/" title="多线程" itemprop="url">多线程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-19T06:46:08.000Z" itemprop="datePublished"> Published 2018-09-19</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程的状态"><span class="toc-number">1.</span> <span class="toc-text">线程的状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程示例"><span class="toc-number">2.</span> <span class="toc-text">线程示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#同步与通信"><span class="toc-number">3.</span> <span class="toc-text">同步与通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#线程同步"><span class="toc-number">3.1.</span> <span class="toc-text">线程同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线程通信"><span class="toc-number">3.2.</span> <span class="toc-text">线程通信</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="线程的状态"><a href="#线程的状态" class="headerlink" title="线程的状态"></a>线程的状态</h2><p>线程可以分为以下几种状态:</p>
+<ol>
+<li>新建  要使用一个线程, 首先要创建一个线程. 完成创建的线程就进入可执行的状态.</li>
+<li>Runnable 进入此状态的线程还并未开始运行,一旦CPU分配时间片给这个线程后,该线程才正式的开始运行</li>
+<li>running 线程正式开始运行,在运行过程中线程可能会进入阻塞的状态,即Blocked</li>
+<li>Blocked 在该状态下,线程暂停运行,解除阻塞后,线程会进入Runnable状态,等待CPU再次分配时间片给它</li>
+<li>结束 线程方法执行完毕或者因为异常终止返回</li>
+</ol>
+<p>有三种情况会导致线程进入blocked状态, 分别是</p>
+<ol>
+<li>睡眠:线程主动调用sleep()或join()方法后.</li>
+<li>等待:线程中调用wait()方法,此时需要有其他线程通过notify()方法来唤醒</li>
+<li>同步:线程中获取线程锁,但是因为资源已经被其他线程占用时.</li>
+</ol>
+<h2 id="线程示例"><a href="#线程示例" class="headerlink" title="线程示例"></a>线程示例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(number)</span>:</span></span><br><span class="line">    print(threading.currentThread().getName() + <span class="string">'\n'</span>)</span><br><span class="line">    print(number)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        t = threading.Thread(target=run, args=(i, ))</span><br><span class="line">        t.start()</span><br></pre></td></tr></table></figure>
+
+<h2 id="同步与通信"><a href="#同步与通信" class="headerlink" title="同步与通信"></a>同步与通信</h2><p>所谓的通信指的是线程之间如何交换消息,而同步则用于控制不同线程之间操作发生的相对顺序. Python中实现同步的最简单的方案就是使用锁机制,实现通信最简单的方案就是Event.</p>
+<h3 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h3><p>Python的threading 模块提供了线程锁功能(RLock, 这是一个可重入锁). 对于Lock对象而言，如果一个线程连续两次进行acquire操作，那么由于第一次acquire之后没有release，第二次acquire将挂起线程。这会导致Lock对象永远不会release，使得线程死锁。而RLock对象允许一个线程多次对其进行acquire操作，因为在其内部通过一个counter变量维护着线程acquire的次数。而且每一次的acquire操作必须有一个release操作与之对应，在所有的release操作完成之后，别的线程才能申请该RLock对象.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line">mylock = threading.RLock()</span><br><span class="line">num = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkThread</span><span class="params">(threading.Thread)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line">        threading.Thread.__init__(self)</span><br><span class="line">        self.t_name = name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">global</span> num</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            mylock.acquire()</span><br><span class="line">            print(<span class="string">'\n%s locked, number: %d'</span> % (self.t_name, num))</span><br><span class="line">            <span class="keyword">if</span> num &gt;= <span class="number">4</span>:</span><br><span class="line">                mylock.release()</span><br><span class="line">                print(<span class="string">'\n%s released, number: %d'</span> % (self.t_name, num))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            num += <span class="number">1</span></span><br><span class="line">            print(<span class="string">'\n%s released, number: %d'</span> % (self.t_name, num))</span><br><span class="line">            mylock.release()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    thread1 = WorkThread(<span class="string">'A-Worker'</span>)</span><br><span class="line">    thread2 = WorkThread(<span class="string">'B-Worker'</span>)</span><br><span class="line">    thread1.start()</span><br><span class="line">    thread2.start()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+
+<h3 id="线程通信"><a href="#线程通信" class="headerlink" title="线程通信"></a>线程通信</h3><p>使用threading.Event可以使一个线程等待其他线程的通知，我们把这个Event传递到线程对象中，Event默认内置了一个标志，初始值为False。一旦该线程通过wait()方法进入等待状态，直到另一个线程调用该Event的set()方法将内置标志设置为True时，该Event会通知所有等待状态的线程恢复运行</p>
+<p><img src="https://i.imgur.com/YkYsPRL.jpg" alt="Imgur"></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/并发/">并发</a>
+</div>
+
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2018/09/19/多线程/" data-title="多线程 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/09/26/记一次数据导入调优过程/" title="记一次数据导入调优过程">
+  <strong>上一篇：</strong><br/>
+  <span>
+  记一次数据导入调优过程</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/09/14/scala结构类型/"  title="scala结构类型">
+ <strong>下一篇：</strong><br/> 
+ <span>scala结构类型
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#线程的状态"><span class="toc-number">1.</span> <span class="toc-text">线程的状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#线程示例"><span class="toc-number">2.</span> <span class="toc-text">线程示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#同步与通信"><span class="toc-number">3.</span> <span class="toc-text">同步与通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#线程同步"><span class="toc-number">3.1.</span> <span class="toc-text">线程同步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#线程通信"><span class="toc-number">3.2.</span> <span class="toc-text">线程通信</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

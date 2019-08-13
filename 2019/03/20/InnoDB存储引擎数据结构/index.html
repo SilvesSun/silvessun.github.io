@@ -1,0 +1,744 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>InnoDB存储引擎数据结构 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="B树和B+树的区别  B+树中只有叶子节点会带有指向记录的指针（ROWID），而B树则所有节点都带有，在内部节点出现的索引项不会再出现在叶子节点中。  B+树中所有叶子节点都是通过指针连接在一起，而B树不会   InnoDB 和 Myisam 的区别存储结构的不同 MyISAM 每个MyISAM在磁盘上存储为三个文件, 表定义文件/数据文件/索引文件. 第一个文件的名字以表名开头, 扩展名指出文件">
+<meta name="keywords" content="InnoDB,数据结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="InnoDB存储引擎数据结构">
+<meta property="og:url" content="http://sksun.com.cn/2019/03/20/InnoDB存储引擎数据结构/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="B树和B+树的区别  B+树中只有叶子节点会带有指向记录的指针（ROWID），而B树则所有节点都带有，在内部节点出现的索引项不会再出现在叶子节点中。  B+树中所有叶子节点都是通过指针连接在一起，而B树不会   InnoDB 和 Myisam 的区别存储结构的不同 MyISAM 每个MyISAM在磁盘上存储为三个文件, 表定义文件/数据文件/索引文件. 第一个文件的名字以表名开头, 扩展名指出文件">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://supcoder.net/B-Tree.png">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="InnoDB存储引擎数据结构">
+<meta name="twitter:description" content="B树和B+树的区别  B+树中只有叶子节点会带有指向记录的指针（ROWID），而B树则所有节点都带有，在内部节点出现的索引项不会再出现在叶子节点中。  B+树中所有叶子节点都是通过指针连接在一起，而B树不会   InnoDB 和 Myisam 的区别存储结构的不同 MyISAM 每个MyISAM在磁盘上存储为三个文件, 表定义文件/数据文件/索引文件. 第一个文件的名字以表名开头, 扩展名指出文件">
+<meta name="twitter:image" content="http://supcoder.net/B-Tree.png">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/20/InnoDB存储引擎数据结构/" title="InnoDB存储引擎数据结构" itemprop="url">InnoDB存储引擎数据结构</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-20T03:06:23.000Z" itemprop="datePublished"> Published 2019-03-20</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#B树和B-树的区别"><span class="toc-number">1.</span> <span class="toc-text">B树和B+树的区别</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB-和-Myisam-的区别"><span class="toc-number">2.</span> <span class="toc-text">InnoDB 和 Myisam 的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#存储结构的不同"><span class="toc-number">2.1.</span> <span class="toc-text">存储结构的不同</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#事务"><span class="toc-number">2.2.</span> <span class="toc-text">事务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-update-insert-delete"><span class="toc-number">2.3.</span> <span class="toc-text">select/update/insert/delete</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#锁"><span class="toc-number">2.4.</span> <span class="toc-text">锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-count-from-table"><span class="toc-number">2.5.</span> <span class="toc-text">select count(*) from table</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自增"><span class="toc-number">2.6.</span> <span class="toc-text">自增</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB的关键特性"><span class="toc-number">3.</span> <span class="toc-text">InnoDB的关键特性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#插入缓冲-insert-buffer"><span class="toc-number">3.1.</span> <span class="toc-text">插入缓冲(insert buffer)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#两次写"><span class="toc-number">3.2.</span> <span class="toc-text">两次写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自适应哈希索引"><span class="toc-number">3.3.</span> <span class="toc-text">自适应哈希索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异步IO"><span class="toc-number">3.4.</span> <span class="toc-text">异步IO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#刷新邻接页"><span class="toc-number">3.5.</span> <span class="toc-text">刷新邻接页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#预读"><span class="toc-number">3.6.</span> <span class="toc-text">预读</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB事务的实现方式"><span class="toc-number">4.</span> <span class="toc-text">InnoDB事务的实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重做日志"><span class="toc-number">4.1.</span> <span class="toc-text">重做日志</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h1 id="B树和B-树的区别"><a href="#B树和B-树的区别" class="headerlink" title="B树和B+树的区别"></a>B树和B+树的区别</h1><p><img src="http://supcoder.net/B-Tree.png" alt></p>
+<ul>
+<li><p>B+树中只有叶子节点会带有指向记录的指针（ROWID），而B树则所有节点都带有，在内部节点出现的索引项不会再出现在叶子节点中。</p>
+</li>
+<li><p>B+树中所有叶子节点都是通过指针连接在一起，而B树不会</p>
+</li>
+</ul>
+<h1 id="InnoDB-和-Myisam-的区别"><a href="#InnoDB-和-Myisam-的区别" class="headerlink" title="InnoDB 和 Myisam 的区别"></a>InnoDB 和 Myisam 的区别</h1><h2 id="存储结构的不同"><a href="#存储结构的不同" class="headerlink" title="存储结构的不同"></a>存储结构的不同</h2><ul>
+<li><p>MyISAM 每个MyISAM在磁盘上存储为三个文件, 表定义文件/数据文件/索引文件. 第一个文件的名字以表名开头, 扩展名指出文件类型. <code>.frm</code>文件存储表定义,<br><code>.MYD</code> 文件存储表数据, <code>.MYI</code>文件存储索引</p>
+</li>
+<li><p>InnoDB 基于磁盘的资源是InnoDB表空间数据文件和它的日志文件. 大小受限于操作系统的大小, 一般为2G</p>
+</li>
+</ul>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>InnoDB 提供事务/外键等支持, MyISAM不支持事务</p>
+<h2 id="select-update-insert-delete"><a href="#select-update-insert-delete" class="headerlink" title="select/update/insert/delete"></a>select/update/insert/delete</h2><p>如果主要表主要是提供查询, 比如报表系统, MyISAM更好; 如果对数据有大量的更新插入, 选择InnoDB</p>
+<h2 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h2><p>MyISAM 只支持表级锁, InnoDB支持事务和行级锁. 注意InnoDB的行级锁只在<code>where</code>主键有效的时候有用. 非主键的where都会锁表</p>
+<h2 id="select-count-from-table"><a href="#select-count-from-table" class="headerlink" title="select count(*) from table"></a>select count(*) from table</h2><p>MyISAM只要简单的读出保存好的行数，注意的是，当count(*)语句包含 where条件时，两种表的操作是一样的</p>
+<p>InnoDB 中不 保存表的具体行数，也就是说，执行select count(*) from table时，InnoDB要扫描一遍整个表来计算有多少行</p>
+<h2 id="自增"><a href="#自增" class="headerlink" title="自增"></a>自增</h2><ul>
+<li>MyISAM  可以和其他字段一起建立联合索引。引擎的自动增长列必须是索引，如果是组合索引，自动增长可以不是第一列，可以根据前面几列进行排序后递增</li>
+<li>InnoDB  InnoDB中必须包含只有该字段的索引。引擎的自动增长列必须是索引，如果是组合索引也必须是组合索引的第一列</li>
+</ul>
+<h1 id="InnoDB的关键特性"><a href="#InnoDB的关键特性" class="headerlink" title="InnoDB的关键特性"></a>InnoDB的关键特性</h1><h2 id="插入缓冲-insert-buffer"><a href="#插入缓冲-insert-buffer" class="headerlink" title="插入缓冲(insert buffer)"></a>插入缓冲(insert buffer)</h2><p>insert buffer 是一颗 B+树. 放在共享表空间中</p>
+<p>对于非聚集索引的插入或者更新操作, 不是一次直接插入到索引页中, 而是先判断插入的非聚集索引是否在缓冲池中, 若在则直接插入; 若不在, 则先放入到一个<br>Insert Buffer 中, 然后再以一定的频率和情况进行 Insert Buffer 和辅助索引叶子节点的合并操作, 这时通常能一次插入多个记录, 从而提高了效率.</p>
+<p>Insert Buffer的使用需要满足的条件为:</p>
+<ul>
+<li>索引是辅助索引</li>
+<li>索引不是唯一的</li>
+</ul>
+<p>change buffer 可以视为 Insert Buffer 的升级</p>
+<p>insert buffer 的合并操作可能发生的情况:</p>
+<ul>
+<li>辅助索引页被读取到缓冲池中</li>
+<li>Insert Buffer Bitmap页追踪到该辅助索引页已无可用空间</li>
+<li>Master Thread</li>
+</ul>
+<h2 id="两次写"><a href="#两次写" class="headerlink" title="两次写"></a>两次写</h2><p>数据页的可靠性.</p>
+<p>当发生写失效时, 先通过页的副本来还原该页, 再应用重做日志. </p>
+<h2 id="自适应哈希索引"><a href="#自适应哈希索引" class="headerlink" title="自适应哈希索引"></a>自适应哈希索引</h2><p>InnoDB 会监控对表上各索引页的查询, 如果观察到建立哈希索引可以带来速度提升, 则建立哈希索引. 称为自适应哈希索引</p>
+<h2 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h2><h2 id="刷新邻接页"><a href="#刷新邻接页" class="headerlink" title="刷新邻接页"></a>刷新邻接页</h2><p>当刷新一个脏页时, InnoDB会检测该页所在区的所有页, 如果是脏页, 那么一起刷新.</p>
+<h2 id="预读"><a href="#预读" class="headerlink" title="预读"></a>预读</h2><p>I/O的优化上有个比较重要的特性为预读，预读请求是一个i/o请求，它会异步地在缓冲池中预先回迁多个页面，预计很快就会需要这些页面，这些请求在一个范围内引入所有页面</p>
+<h1 id="InnoDB事务的实现方式"><a href="#InnoDB事务的实现方式" class="headerlink" title="InnoDB事务的实现方式"></a>InnoDB事务的实现方式</h1><p>事务的隔离性由锁实现, 原子性/一致性/持久性 由数据库的 <code>redo log</code> 和 <code>undo log</code>完成. 重做日志保证事务的原子性和持久性, undo log用来保证事事务的一致性</p>
+<p>redo 通常是物理日志, 记录页的物理操作; undo是逻辑日志, 根据每行记录进行记录</p>
+<h2 id="重做日志"><a href="#重做日志" class="headerlink" title="重做日志"></a>重做日志</h2><p>包括两部分, 内存中的重做日志缓冲 和 重做日志文件</p>
+<p>通过 <code>Force Log at Commit</code> 机制实现事务的持久性. 即当事务提交时, 必须先将事务的所有日志写入到重做日志文件进行持久化, 待事务的commit操作完成才算完成</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/InnoDB/">InnoDB</a><a href="/tags/数据结构/">数据结构</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2019/03/20/InnoDB存储引擎数据结构/" data-title="InnoDB存储引擎数据结构 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/04/18/DRF填坑记/" title="DRF填坑记">
+  <strong>上一篇：</strong><br/>
+  <span>
+  DRF填坑记</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/03/20/数据库事务/"  title="数据库事务">
+ <strong>下一篇：</strong><br/> 
+ <span>数据库事务
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#B树和B-树的区别"><span class="toc-number">1.</span> <span class="toc-text">B树和B+树的区别</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB-和-Myisam-的区别"><span class="toc-number">2.</span> <span class="toc-text">InnoDB 和 Myisam 的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#存储结构的不同"><span class="toc-number">2.1.</span> <span class="toc-text">存储结构的不同</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#事务"><span class="toc-number">2.2.</span> <span class="toc-text">事务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-update-insert-delete"><span class="toc-number">2.3.</span> <span class="toc-text">select/update/insert/delete</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#锁"><span class="toc-number">2.4.</span> <span class="toc-text">锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-count-from-table"><span class="toc-number">2.5.</span> <span class="toc-text">select count(*) from table</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自增"><span class="toc-number">2.6.</span> <span class="toc-text">自增</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB的关键特性"><span class="toc-number">3.</span> <span class="toc-text">InnoDB的关键特性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#插入缓冲-insert-buffer"><span class="toc-number">3.1.</span> <span class="toc-text">插入缓冲(insert buffer)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#两次写"><span class="toc-number">3.2.</span> <span class="toc-text">两次写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自适应哈希索引"><span class="toc-number">3.3.</span> <span class="toc-text">自适应哈希索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异步IO"><span class="toc-number">3.4.</span> <span class="toc-text">异步IO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#刷新邻接页"><span class="toc-number">3.5.</span> <span class="toc-text">刷新邻接页</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#预读"><span class="toc-number">3.6.</span> <span class="toc-text">预读</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#InnoDB事务的实现方式"><span class="toc-number">4.</span> <span class="toc-text">InnoDB事务的实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#重做日志"><span class="toc-number">4.1.</span> <span class="toc-text">重做日志</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

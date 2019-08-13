@@ -1,0 +1,1412 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://sksun.com.cn/page/2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/18/Python杂记/" title="Python杂记" itemprop="url">Python杂记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-18T01:40:41.000Z" itemprop="datePublished"> Published 2019-03-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="1-Python的可变对象和不可变对象"><a href="#1-Python的可变对象和不可变对象" class="headerlink" title="1.Python的可变对象和不可变对象"></a>1.Python的可变对象和不可变对象</h1><p>诸如（int，float，bool，str，tuple，unicode）等内置类型的对象是不可变的。像（list，set，dict）这样的内置类型的对象是可变的</p>
+<p>下面代码的输出为?</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">"hello"</span></span><br><span class="line">s[<span class="number">2</span>] = <span class="string">"u"</span></span><br></pre></td></tr></table></figure>
+
+<p>因为 Python 中字符串是不可变对象, 所以不允许修改字符串的值. 输出为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;</span><br><span class="line">TypeError: &apos;str&apos; object does not support item assignment</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-和-is-的区别"><a href="#2-和-is-的区别" class="headerlink" title="2. == 和 is 的区别"></a>2. == 和 is 的区别</h1><ul>
+<li><code>==</code> 比较两个对象的值, 对象中保存的数据, is 比较的是两个对象的标识</li>
+<li>is 比 == 要更快, 因为is不能重载, 所以 Python 不用寻找并调用特殊方法, 而是直接比较两个对象的ID</li>
+</ul>
+<h1 id="3-迭代器-生成器-可迭代对象"><a href="#3-迭代器-生成器-可迭代对象" class="headerlink" title="3.迭代器, 生成器, 可迭代对象"></a>3.迭代器, 生成器, 可迭代对象</h1><h2 id="可迭代对象"><a href="#可迭代对象" class="headerlink" title="可迭代对象"></a>可迭代对象</h2><p>可以返回一个迭代器的对象可称之为可迭代对象. 可以使用 for 来循环遍历的对象. 可迭代对象具有 <code>__iter__</code> 方法, 用于返回一个迭代器; 或者定义了<code>getitem</code><br>方法, 可以按照index索引的对象.</p>
+<h2 id="迭代器对象"><a href="#迭代器对象" class="headerlink" title="迭代器对象"></a>迭代器对象</h2><p>迭代器协议</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">指要实现对象的 __iter()__ 和 next() 方法（注意：Python3 要实现 __next__() 方法），其中，__iter()__ 方法返回迭代器对象本身，next() 方法返回容器的下一个元素，在没有后续元素时抛出 StopIteration 异常</span><br></pre></td></tr></table></figure>
+
+<p>迭代器是指遵循迭代器协议（iterator protocol）的对象</p>
+<h2 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h2><p>生成器就是一种迭代器。生成器拥有next方法并且行为与迭代器完全相同，这意味着生成器也可以用于Python的for循环中</p>
+<p>生成器使用 <code>yield</code> 返回值</p>
+<h1 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h1><p>协程是比线程更轻量的存在. 一个线程也可以拥有多个协程. 协程由用户程序控制. yield让协程暂停，和线程的阻塞是有本质区别的。协程的暂停完全由程序控制，线程的阻塞状态是由操作系统内核来进行切换。<br>因此，协程的开销远远小于线程的开销. </p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Python/">Python</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/释疑/">释疑</a><a href="/tags/面试/">面试</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/18/Python杂记/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/13/Docker镜像容器和存储驱动/" title="Docker镜像容器和存储驱动" itemprop="url">Docker镜像容器和存储驱动</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-13T07:30:53.000Z" itemprop="datePublished"> Published 2019-03-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>为了更有效率的使用存储驱动, 必须立即 Docker 是如何构建和存储镜像的. 了解这些镜像是如何被容器使用, 以及一些有关镜像和容器操作的技术</p>
+<h2 id="镜像和数据层"><a href="#镜像和数据层" class="headerlink" title="镜像和数据层"></a>镜像和数据层</h2><p>一个镜像由一系列的数据层构成, 这些数据层除开最后一个外都是只读的, 每个数据层代表着 Dockerfile 中的指令. 以下面这个 Dockerfile 为例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:15.04</span><br><span class="line">COPY . /app</span><br><span class="line">RUN make /app</span><br><span class="line">CMD python /app/app.py</span><br></pre></td></tr></table></figure>
+
+<p>上面这个 Dockerfile 包含4条命令, 每一条命令都会生成一个数据层. 如图所示</p>
+<p><img src="http://supcoder.net/dockerImages.png" alt></p>
+<p>每一层相较于之前的一层, 仅仅只有一些不同. 这些数据层相互堆叠在一起. 当创建一个新的容器时, 将会在底层堆栈的顶部创建一个新的可写的数据层. 即容器数据层.<br>所有对正在运行的容器的修改, 如新增文件, 对已有文件修改, 删除文件等都会写到这个数据层</p>
+<h2 id="容器和数据层"><a href="#容器和数据层" class="headerlink" title="容器和数据层"></a>容器和数据层</h2><p>容器和镜像间的主要区别是顶部的可写数据层. 所有容器数据新增, 修改都会保存到这个数据层. 容器删除时, 这个可写数据层也会被删除, 但是底层镜像保持不变.</p>
+<p>由于不同容器各自拥有自己的可写数据层, 所以不同的容器可以在共用基础镜像的同时拥有自己的数据状态. 如图显示多个容器共享一个相同的Ubuntu 15.04镜像:</p>
+<p><img src="http://supcoder.net/sharing-layers.jpg" alt></p>
+<p><strong>如果想要多个容器共享同一份数据, 将数据保存到 Docker 数据卷并将它挂载到容器上</strong></p>
+<p>Docker 使用存储驱动来管理镜像数据层和可写容器数据层. 不同的存储驱动处理这两个数据层的方式有所不同, 但是都使用可堆叠镜像数据层和写时拷贝(copy-on-write)</p>
+<h2 id="容器大小"><a href="#容器大小" class="headerlink" title="容器大小"></a>容器大小</h2>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a><a href="/tags/虚拟化技术/">虚拟化技术</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/13/Docker镜像容器和存储驱动/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/07/使用多级构建/" title="使用多级构建" itemprop="url">使用多级构建</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-07T06:05:20.000Z" itemprop="datePublished"> Published 2019-03-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="不适用多级构建的情形"><a href="#不适用多级构建的情形" class="headerlink" title="不适用多级构建的情形"></a>不适用多级构建的情形</h2><p>在构建镜像的过程中, 要使镜像足够小并非易事. 每一个命令都会在当前镜像基础上添加一层, 而且当你构建下一层之前, 要记得清除并不需要的依赖. 想要书写一个足够<br>高效的 Dockerfile , 需要使用一些 shell 技巧等方式, 在保证每一层除开必须的依赖外, 不包含前一层多余的依赖.</p>
+<p>如果我们构建的镜像既是编译软件的环境，又是软件最终的运行环境，这是很难控制镜像大小的. 在这种情况下, 一般的处理方式是分别为软件的编译环境和运行环境提供不同的容器镜像,<br>维护两个 Dockerfile. 一个 Dockerfile(Dockerfile.build) 用于开发, 包含所有需要用来构建应用的依赖; 同时为软件的运行构建一个镜像, 它依赖于 Dockerfile.build<br>, 这个 Dockerfile 仅仅包含用来运行应用的依赖, 这种情况被称为构造者模式(builder pattern). 维护两个 Dockerfile 并不是一个好主意, 多级构建正好用来解决这个问题</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Dockerfile.build</span><br><span class="line"></span><br><span class="line">FROM golang:1.7.3</span><br><span class="line">WORKDIR /go/src/github.com/alexellis/href-counter/</span><br><span class="line">RUN go get -d -v golang.org/x/net/html  </span><br><span class="line">COPY app.go .</span><br><span class="line">RUN go get -d -v golang.org/x/net/html \</span><br><span class="line">  &amp;&amp; CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .</span><br></pre></td></tr></table></figure>
+
+<p>构建好的应用程序部署到生成环境</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FROM alpine:latest  </span><br><span class="line">RUN apk --no-cache add ca-certificates</span><br><span class="line">WORKDIR /root/</span><br><span class="line">COPY app .</span><br><span class="line">CMD ["./app"]</span><br></pre></td></tr></table></figure>
+
+<p>然后需要一个脚本将两个文件联系起来</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/sh</span><br><span class="line">echo Building alexellis2/href-counter:build</span><br><span class="line"></span><br><span class="line">docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy \  </span><br><span class="line">    -t alexellis2/href-counter:build . -f Dockerfile.build</span><br><span class="line"></span><br><span class="line">docker create --name extract alexellis2/href-counter:build  </span><br><span class="line">docker cp extract:/go/src/github.com/alexellis/href-counter/app ./app  </span><br><span class="line">docker rm -f extract</span><br><span class="line"></span><br><span class="line">echo Building alexellis2/href-counter:latest</span><br><span class="line"></span><br><span class="line">docker build --no-cache -t alexellis2/href-counter:latest .</span><br><span class="line">rm ./app</span><br></pre></td></tr></table></figure>
+
+<h2 id="多级构建-multi-stage"><a href="#多级构建-multi-stage" class="headerlink" title="多级构建(multi-stage)"></a>多级构建(multi-stage)</h2><p>multi-stage 允许我们在 Dockerfile 中完成类似前面 build.sh 脚本中的功能，每个 stage 可以理解为构建一个容器镜像，后面的 stage 可以引用前面 stage 中创建的镜像。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">FROM golang:1.7.3</span><br><span class="line">WORKDIR /go/src/github.com/alexellis/href-counter/</span><br><span class="line">RUN go get -d -v golang.org/x/net/html  </span><br><span class="line">COPY app.go .</span><br><span class="line">RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .</span><br><span class="line"></span><br><span class="line">FROM alpine:latest  </span><br><span class="line">RUN apk --no-cache add ca-certificates</span><br><span class="line">WORKDIR /root/</span><br><span class="line">COPY --from=0 /go/src/github.com/alexellis/href-counter/app .</span><br><span class="line">CMD [<span class="string">"./app"</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第二个 FROM 指令使用 alpine:latest 作为基础 image 开启一个新的构建阶段</li>
+<li>COPY –from=0 这一行拷贝前一个阶段构建的产品到这个新的阶段中。GO SDK 和其它中间产品被留下，并且不会被保存到最终的 image 中</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Dockerfile/">Dockerfile</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/07/使用多级构建/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/05/Dockerfile编写的最佳实践/" title="Dockerfile编写的最佳实践" itemprop="url">Dockerfile编写的最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-05T07:35:46.000Z" itemprop="datePublished"> Published 2019-03-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="通用规则和建议"><a href="#通用规则和建议" class="headerlink" title="通用规则和建议"></a>通用规则和建议</h2><h3 id="通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂"><a href="#通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂" class="headerlink" title="通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂"></a>通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂</h3><h3 id="使用-dockerignore-文件来提高效率"><a href="#使用-dockerignore-文件来提高效率" class="headerlink" title="使用 .dockerignore 文件来提高效率"></a>使用 .dockerignore 文件来提高效率</h3><h3 id="避免安装不需要的依赖"><a href="#避免安装不需要的依赖" class="headerlink" title="避免安装不需要的依赖"></a>避免安装不需要的依赖</h3><h3 id="每个镜像应该只关注一个问题"><a href="#每个镜像应该只关注一个问题" class="headerlink" title="每个镜像应该只关注一个问题"></a>每个镜像应该只关注一个问题</h3><p>将应用解耦有助于横向扩展和镜像复用. 举例来说, 一个web应用应该分离为三个镜像, 应用本身/数据库/缓存</p>
+<p>你可能听过”一个容器只运行一个进程”, 大部分情况下这是很好的, 但是这并不是必须的. </p>
+<p>如果容器相互依赖, 可以使用容器网络来保证容器间通信</p>
+<h3 id="最小化容器的层数"><a href="#最小化容器的层数" class="headerlink" title="最小化容器的层数"></a>最小化容器的层数</h3><h3 id="多行参数排序"><a href="#多行参数排序" class="headerlink" title="多行参数排序"></a>多行参数排序</h3><p>将需要安装的包安装字母排序, 有助于避免安装重复的包, 并易于阅读. “&quot; 前加入空格便于阅读</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">  bzr \</span><br><span class="line">  cvs \</span><br><span class="line">  git \</span><br><span class="line">  mercurial \</span><br><span class="line">  subversion</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建缓存"><a href="#构建缓存" class="headerlink" title="构建缓存"></a>构建缓存</h3><p>构建镜像的过程中, Docker 会遍历 Dockerfile 并按顺序执行. 在执行每条命令之前, 都会检查是否有缓存可用而不是重新生成一个新的镜像. 可用使用 <code>--no-cache=true</code><br>来禁用缓存</p>
+<ul>
+<li>从一个基础镜像开始（FROM 指令指定），下一条指令将和该基础镜像的所有子镜像进行匹配，检查这些子镜像被创建时使用的指令是否和被检查的指令完全一样。如果不是，则缓存失效</li>
+<li>多数情况只需要对比Dockerfile 中镜像的指令, 特殊情况需要更详细的标注</li>
+<li>对于 ADD 和 COPY 指令，镜像中对应文件的内容也会被检查，每个文件都会计算出一个校验和。文件的最后修改时间和最后访问时间不会纳入校验。在缓存的查找过程中，会将这些校验和和已存在镜像中的文件校验和进行对比。如果文件有任何改变，比如内容和元数据，则缓存失效</li>
+<li>除了 ADD 和 COPY 指令，缓存匹配过程不会查看临时容器中的文件来决定缓存是否匹配。例如，当执行完 RUN apt-get -y update 指令后，容器中一些文件被更新，但 Docker 不会检查这些文件。这种情况下，只有指令字符串本身被用来匹配缓存</li>
+</ul>
+<h2 id="Dockerfile指令使用建议"><a href="#Dockerfile指令使用建议" class="headerlink" title="Dockerfile指令使用建议"></a>Dockerfile指令使用建议</h2><h3 id="FROM"><a href="#FROM" class="headerlink" title="FROM"></a>FROM</h3><p>尽可能使用官方镜像作为基础镜像</p>
+<h3 id="LABEL"><a href="#LABEL" class="headerlink" title="LABEL"></a>LABEL</h3><p>一个镜像可包含多个标签, 建议将多个标签放到一个 LABEL 中</p>
+<h3 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h3><p>永远将 RUN apt-get update 和 apt-get install 组合成一条 RUN 声明. </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">        package-bar \</span><br><span class="line">        package-baz \</span><br><span class="line">        package-foo</span><br></pre></td></tr></table></figure>
+
+<p>将 apt-get update 放在一条单独的 RUN 声明中会导致缓存问题以及可能后续的 apt-get install 失败.</p>
+<p>使用 RUN apt-get update &amp;&amp; apt-get install -y 可以确保你的 Dockerfiles 每次安装的都是包的最新的版本，而且这个过程不需要进一步的编码或额外干预。<br>这项技术叫作 cache busting。你也可以显示指定一个包的版本号来达到 cache-busting，这就是所谓的固定版本</p>
+<h3 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h3><p>CMD 大多数情况下都应该以 CMD [“executable”, “param1”, “param2”…] 的形式使用. </p>
+<h3 id="EXPOSE"><a href="#EXPOSE" class="headerlink" title="EXPOSE"></a>EXPOSE</h3><p>为应用程序使用常见的端口</p>
+<h3 id="ENV"><a href="#ENV" class="headerlink" title="ENV"></a>ENV</h3><p>为了方便新程序运行，你可以使用 ENV 来为容器中安装的程序更新 PATH 环境变量。例如使用 ENV PATH /usr/local/nginx/bin:$PATH 来确保 CMD [“nginx”] 能正确运行</p>
+<p>ENV 指令也可用于为你想要容器化的服务提供必要的环境变量，比如 Postgres 需要的 PGDATA</p>
+<h3 id="ADD-COPY"><a href="#ADD-COPY" class="headerlink" title="ADD/COPY"></a>ADD/COPY</h3><p>优先使用 COPY, 它比ADD更透明. COPY 只支持简单将本地文件拷贝到容器中, ADD 的最佳用例是将本地 tar 文件自动提取到镜像中 <code>ADD rootfs.tar.xz</code></p>
+<p>如果你的 Dockerfile 有多个步骤需要使用上下文中不同的文件。单独 COPY 每个文件，而不是一次性的 COPY 所有文件，这将保证每个步骤的构建缓存只在特定的文件变化时失效</p>
+<p>为了让镜像尽量小，最好不要使用 ADD 指令从远程 URL 获取包，而是使用 curl 和 wget. 这样你可以在文件提取完之后删掉不再需要的文件来避免在镜像中额外添加一层</p>
+<h3 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h3><p>ENTRYPOINT 的最佳用处是设置镜像的主命令. ENTRYPOINT 指令也可以结合一个辅助脚本使用</p>
+<h3 id="VOLUME"><a href="#VOLUME" class="headerlink" title="VOLUME"></a>VOLUME</h3><p>VOLUME 指令用于暴露任何数据库存储文件，配置文件，或容器创建的文件和目录。强烈建议使用 VOLUME 来管理镜像中的可变部分和用户可以改变的部分</p>
+<h3 id="USER"><a href="#USER" class="headerlink" title="USER"></a>USER</h3><p>如果某个服务不需要特权执行，建议使用 USER 指令切换到非 root 用户</p>
+<p>你应该避免使用 sudo，因为它不可预期的 TTY 和信号转发行为可能造成的问题比它能解决的问题还多。如果你真的需要和 sudo 类似的功能（例如，以 root 权限初始化某个守护进程，以非 root 权限执行它），你可以使用 gosu。</p>
+<p>最后，为了减少层数和复杂度，避免频繁地使用 USER 来回切换用户。</p>
+<h3 id="WORKDIR"><a href="#WORKDIR" class="headerlink" title="WORKDIR"></a>WORKDIR</h3><p>使用绝对路径. 使用 WORKDIR 来替代类似于 RUN cd … &amp;&amp; do-something 的指令，后者难以阅读、排错和维护</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">FROM buildpack-deps:stretch-scm</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gcc for cgo</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y --no-install-recommends \</span><br><span class="line">		g++ \</span><br><span class="line">		gcc \</span><br><span class="line">		libc6-dev \</span><br><span class="line">		make \</span><br><span class="line">		pkg-config \</span><br><span class="line">	&amp;&amp; rm -rf /var/lib/apt/lists/*</span><br><span class="line"></span><br><span class="line">ENV GOLANG_VERSION 1.12</span><br><span class="line"></span><br><span class="line">RUN set -eux; \</span><br><span class="line">	\</span><br><span class="line"><span class="meta">#</span> this "case" statement is generated via "update.sh"</span><br><span class="line">	dpkgArch="$(dpkg --print-architecture)"; \</span><br><span class="line">	case "$&#123;dpkgArch##*-&#125;" in \</span><br><span class="line">		amd64) goRelArch='linux-amd64'; goRelSha256='750a07fef8579ae4839458701f4df690e0b20b8bcce33b437e4df89c451b6f13' ;; \</span><br><span class="line">		armhf) goRelArch='linux-armv6l'; goRelSha256='ea0636f055763d309437461b5817452419411eb1f598dc7f35999fae05bcb79a' ;; \</span><br><span class="line">		arm64) goRelArch='linux-arm64'; goRelSha256='b7bf59c2f1ac48eb587817a2a30b02168ecc99635fc19b6e677cce01406e3fac' ;; \</span><br><span class="line">		i386) goRelArch='linux-386'; goRelSha256='3ac1db65a6fa5c13f424b53ee181755429df0c33775733cede1e0d540440fd7b' ;; \</span><br><span class="line">		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='5be21e7035efa4a270802ea04fb104dc7a54e3492641ae44632170b93166fb68' ;; \</span><br><span class="line">		s390x) goRelArch='linux-s390x'; goRelSha256='c0aef360b99ebb4b834db8b5b22777b73a11fa37b382121b24bf587c40603915' ;; \</span><br><span class="line">		*) goRelArch='src'; goRelSha256='09c43d3336743866f2985f566db0520b36f4992aea2b4b2fd9f52f17049e88f2'; \</span><br><span class="line">			echo &gt;&amp;2; echo &gt;&amp;2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo &gt;&amp;2 ;; \</span><br><span class="line">	esac; \</span><br><span class="line">	\</span><br><span class="line">	url="https://golang.org/dl/go$&#123;GOLANG_VERSION&#125;.$&#123;goRelArch&#125;.tar.gz"; \</span><br><span class="line">	wget -O go.tgz "$url"; \</span><br><span class="line">	echo "$&#123;goRelSha256&#125; *go.tgz" | sha256sum -c -; \</span><br><span class="line">	tar -C /usr/local -xzf go.tgz; \</span><br><span class="line">	rm go.tgz; \</span><br><span class="line">	\</span><br><span class="line">	if [ "$goRelArch" = 'src' ]; then \</span><br><span class="line">		echo &gt;&amp;2; \</span><br><span class="line">		echo &gt;&amp;2 'error: UNIMPLEMENTED'; \</span><br><span class="line">		echo &gt;&amp;2 'TODO install golang-any from jessie-backports for GOROOT_BOOTSTRAP (and uninstall after build)'; \</span><br><span class="line">		echo &gt;&amp;2; \</span><br><span class="line">		exit 1; \</span><br><span class="line">	fi; \</span><br><span class="line">	\</span><br><span class="line">	export PATH="/usr/local/go/bin:$PATH"; \</span><br><span class="line">	go version</span><br><span class="line"></span><br><span class="line">ENV GOPATH /go</span><br><span class="line">ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH</span><br><span class="line"></span><br><span class="line">RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" &amp;&amp; chmod -R 777 "$GOPATH"</span><br><span class="line">WORKDIR $GOPATH</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/05/Dockerfile编写的最佳实践/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/05/打家劫舍/" title="打家劫舍" itemprop="url">打家劫舍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-05T01:41:01.000Z" itemprop="datePublished"> Published 2019-03-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="打家劫舍I"><a href="#打家劫舍I" class="headerlink" title="打家劫舍I"></a>打家劫舍I</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。</p>
+<p>给定一个代表每个房屋存放金额的非负整数数组，计算你在不触动警报装置的情况下，能够偷窃到的最高金额。</p>
+<p>示例 1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,3,1]</span><br><span class="line">输出: 4</span><br><span class="line">解释: 偷窃 1 号房屋 (金额 = 1) ，然后偷窃 3 号房屋 (金额 = 3)。</span><br><span class="line">      偷窃到的最高金额 = 1 + 3 = 4 。</span><br></pre></td></tr></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入: [2,7,9,3,1]</span><br><span class="line">输出: 12</span><br><span class="line">解释: 偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。</span><br><span class="line">      偷窃到的最高金额 = 2 + 9 + 1 = 12 。</span><br></pre></td></tr></table></figure>
+
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>对于任意一个屋子, 存在两种情况, 偷或者不偷. </p>
+<ul>
+<li>如果抢劫了上一个屋子, 那么当前屋子就不能偷, 最大的收益为上一个屋子的最大收益</li>
+<li>如果选择抢劫当前房屋, 就不能抢劫上一个屋子, 最大收益是到上一个屋子的上一个屋子为止的最大收益, 加上当前屋子的钱</li>
+</ul>
+<p>基于此, 我们用f(n) 表示当数组长度为n+1时可得的最大的收益.相关方程:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f(0) = arr[0]</span><br><span class="line">f(1) = max(arr[0], arr[1])</span><br><span class="line">f(n) = max(f(n-2)+arr[n], f(n-1))</span><br></pre></td></tr></table></figure>
+
+<p>得到了递推方程, 就可以得到答案了.</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rob</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :type nums: List[int]</span></span><br><span class="line"><span class="string">    :rtype: int</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nums: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    n = len(nums)</span><br><span class="line">    dp = [<span class="number">0</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> n == <span class="number">1</span>: <span class="keyword">return</span> nums[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">if</span> n == <span class="number">2</span>: <span class="keyword">return</span> max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        <span class="keyword">if</span> i == <span class="number">0</span>: dp[<span class="number">0</span>] = nums[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> i == <span class="number">1</span>: dp[<span class="number">1</span>] = max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            dp[i] = max(dp[i<span class="number">-2</span>]+nums[i], dp[i<span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> dp[n<span class="number">-1</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h4><p>这里我们发现需要的是上一次和上上一次的最大收益, 所以不需要保存所有的最大收益, 直接用两个变量表示即可</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rob</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  :type nums: List[int]</span></span><br><span class="line"><span class="string">  :rtype: int</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  length = len(nums)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> length == <span class="number">0</span>:</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">  <span class="keyword">if</span> length == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> nums[<span class="number">0</span>]</span><br><span class="line">  <span class="keyword">if</span> length == <span class="number">2</span>:</span><br><span class="line">      <span class="keyword">return</span> max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">  last_max = nums[<span class="number">0</span>]  <span class="comment"># 上次最大收益</span></span><br><span class="line"></span><br><span class="line">  cur_max = max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line">  <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>, length):</span><br><span class="line">      last_max, cur_max = cur_max, max(last_max+nums[i], cur_max)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> cur_max</span><br></pre></td></tr></table></figure>
+
+<h2 id="打家劫舍II"><a href="#打家劫舍II" class="headerlink" title="打家劫舍II"></a>打家劫舍II</h2><h3 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h3><p>你是一个专业的小偷，计划偷窃沿街的房屋，每间房内都藏有一定的现金。这个地方所有的房屋都围成一圈，这意味着第一个房屋和最后一个房屋是紧挨着的。同时，相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。</p>
+<p>给定一个代表每个房屋存放金额的非负整数数组，计算你在不触动警报装置的情况下，能够偷窃到的最高金额。</p>
+<p>示例 1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: [2,3,2]</span><br><span class="line">输出: 3</span><br><span class="line">解释: 你不能先偷窃 1 号房屋（金额 = 2），然后偷窃 3 号房屋（金额 = 2）, 因为他们是相邻的。</span><br></pre></td></tr></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,3,1]</span><br><span class="line">输出: 4</span><br><span class="line">解释: 你可以先偷窃 1 号房屋（金额 = 1），然后偷窃 3 号房屋（金额 = 3）。</span><br><span class="line">      偷窃到的最高金额 = 1 + 3 = 4 。</span><br></pre></td></tr></table></figure>
+
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>相比上一个问题来说, 多了一个限制. 简单来说就是第一个屋子和最后一个屋子不能同时抢.</p>
+<p>所以分两种情况, 然后求其中较大值</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rob</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  :type nums: List[int]</span></span><br><span class="line"><span class="string">  :rtype: int</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line"></span><br><span class="line">  n = len(nums)</span><br><span class="line">  rob_start = [<span class="number">0</span> <span class="keyword">for</span> x <span class="keyword">in</span> range(n)]</span><br><span class="line">  rob_end = [<span class="number">0</span> <span class="keyword">for</span> x <span class="keyword">in</span> range(n)]</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> n == <span class="number">0</span>:</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">  <span class="keyword">if</span> n == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> nums[<span class="number">0</span>]</span><br><span class="line">  <span class="keyword">if</span> n == <span class="number">2</span>:</span><br><span class="line">      <span class="keyword">return</span> max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">      rob_start[<span class="number">0</span>] = nums[<span class="number">0</span>]</span><br><span class="line">      rob_start[<span class="number">1</span>] = max(nums[<span class="number">0</span>], nums[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">      rob_end[<span class="number">1</span>] = nums[<span class="number">1</span>]</span><br><span class="line">      rob_end[<span class="number">2</span>] = max(nums[<span class="number">1</span>], nums[<span class="number">2</span>])</span><br><span class="line"></span><br><span class="line">      <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>, n - <span class="number">1</span>):</span><br><span class="line">          rob_start[i] = max(rob_start[i - <span class="number">2</span>] + nums[i], rob_start[i - <span class="number">1</span>])</span><br><span class="line">          rob_end[i + <span class="number">1</span>] = max(rob_end[i - <span class="number">1</span>] + nums[i + <span class="number">1</span>], rob_end[i])</span><br><span class="line">  <span class="keyword">return</span> max(rob_start[n - <span class="number">2</span>], rob_end[n - <span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+
+<h2 id="打家劫舍III"><a href="#打家劫舍III" class="headerlink" title="打家劫舍III"></a>打家劫舍III</h2><h3 id="问题-2"><a href="#问题-2" class="headerlink" title="问题"></a>问题</h3><p>在上次打劫完一条街道之后和一圈房屋后，小偷又发现了一个新的可行窃的地区。这个地区只有一个入口，我们称之为“根”。 除了“根”之外，每栋房子有且只有一个“父“房子与之相连。一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。 如果两个直接相连的房子在同一天晚上被打劫，房屋将自动报警。</p>
+<p>计算在不触动警报的情况下，小偷一晚能够盗取的最高金额。</p>
+<p>示例 1:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">输入: [3,2,3,null,3,null,1]</span><br><span class="line"></span><br><span class="line">     3</span><br><span class="line">    / \</span><br><span class="line">   2   3</span><br><span class="line">    \   \ </span><br><span class="line">     3   1</span><br><span class="line"></span><br><span class="line">输出: 7 </span><br><span class="line">解释: 小偷一晚能够盗取的最高金额 = 3 + 3 + 1 = 7.</span><br></pre></td></tr></table></figure>
+
+<p>示例 2:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">输入: [3,4,5,1,3,null,1]</span><br><span class="line"></span><br><span class="line">     3</span><br><span class="line">    / \</span><br><span class="line">   4   5</span><br><span class="line">  / \   \ </span><br><span class="line"> 1   3   1</span><br><span class="line"></span><br><span class="line">输出: 9</span><br><span class="line">解释: 小偷一晚能够盗取的最高金额 = 4 + 5 = 9.</span><br></pre></td></tr></table></figure>
+
+<h3 id="思路-2"><a href="#思路-2" class="headerlink" title="思路"></a>思路</h3><p>对于任意节点, 存在偷与不偷两种情况. 定义rob(root) 为当节点为 root 时能获取的最大收益. 最大值的获取分两种情况</p>
+<ul>
+<li>抢劫root, 那么就只能抢劫孙子节点</li>
+<li>不抢root, 可抢孩子节点</li>
+</ul>
+<p>故可得代码为</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rob</span><span class="params">(root)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">  val = <span class="number">0</span></span><br><span class="line">  <span class="keyword">if</span> root.left <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">    val += rob(root.left.left) + rob(root.left.right)</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> root.right <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">    val == rob(root.right.left) + rob(root.right.right)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> max(val + root.val, rob(root.left)+rob(root.right))</span><br></pre></td></tr></table></figure>
+
+<p>但是这个代码运行超时. 分析发现, 当求 rob(root) 时, rob(root.left), rob(root.right), rob(root.left.left), rob(root.left.right), rob(root.right.left), rob(root.right.right)<br>这些值已经被求过, 但是求 rob(root.left) 时, rob(root.left.left), rob(root.left.right) 同样需要再求一次. 也就是没有记录已经存在的节点的最大值.所以<br>使用一个字典保存已求到的状态</p>
+<h3 id="优化-1"><a href="#优化-1" class="headerlink" title="优化"></a>优化</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rob</span><span class="params">(self, root)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">  :type root: TreeNode</span></span><br><span class="line"><span class="string">  :rtype: int</span></span><br><span class="line"><span class="string">  """</span></span><br><span class="line">  dic = &#123;&#125;</span><br><span class="line">  <span class="keyword">return</span> self.robSub(root, dic)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">robSub</span><span class="params">(self, root, dic)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> root <span class="keyword">is</span> <span class="literal">None</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">  <span class="keyword">if</span> root <span class="keyword">in</span> dic: <span class="keyword">return</span> dic.get(root)</span><br><span class="line"></span><br><span class="line">  val = <span class="number">0</span></span><br><span class="line">  <span class="keyword">if</span> root.left <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">      val += self.robSub(root.left.left, dic) + self.robSub(root.left.right, dic)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> root.right <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">      val += self.robSub(root.right.left, dic) + self.robSub(root.right.right, dic)</span><br><span class="line"></span><br><span class="line">  val = max(val+root.val, self.robSub(root.left, dic)+self.robSub(root.right, dic))</span><br><span class="line"></span><br><span class="line">  dic[root] = val</span><br><span class="line">  <span class="keyword">return</span> val</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/LeetCode/">LeetCode</a><a href="/tags/动态规划/">动态规划</a><a href="/tags/dfs/">dfs</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/05/打家劫舍/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/01/Dockerfile指南/" title="Dockerfile指南" itemprop="url">Dockerfile指南</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-01T07:08:39.000Z" itemprop="datePublished"> Published 2019-03-01</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/Docker_logo.png" alt></p>
+<p>一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</p>
+<h2 id="build"><a href="#build" class="headerlink" title="build"></a>build</h2><p><code>docker build</code> 可以通过 <code>Dockerfile</code> 和<code>context</code> 构建镜像. 这里的<code>context</code>指的是特定<code>PATH</code>和<code>URL</code>中的Dockerfile的集合. PATH是本地系统的一个目录,<br>URL是一个git地址</p>
+<p>build 是由Docker daemon 运行的, 而不是 CLI. 当运行 docker build 的时候, docker 进程首先将指定 context 的所有文件发送到 daemon. 因此, 不要使用根<br>目录作为 PATH, 这会将宿主机的所有文件导入到 daemon 中.</p>
+<p>一般来说, Dockerfile 位于 context 的根. 可以使用 -f 指定特定位置的 Dockerfile; -t 指定生成的镜像保存位置</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -f /<span class="built_in">path</span>/to/a/Dockerfile .</span><br><span class="line">docker build -t shykes/myapp .</span><br></pre></td></tr></table></figure>
+
+<p>也可以一次指定多个 repo 和 tag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t shykes/myapp:1.0.2 -t shykes/myapp:latest .</span><br></pre></td></tr></table></figure>
+
+<p>在构建镜像之前, Docker deamon 会首先检查 Dockerfile 是否有语法错误. 需要注意的是 Dockerfile 中的每一步构建都是相互独立的, 也就是说类似<code>RUN cd/tmp</code><br>这样的命令对下一步构建不会产生任何作用</p>
+<p>为了加快构建速度, Docker 会尽可能的复用一些缓存镜像. </p>
+<h2 id="Parser-directives"><a href="#Parser-directives" class="headerlink" title="Parser directives"></a>Parser directives</h2><p>Parser directives 是可选的, 用于提示解释器做特殊的处理. 如果需要定义 Parser directives, 需要在 Dockerfile 的第一行定义. 当前, Parser directives<br>只支持转义字符. 默认的在 Unix-like 中转义字符为<code>\</code>, 如果是在 Windows 系统中, 需要修改, 推荐为 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> escape=`</span><br></pre></td></tr></table></figure>
+
+<h2 id="申明环境变量-Environment-replacement"><a href="#申明环境变量-Environment-replacement" class="headerlink" title="申明环境变量(Environment replacement)"></a>申明环境变量(Environment replacement)</h2><p>在 Dockerfile 中可以通过 <code>ENV</code> 申明一个环境变量, 然后在 Dockerfile 中使用 <code>${variable_name}</code></p>
+<p>在同一个指令中, 变量共享同一个值. 所以在下面的例子中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ENV abc=hello</span><br><span class="line">ENV abc=bye def=$abc</span><br><span class="line">ENV ghi=$abc</span><br></pre></td></tr></table></figure>
+
+<p><code>def</code> 的值为<code>hello</code>, 而<code>ghi</code> 的值为<code>bye</code></p>
+<h2 id="FROM"><a href="#FROM" class="headerlink" title="FROM"></a>FROM</h2><p><code>FROM</code> 初始化一层镜像, 并将其设置为接下来的构建的 <code>Base Image</code>. 因此, 一个 Dockerfile 的第一句可执行的指令一般都是是 FROM.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM &lt;image&gt; [AS &lt;name&gt;]</span><br><span class="line">FROM &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]</span><br><span class="line">FROM &lt;image&gt;[@&lt;digest&gt;] [AS &lt;name&gt;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>ARG</code> 是唯一有可能先于 FROM 的指令</li>
+<li>在一个 Dockerfile 中, FROM 可以多次出现, 每个 FROM 都会清除之前构建命令的所有状态</li>
+<li>可以通过 AS 对一个镜像指定别名, 这个别名可以在接下来的<code>FROM</code> <code>CPOY</code>命令中使用</li>
+<li>可选的 <code>TAG</code> / <code>digest</code></li>
+</ul>
+<h2 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h2><p>RUN 会在当前镜像的顶层执行任何命令，并commit成新的（中间）镜像，提交的镜像会在后面继续用到. 两种格式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RUN &lt;command&gt;：shell格式</span><br><span class="line">RUN ["executable", "param1", "param2"]：exec格式</span><br></pre></td></tr></table></figure>
+
+<p><strong>exec</strong> 格式的 RUN 命令将命令解析为 JSON 格式, 所以应该使用双引号</p>
+<h2 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h2><p>一个 Dockerfile 中只能有一个 CMD 命令, 多个 CMD 命令只有最后一个生效. <strong>用来指定容器启动时运行的命令。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CMD [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;]：exec格式</span><br><span class="line">CMD command param1 param2：shell格式</span><br><span class="line">CMD [&quot;param1&quot;, &quot;param2&quot;]：省略可执行文件的exec格式，这种写法使CMD中的参数当做ENTRYPOINT的默认参数</span><br></pre></td></tr></table></figure>
+
+<h2 id="LBAEL"><a href="#LBAEL" class="headerlink" title="LBAEL"></a>LBAEL</h2><p>给构建的镜像打标签</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...</span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPOSE"><a href="#EXPOSE" class="headerlink" title="EXPOSE"></a>EXPOSE</h2><p>为构建的镜像设置监听端口，使容器在运行时监听</p>
+<h2 id="ENV"><a href="#ENV" class="headerlink" title="ENV"></a>ENV</h2><p>设置环境变量, 供后续的指令使用. 可以在 RUN 时替换镜像中设置的环境变量 <code>docker run --env &lt;key&gt;=&lt;value&gt;</code></p>
+<h2 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h2><p>复制上下文中的文件到目标镜像内</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ADD &lt;src&gt;... &lt;dest&gt;</span><br><span class="line">ADD [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>src 文件、目录，也可以是文件URL. 可以指定多个<src>，必须是在上下文目录和子目录中</src></li>
+<li>可以是绝对路径，也可以是相对WORKDIR目录的相对路径。所有文件的UID和GID都是0</li>
+</ul>
+<h2 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENTRYPOINT [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;] (exec form, preferred)</span><br><span class="line">ENTRYPOINT command param1 param2 (shell form)</span><br></pre></td></tr></table></figure>
+
+<p>指定镜像的执行程序，只有最后一条ENTRYPOINT指令有效</p>
+<h2 id="VOLUME"><a href="#VOLUME" class="headerlink" title="VOLUME"></a>VOLUME</h2><p>指定镜像内的目录为数据卷</p>
+<h2 id="USER"><a href="#USER" class="headerlink" title="USER"></a>USER</h2><p>为接下来的Dockerfile 指令指定用户</p>
+<h2 id="WORKDIR"><a href="#WORKDIR" class="headerlink" title="WORKDIR"></a>WORKDIR</h2><h2 id="ARG"><a href="#ARG" class="headerlink" title="ARG"></a>ARG</h2><p>指定了用户在docker build –build-arg <varname>=<value>时可以使用的参数</value></varname></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/01/Dockerfile指南/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/02/19/pathSum/" title="pathSum" itemprop="url">pathSum</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-02-19T06:45:49.000Z" itemprop="datePublished"> Published 2019-02-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h2><p>Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum</p>
+<p>For example:<br>Given the below binary tree and sum = 22,</p>
+<pre><code>      5
+     / \
+    4   8
+   /   / \
+  11  13  4
+ /  \      \
+7    2      1</code></pre><p>return true, as there exist a root-to-leaf path 5-&gt;4-&gt;11-&gt;2 which sum is 22.</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>在遍历到叶子的过程中顺便判断sum是否等于目标值, 发现不合适的直接返回</p>
+<h3 id="解题"><a href="#解题" class="headerlink" title="解题"></a>解题</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">hasPathSum</span><span class="params">(self, root, sum)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type root: TreeNode</span></span><br><span class="line"><span class="string">        :type sum: int</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        sum -= root.val</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> root.left) <span class="keyword">and</span> (<span class="keyword">not</span> root.right):</span><br><span class="line">            <span class="keyword">if</span> sum == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> root.left <span class="keyword">and</span> self.hasPathSum(root.left, sum): <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">if</span> root.right <span class="keyword">and</span> self.hasPathSum(root.right, sum): <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h2><p>You are given a binary tree in which each node contains an integer value.</p>
+<p>Find the number of paths that sum to a given value.</p>
+<p>The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).</p>
+<p>The tree has no more than 1,000 nodes and the values are in the range -1,000,000 to 1,000,000.</p>
+<p>Example:</p>
+<p>root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8</p>
+<pre><code>  10
+ /  \
+5   -3</code></pre><p>   / \    <br>  3   2   11<br> / \   <br>3  -2   1</p>
+<p>Return 3. The paths that sum to 8 are:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.  5 -&gt; 3</span><br><span class="line">2.  5 -&gt; 2 -&gt; 1</span><br><span class="line">3. -3 -&gt; 11</span><br></pre></td></tr></table></figure>
+
+<h3 id="思路-1"><a href="#思路-1" class="headerlink" title="思路"></a>思路</h3><p>对于遍历到的节点, 可能的结果是这个节点的值的和满足sum, 也有可能是不包含此节点的值满足sum.故</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pathSum</span><span class="params">(self, root, sum)</span>:</span></span><br><span class="line">  <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">  <span class="comment"># 包含本节点的值的和为sum的情况</span></span><br><span class="line">  ans = traverse(root, sum)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 不包含本节点的值的和为sum的情况</span></span><br><span class="line">  ans += self.pathSum(root.left, sum)</span><br><span class="line">  ans += self.pathSum(root.right, sum)</span><br><span class="line">  <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
+
+<p>然后现在需要找到一条从当前节点到某一节点和为sum的情况. 相较于第一题来说, 只是遍历路径可能不到叶子节点. 故</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">traverse</span><span class="params">(root, val)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    res = (val == root.val)</span><br><span class="line"></span><br><span class="line">    res += traverse(root.left, val - root.val)</span><br><span class="line">    res += traverse(root.right, val - root.val)</span><br><span class="line">    <span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
+
+<p>最终的代码为</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pathSum</span><span class="params">(self, root, sum)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type root: TreeNode</span></span><br><span class="line"><span class="string">        :type sum: int</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">traverse</span><span class="params">(root, val)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">            res = (val == root.val)</span><br><span class="line"></span><br><span class="line">            res += traverse(root.left, val - root.val)</span><br><span class="line">            res += traverse(root.right, val - root.val)</span><br><span class="line">            <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> root: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        ans = traverse(root, sum)</span><br><span class="line">        ans += self.pathSum(root.left, sum)</span><br><span class="line">        ans += self.pathSum(root.right, sum)</span><br><span class="line">        <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/02/19/pathSum/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/02/15/最大子数组Leetcode53/" title="最大子数组Leetcode53" itemprop="url">最大子数组Leetcode53</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-02-15T03:09:49.000Z" itemprop="datePublished"> Published 2019-02-15</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.</p>
+<p>Example:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Input: [-2,1,-3,4,-1,2,1,-5,4],</span><br><span class="line">Output: 6</span><br><span class="line">Explanation: [4,-1,2,1] has the largest sum = 6.</span><br></pre></td></tr></table></figure>
+
+<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><p><strong>Kadane算法思路</strong></p>
+<p>Kadane算法将子问题定义为：求以第i个元素结尾的最大子数组</p>
+<p>假设有数组A:[1, -3, 2, 4, -5]，则：</p>
+<ul>
+<li>以第0个元素结尾的最大子数组就是它自己：[1]</li>
+<li>以第1个元素结尾的最大子数组可能是这些中的一个：[1, -3], [-3]</li>
+<li>以第2个元素结尾的最大子数组可能是这些中的一个：[1, -3, 2], [-3, 2], [2]</li>
+</ul>
+<blockquote>
+<p>以第i个元素结尾的子数组，一定是以第i-1个元素结尾的子数组加上第i个元素组成的</p>
+</blockquote>
+<p>故有:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">maxSum[0] = A[0]; // i = 0</span><br><span class="line">maxSum[i] = A[i] + （maxSum[i-1] &gt; 0 ? maxSum[i-1] : 0); // i &gt; 0</span><br></pre></td></tr></table></figure>
+
+<p>所以如果以第i-1个元素结尾的最大子数组和大于0，那么以第i个元素结尾的最大子数组就等于它前面的那部分加上它自己，否则就舍弃前面的部分，只剩它自己</p>
+<p>maxSum这个数组中的每个元素就代表了以当前位置结尾的最大子数组和，取maxSum中的最大值</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maxSubArray</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">    maxSum = [<span class="literal">None</span> <span class="keyword">for</span> _ <span class="keyword">in</span> range(len(nums))]</span><br><span class="line">    maxSum[<span class="number">0</span>] = nums[<span class="number">0</span>]</span><br><span class="line">    gMax  = nums[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(nums)):</span><br><span class="line">        maxSum[i] = nums[i] + max(<span class="number">0</span>, maxSum[i<span class="number">-1</span>])</span><br><span class="line">        gMax = max(gMax, maxSum[i])</span><br><span class="line">    <span class="keyword">return</span> gMax</span><br></pre></td></tr></table></figure>
+
+<h4 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h4><p>实时更新最大值, 而不用使用数组来存储</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maxSubArray</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :type nums: List[int]</span></span><br><span class="line"><span class="string">    :rtype: int</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nums:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    current = nums[<span class="number">0</span>]</span><br><span class="line">    gMax = current</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(nums)):</span><br><span class="line">        <span class="keyword">if</span> current &lt; <span class="number">0</span>:</span><br><span class="line">            current = <span class="number">0</span></span><br><span class="line">        current += nums[i]</span><br><span class="line">        gMax = max(current, m)</span><br><span class="line">    <span class="keyword">return</span> gMax</span><br></pre></td></tr></table></figure>
+
+<h2 id="分冶法"><a href="#分冶法" class="headerlink" title="分冶法"></a>分冶法</h2><p>针对给定的一个区段，首先将它划分成相等的两个部分。这个最大连续子串可能出现在它的左边子串里，也可能出现在它的右边子串里，<br>也有可能是通过跨越左右两个子串的这个串。所以我们要计算出它们两个部分，取它们中间最大的那个.</p>
+<p>前两种情况只需递归调用即可；第三种情况需要单独处理。需要从 mid 开始分别向两个方向不断求和，分别计算出两个方向的最大值（两者的端点其中之一均为中间点），求和就得到第三种情况的最大值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">maxSubArray2</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    分冶法</span></span><br><span class="line"><span class="string">    :param nums:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> self.helper(nums, <span class="number">0</span>, len(nums) - <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">helper</span><span class="params">(self, nums, left, right)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> left == right: <span class="keyword">return</span> nums[left]</span><br><span class="line">    mid = (left + right) / <span class="number">2</span></span><br><span class="line"></span><br><span class="line">    left_max = sum_num = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(mid - <span class="number">1</span>, left - <span class="number">1</span>, <span class="number">-1</span>):</span><br><span class="line">        sum_num += nums[i]</span><br><span class="line">        left_max = max(left_max, sum_num)</span><br><span class="line"></span><br><span class="line">    right_max = sum_num = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(mid + <span class="number">1</span>, right + <span class="number">1</span>):</span><br><span class="line">        sum_num += nums[i]</span><br><span class="line">        right_max = max(right_max, sum_num)</span><br><span class="line"></span><br><span class="line">    left_ans = self.helper(nums, left, mid - <span class="number">1</span>)</span><br><span class="line">    right_ans = self.helper(nums, mid + <span class="number">1</span>, right)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> max(left_max + nums[mid] + right_max, max(left_ans, right_ans))</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/LeetCode/">LeetCode</a><a href="/tags/动态规划/">动态规划</a><a href="/tags/分冶/">分冶</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/02/15/最大子数组Leetcode53/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/29/删除排序数组中的重复项/" title="删除排序数组中的重复项" itemprop="url">删除排序数组中的重复项</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-29T02:08:10.000Z" itemprop="datePublished"> Published 2019-01-29</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/LeetCode_Sharing.png" alt></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>给定一个排序数组，你需要在原地删除重复出现的元素，使得每个元素只出现一次，返回移除后数组的新长度。</p>
+<p>不要使用额外的数组空间，你必须在原地修改输入数组并在使用 O(1) 额外空间的条件下完成。</p>
+<p><strong>示例 1</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">给定数组 nums = [1,1,2], </span><br><span class="line"></span><br><span class="line">函数应该返回新的长度 2, 并且原数组 nums 的前两个元素被修改为 1, 2。 </span><br><span class="line"></span><br><span class="line">你不需要考虑数组中超出新长度后面的元素。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">给定 nums = [0,0,1,1,1,2,2,3,3,4],</span><br><span class="line"></span><br><span class="line">函数应该返回新的长度 5, 并且原数组 nums 的前五个元素被修改为 0, 1, 2, 3, 4。</span><br><span class="line"></span><br><span class="line">你不需要考虑数组中超出新长度后面的元素。</span><br></pre></td></tr></table></figure>
+
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><blockquote>
+<p>数组完成排序后，我们可以放置两个指针 i 和 j，其中 i 是慢指针，而 j 是快指针。只要 nums[i]=nums[j]，我们就增加 j 以跳过重复项。当我们遇到 nums[j]≠nums[i] 时，跳过重复项的运行已经结束，因此我们必须把它（nums[j]）的值复制到 nums[i + 1]。然后递增 i，接着我们将再次重复相同的过程，直到 j 到达数组的末尾为止。</p>
+</blockquote>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">removeDuplicates</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> nums: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(len(nums)):</span><br><span class="line">            <span class="keyword">if</span> nums[j] != nums[i]:</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line">                nums[i] = nums[j]</span><br><span class="line">        <span class="keyword">return</span> i + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/LeetCode/">LeetCode</a><a href="/tags/双指针/">双指针</a><a href="/tags/Array/">Array</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/29/删除排序数组中的重复项/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/18/centos7配置service/" title="centos7配置service" itemprop="url">centos7配置service</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-18T02:13:45.000Z" itemprop="datePublished"> Published 2019-01-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/centos7.jpg" alt></p>
+<p>在<code>centos6</code>中, 一般启动一个服务常用<code>service</code>命令, 例如<code>service mysqld start</code>. 但是在<code>centos7</code>中, 使用同样的命令最终执行的并不是<code>/etc/init.d</code>目录<br>下的脚本, 而是使用<code>/bin/systemctl</code>去<code>/usr/lib/systemd/</code>目录下执行相应的服务. Centos7 开机第一程序从init换成了systemd的启动方式，而systemd依靠unit的方式来控制开机服务，开机级别等功能。</p>
+<p>Centos7的服务分为user和system</p>
+<ul>
+<li>/usr/lib/systemd/system   # 系统服务，开机不需要登录就能运行的程序（相当于开机自启）</li>
+<li>/usr/lib/systemd/user     # 用户服务，需要登录后才能运行的程序</li>
+</ul>
+<p>目录下又存在两种类型的文件：</p>
+<ul>
+<li>*.service   # 服务unit文件</li>
+<li>*.target    # 开机级别unit</li>
+</ul>
+<p>每一个服务以.service结尾，一般会分为3部分：[Unit]、[Service]和[Install]</p>
+<p>以mysql的服务脚本为例, 大致说明每个字段的含义.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span> Simple MySQL systemd service file</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span> systemd supports lots of fancy features, look here (and linked docs) for a full list: </span><br><span class="line"><span class="meta">#</span>   http://www.freedesktop.org/software/systemd/man/systemd.exec.html</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span> Note: this file ( /usr/lib/systemd/system/mysql.service )</span><br><span class="line"><span class="meta">#</span> will be overwritten on package upgrade, please copy the file to </span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span>  /etc/systemd/system/mysql.service </span><br><span class="line"><span class="meta">#</span>  </span><br><span class="line"><span class="meta">#</span> to make needed changes.</span><br><span class="line"><span class="meta">#</span> </span><br><span class="line"><span class="meta">#</span> systemd-delta can be used to check differences between the two mysql.service files.</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line">[Unit]                                       # 服务说明</span><br><span class="line">Description=MySQL Community Server           # 服务描述</span><br><span class="line">After=network.target                         # 描述服务类别，表示本服务需要在network服务启动后在启动</span><br><span class="line">After=syslog.target</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">Alias=mysql.service</span><br><span class="line"></span><br><span class="line">[Service]                                    # 核心区域</span><br><span class="line">User=mysql                                   # 设置服务运行的用户</span><br><span class="line">Group=mysql                                  # 设置服务运行的用户组</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Execute pre and post scripts as root</span><br><span class="line">PermissionsStartOnly=true</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Needed to create system tables etc.</span><br><span class="line">ExecStartPre=/usr/bin/mysql-systemd-start pre</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Start main service</span><br><span class="line">ExecStart=/usr/bin/mysqld_safe --basedir=/usr # 启动服务</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Don't signal startup success before a ping works</span><br><span class="line">ExecStartPost=/usr/bin/mysql-systemd-start post</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> Give up if ping don't get an answer</span><br><span class="line">TimeoutSec=600</span><br><span class="line"></span><br><span class="line">Restart=always</span><br><span class="line">PrivateTmp=false</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用字段说明"><a href="#常用字段说明" class="headerlink" title="常用字段说明"></a>常用字段说明</h2><h3 id="Type"><a href="#Type" class="headerlink" title="Type"></a>Type</h3><pre><code>表示后台运行模式。
+simple(默认）：# 以ExecStart字段启动的进程为主进程
+forking:  # ExecStart字段以fork()方式启动，此时父进程将退出，子进程将成为主进程（后台运行）。一般都设置为forking
+oneshot:  # 类似于simple，但只执行一次，systemd会等它执行完，才启动其他服务
+dbus：    # 类似于simple, 但会等待D-Bus信号后启动
+notify:   # 类似于simple, 启动结束后会发出通知信号，然后systemd再启动其他服务
+idle：    # 类似于simple，但是要等到其他任务都执行完，才会启动该服务。</code></pre><h3 id="Restart的类型"><a href="#Restart的类型" class="headerlink" title="Restart的类型"></a>Restart的类型</h3><pre><code>no(默认值)：  # 退出后无操作
+on-success:  # 只有正常退出时（退出状态码为0）,才会重启
+on-failure:  # 非正常退出时，重启，包括被信号终止和超时等
+on-abnormal: # 只有被信号终止或超时，才会重启
+on-abort:    # 只有在收到没有捕捉到的信号终止时，才会重启
+on-watchdog: # 超时退出时，才会重启
+always:      # 不管什么退出原因，都会重启</code></pre><h3 id="RestartSec字段："><a href="#RestartSec字段：" class="headerlink" title="RestartSec字段："></a>RestartSec字段：</h3><pre><code>表示systemd重启服务之前，需要等待的秒数：RestartSec: 30</code></pre><h3 id="Exec-字段"><a href="#Exec-字段" class="headerlink" title="Exec*字段"></a>Exec*字段</h3><pre><code>ExecStart：    # 启动服务时执行的命令
+ExecReload：   # 重启服务时执行的命令 
+ExecStop：     # 停止服务时执行的命令 
+ExecStartPre： # 启动服务前执行的命令 
+ExecStartPost：# 启动服务后执行的命令 
+ExecStopPost： # 停止服务后执行的命令</code></pre>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux配置/">Linux配置</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/自定义service/">自定义service</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/18/centos7配置service/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/3/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

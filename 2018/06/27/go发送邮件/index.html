@@ -1,0 +1,727 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>go发送邮件 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="今天来说说go中邮件服务相关的内容 我们知道,  简单邮件传送服务基于smtp协议. 但是smtp协议存在几个缺点:  SMTP 不能传送可执行文件或者其他二进制对象； SMTP 只能传送7位的 ASCII 码，许多国家非英文的文字将无法传送； SMTP 服务器会拒绝超过一定长度的邮件； 某些 SMTP 的实现并没有完全按照 SMTP 的因特网标准。  为了弥补这些缺陷, 新增了MIME. MI">
+<meta name="keywords" content="邮件,gomail,smtp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go发送邮件">
+<meta property="og:url" content="http://sksun.com.cn/2018/06/27/go发送邮件/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="今天来说说go中邮件服务相关的内容 我们知道,  简单邮件传送服务基于smtp协议. 但是smtp协议存在几个缺点:  SMTP 不能传送可执行文件或者其他二进制对象； SMTP 只能传送7位的 ASCII 码，许多国家非英文的文字将无法传送； SMTP 服务器会拒绝超过一定长度的邮件； 某些 SMTP 的实现并没有完全按照 SMTP 的因特网标准。  为了弥补这些缺陷, 新增了MIME. MI">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://blogsk.oss-us-west-1.aliyuncs.com/golang.png">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-27/84540210.jpg">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com/2018-06-27-12-11-33.png">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.276Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go发送邮件">
+<meta name="twitter:description" content="今天来说说go中邮件服务相关的内容 我们知道,  简单邮件传送服务基于smtp协议. 但是smtp协议存在几个缺点:  SMTP 不能传送可执行文件或者其他二进制对象； SMTP 只能传送7位的 ASCII 码，许多国家非英文的文字将无法传送； SMTP 服务器会拒绝超过一定长度的邮件； 某些 SMTP 的实现并没有完全按照 SMTP 的因特网标准。  为了弥补这些缺陷, 新增了MIME. MI">
+<meta name="twitter:image" content="http://blogsk.oss-us-west-1.aliyuncs.com/golang.png">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/27/go发送邮件/" title="go发送邮件" itemprop="url">go发送邮件</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-27T03:42:42.000Z" itemprop="datePublished"> Published 2018-06-27</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MIME邮件的格式"><span class="toc-number">1.</span> <span class="toc-text">MIME邮件的格式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#邮件头"><span class="toc-number">1.1.</span> <span class="toc-text">邮件头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#邮件体"><span class="toc-number">1.2.</span> <span class="toc-text">邮件体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#go中smtp接口"><span class="toc-number">2.</span> <span class="toc-text">go中smtp接口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用gomail发送邮件"><span class="toc-number">3.</span> <span class="toc-text">使用gomail发送邮件</span></a></li></ol>
+		
+		</div>
+		
+		<p><img src="http://blogsk.oss-us-west-1.aliyuncs.com/golang.png" alt="go图标"></p>
+<p>今天来说说go中邮件服务相关的内容</p>
+<p>我们知道,  简单邮件传送服务基于smtp协议. 但是smtp协议存在几个缺点:</p>
+<ul>
+<li>SMTP 不能传送可执行文件或者其他二进制对象；</li>
+<li>SMTP 只能传送7位的 ASCII 码，许多国家非英文的文字将无法传送；</li>
+<li>SMTP 服务器会拒绝超过一定长度的邮件；</li>
+<li>某些 SMTP 的实现并没有完全按照 SMTP 的因特网标准。</li>
+</ul>
+<p>为了弥补这些缺陷, 新增了MIME. MIME在smtp的基础上增加了邮件主体的结构，并定义了传送非 ASCII 码的编码规则. MIME消息由消息头和消息体两大部分组成</p>
+<h1 id="MIME邮件的格式"><a href="#MIME邮件的格式" class="headerlink" title="MIME邮件的格式"></a>MIME邮件的格式</h1><h2 id="邮件头"><a href="#邮件头" class="headerlink" title="邮件头"></a>邮件头</h2><p>邮件头中包含了发件人, 收件人, 主题, 时间, MIME版本, 邮件内容的类型等重要信息. 每条信息称为一个域，由域名后加“: ”和信息内容构成，可以是一行，较长的也可以占用多行。域的首行必须“顶头”写，即左边不能有空白字符（空格和制表符）；续行则必须以空白字符打头，且第 一个空白字符不是信息本身固有的，解码时要过滤掉.</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-27/84540210.jpg" alt></p>
+<h2 id="邮件体"><a href="#邮件体" class="headerlink" title="邮件体"></a>邮件体</h2><p>邮件体包含邮件的内容，它的类型由邮件头的“Content-Type”域指出。常见的简单类型有text/plain(纯文本)和text/html(超文本).</p>
+<p>如果在邮件中要添加附件，必须定义multipart/mixed段；如果存在内嵌资源，至少要定义multipart/related段；如果纯文本与超文本共存，至少要定义multipart/alternative段</p>
+<p>mixed段允许单个报文含有多个相互独立的子报文，每个子报文拥有自己的类型和编码。在 mixed 后面用到 boundary=BOUNDARY 关键字，定义分隔各部分子报文的分隔符，在邮件用利用 –BOUNDARY 进行分隔</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-06-27-12-11-33.png" alt="2018-06-27-12-11-33"></p>
+<h1 id="go中smtp接口"><a href="#go中smtp接口" class="headerlink" title="go中smtp接口"></a>go中smtp接口</h1><p>正如前文所述, smtp实现了简单的邮件传输协议. 一个简单的实例如下:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// host := "smtp.qq.com:25"</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SendToMail</span><span class="params">(user, passwd, host, to, subject, body, mailtype <span class="keyword">string</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	hp := strings.Split(host, <span class="string">":"</span>)</span><br><span class="line">	fmt.Println(hp)</span><br><span class="line">	auth := smtp.PlainAuth(<span class="string">""</span>, user, passwd, hp[<span class="number">0</span>])</span><br><span class="line">	<span class="keyword">var</span> content_type <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> mailtype == <span class="string">"html"</span> &#123;</span><br><span class="line">		content_type = <span class="string">"Content-Type: text/"</span> + mailtype + <span class="string">"; charset=UTF-8"</span></span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		content_type = <span class="string">"Content-Type: text/plain"</span> + <span class="string">"; charset=UTF-8"</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	msg := []<span class="keyword">byte</span>(<span class="string">"To: "</span> + to + <span class="string">"\r\nFrom: "</span> + user + <span class="string">"\r\nSubject: "</span> +subject+ <span class="string">"\r\n"</span> + content_type + <span class="string">"\r\n\r\n"</span> + body)</span><br><span class="line">	send_to := strings.Split(to, <span class="string">";"</span>)</span><br><span class="line">	err := smtp.SendMail(host, auth, user, send_to, msg)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种邮件可以发送简单的文本邮件, 如果需要发送附件, 则需要构建 mime 消息</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	to := <span class="string">"**********"</span></span><br><span class="line">	cc := <span class="string">"xxxxxxxxxxxxx"</span></span><br><span class="line">	mime := bytes.NewBuffer(<span class="literal">nil</span>)</span><br><span class="line">	<span class="comment">//设置邮件</span></span><br><span class="line"></span><br><span class="line">	boundary := <span class="string">"---test"</span></span><br><span class="line">	mime.WriteString(<span class="string">"From: sk&lt;"</span>+USER+<span class="string">"&gt;\r\nTo: "</span>+to+<span class="string">"\r\nCc:"</span>+cc +<span class="string">"\r\nSubject: 附件测试\r\nMIME-Version: 1.0\r\n"</span>)</span><br><span class="line">	mime.WriteString(<span class="string">"Content-Type: multipart/mixed; boundary="</span>+boundary+<span class="string">"\r\n\r\n"</span>)</span><br><span class="line"></span><br><span class="line">	mime.WriteString(<span class="string">"--"</span>+boundary+<span class="string">"\r\n"</span>)    <span class="comment">//自定义邮件内容分隔符</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//邮件正文</span></span><br><span class="line">	html := <span class="string">"&lt;p&gt;邮件附件测试&lt;/p&gt;"</span>  <span class="comment">//邮件正文</span></span><br><span class="line">	mime.WriteString(<span class="string">"Content-Type: text/html; charset=utf-8\r\n\r\n"</span>)  <span class="comment">//text/html html text/plain 纯文本</span></span><br><span class="line">	mime.WriteString(html)</span><br><span class="line">	mime.WriteString(<span class="string">"\r\n\r\n\r\n"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//附件</span></span><br><span class="line">	fileName := <span class="string">"log.txt"</span></span><br><span class="line">	mime.WriteString(<span class="string">"--"</span>+boundary+<span class="string">"\r\n"</span>)</span><br><span class="line">	mime.WriteString(<span class="string">"Content-Type: application/txt\r\n"</span>)   <span class="comment">//设置应用类型</span></span><br><span class="line">	mime.WriteString(<span class="string">"Content-Transfer-Encoding: base64\r\n"</span>)</span><br><span class="line">	mime.WriteString(<span class="string">"Content-Disposition: attachment; filename=\""</span>+fileName+<span class="string">"\""</span>)</span><br><span class="line">	mime.WriteString(<span class="string">"\r\n\r\n"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">//将文件转为base64</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//读取并编码文件内容</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//attaData, err := ioutil.ReadFile("../bapi/main.go")</span></span><br><span class="line">	attaData, err := ioutil.ReadFile(fileName)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Print(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, base64.StdEncoding.EncodedLen(<span class="built_in">len</span>(attaData)))</span><br><span class="line">	base64.StdEncoding.Encode(b, attaData)</span><br><span class="line">	mime.Write(b)</span><br><span class="line">	mime.WriteString(<span class="string">"\r\n"</span>)</span><br><span class="line">	mime.WriteString(<span class="string">"--"</span>+boundary+<span class="string">"--"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	str3 := mime.String()</span><br><span class="line">    auth := smtp.PlainAuth(<span class="string">""</span>, USER, PASSWORD, HOST)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 针对所有的接收者发送邮件</span></span><br><span class="line">	errs := smtp.SendMail(SERVER_ADDR,auth,USER,[]<span class="keyword">string</span>&#123;to&#125;, []<span class="keyword">byte</span>(str3))</span><br><span class="line">	smtp.SendMail(SERVER_ADDR,auth,USER,[]<span class="keyword">string</span>&#123;cc&#125;, []<span class="keyword">byte</span>(str3))</span><br><span class="line">	<span class="keyword">if</span> errs != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(errs)</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		fmt.Println(<span class="string">"邮件发送成功!"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用gomail发送邮件"><a href="#使用gomail发送邮件" class="headerlink" title="使用gomail发送邮件"></a>使用gomail发送邮件</h1><p>上面发送邮件的方式可行, 但是每次配置这么多选项还是挺复杂的. go中使用体验比较好的发送邮件的包有很多, 这里以gomail为例</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">m := gomail.NewMessage()</span><br><span class="line">m.SetAddressHeader(<span class="string">"From"</span>, <span class="string">"********"</span>, <span class="string">"sk"</span>)  <span class="comment">// 发件人</span></span><br><span class="line">m.SetHeader(<span class="string">"To"</span>,  <span class="comment">// 收件人</span></span><br><span class="line">    m.FormatAddress(<span class="string">"xxxxxxxx"</span>, <span class="string">"xx"</span>),</span><br><span class="line">)</span><br><span class="line">m.SetHeader(<span class="string">"Cc"</span>, <span class="string">"******12@qq.com"</span>)</span><br><span class="line">m.SetHeader(<span class="string">"Subject"</span>, <span class="string">"Gomail"</span>)  <span class="comment">// 主题</span></span><br><span class="line">m.SetBody(<span class="string">"text/html"</span>, <span class="string">"Hello mail&lt;/a&gt;"</span>)  <span class="comment">// 正文</span></span><br><span class="line">m.Attach(<span class="string">"log.txt"</span>)</span><br><span class="line"></span><br><span class="line">d := gomail.NewPlainDialer(host, <span class="number">25</span>, user, passwd)  <span class="comment">// 发送邮件服务器、端口、发件人账号、发件人密码</span></span><br><span class="line"><span class="keyword">if</span> err := d.DialAndSend(m); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="built_in">panic</span>(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样来看是否简单很多了呢?</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/golang学习/">golang学习</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/邮件/">邮件</a><a href="/tags/gomail/">gomail</a><a href="/tags/smtp/">smtp</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2018/06/27/go发送邮件/" data-title="go发送邮件 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/07/03/sql调优/" title="sql调优">
+  <strong>上一篇：</strong><br/>
+  <span>
+  sql调优</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/26/golang标准库之sync/"  title="golang标准库之sync">
+ <strong>下一篇：</strong><br/> 
+ <span>golang标准库之sync
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MIME邮件的格式"><span class="toc-number">1.</span> <span class="toc-text">MIME邮件的格式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#邮件头"><span class="toc-number">1.1.</span> <span class="toc-text">邮件头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#邮件体"><span class="toc-number">1.2.</span> <span class="toc-text">邮件体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#go中smtp接口"><span class="toc-number">2.</span> <span class="toc-text">go中smtp接口</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用gomail发送邮件"><span class="toc-number">3.</span> <span class="toc-text">使用gomail发送邮件</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

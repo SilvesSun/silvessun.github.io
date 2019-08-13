@@ -13,7 +13,7 @@
     
     <meta property="og:type" content="website">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://sksun.com.cn/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:locale" content="en">
 <meta name="twitter:card" content="summary">
@@ -56,7 +56,7 @@
 					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
 						<label>Search</label>
 						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
-						<input type="hidden" name="q" value="site:yoursite.com">
+						<input type="hidden" name="q" value="site:sksun.com.cn">
 					</form>
 					
 					</li>
@@ -73,32 +73,97 @@
         <header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2019/08/13/hello-world/" title="Hello World" itemprop="url">Hello World</a>
+      <a href="/2019/08/13/Python-面试题/" title="Python 面试题" itemprop="url">Python 面试题</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
 		
   <p class="article-time">
-    <time datetime="2019-08-13T03:38:54.641Z" itemprop="datePublished"> Published 2019-08-13</time>
+    <time datetime="2019-08-13T02:06:36.000Z" itemprop="datePublished"> Published 2019-08-13</time>
     
   </p>
 </header>
     <div class="article-content">
         
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+        <p>＃ 1.python全局解释器锁<br>＃＃ GIL的优点<br>在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的</p>
+<p>＃＃ CPython为什么存在GIL<br>CPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。</p>
+<p>主要考虑到以下几点：</p>
+<ul>
+<li>单线程情况下更快</li>
+<li>瓶颈在于I/O的多线程情况下更快</li>
+<li>CPU耗时操作，在调用C库的时候更快</li>
+<li>编写C扩展更容易：除非手动指定， 否则不会发生线程切换的问题</li>
+<li>封装C库的时候更加容易， 因为不需要考虑线程安全问题， 如果该库不是线程安全的， 只需要保证调用时GIL是锁定的</li>
+</ul>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/面试/">面试</a>
+</div>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/cheatsheet/">cheatsheet</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/08/13/Python-面试题/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/08/08/tcp-ip面试/" title="tcp/ip面试" itemprop="url">tcp/ip面试</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-08-08T03:13:45.000Z" itemprop="datePublished"> Published 2019-08-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="tcp-的特性"><a href="#tcp-的特性" class="headerlink" title="tcp 的特性"></a>tcp 的特性</h2><ul>
+<li>tcp 是一种<strong>面向连接的， 可靠的</strong>字节流服务</li>
+<li>在一个tcp连接中， 仅有双方进行彼此通信。广播和多播不能用于tcp</li>
+<li>tcp使用校验和， 确认和重传机制来保证可靠传输</li>
+<li></li>
+</ul>
 
         
         
@@ -118,7 +183,619 @@
 <div class="comments-count">
 	
 	  	<span></span>
-		<a href="/2019/08/13/hello-world/#disqus_thread" class="comments-count-link">Comments</a>
+		<a href="/2019/08/08/tcp-ip面试/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/05/17/react开启less支持以及antd按需引入/" title="react开启less支持以及antd按需引入" itemprop="url">react开启less支持以及antd按需引入</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-05-17T07:46:30.000Z" itemprop="datePublished"> Published 2019-05-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>系统基本信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node v10.15.3</span><br><span class="line">npm 6.5.0</span><br><span class="line">yarn 1.15.2</span><br><span class="line">webpack 4.29.6</span><br></pre></td></tr></table></figure>
+
+<h1 id="React开启less支持"><a href="#React开启less支持" class="headerlink" title="React开启less支持"></a>React开启less支持</h1><p>使用<code>create-react-app</code>脚手架新建一个<code>react</code>项目</p>
+<p><code>create-react-app react-blog-with-redux</code></p>
+<p>然后进入到对应目录. 安装对应的包</p>
+<p><code>yarn add less less-loader</code></p>
+<p>还需要在<code>webpack</code>的配置文件中添加相应的配置, 故运行 <code>yarn eject</code> 暴露相关的配置</p>
+<p>此时多出一个<code>config</code>文件夹, 结构如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">config/</span><br><span class="line">├── env.js</span><br><span class="line">├── jest</span><br><span class="line">│   ├── cssTransform.js</span><br><span class="line">│   └── fileTransform.js</span><br><span class="line">├── modules.js</span><br><span class="line">├── paths.js</span><br><span class="line">├── pnpTs.js</span><br><span class="line">├── webpack.config.js</span><br><span class="line">└── webpackDevServer.config.js</span><br></pre></td></tr></table></figure>
+
+<p>在<code>webpack.config.js</code>中作如下修改</p>
+<ul>
+<li><p>修改<code>cssRegex</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cssRegex = <span class="regexp">/\.css$/</span>; <span class="comment">//修改为</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// =&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cssRegex = <span class="regexp">/\.(css|less)$/</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>添加less模块</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在getStyleLoaders最后添加less-loader</span></span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">loader</span>: <span class="built_in">require</span>.resolve(<span class="string">'less-loader'</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p><img src="https://supcoder.net/lessloder.jpg" alt="less"></p>
+<h1 id="antd按需引入"><a href="#antd按需引入" class="headerlink" title="antd按需引入"></a>antd按需引入</h1><h2 id="安装antd"><a href="#安装antd" class="headerlink" title="安装antd"></a>安装antd</h2><p><code>yarn add antd</code></p>
+<h2 id="使用-babel-plugin-import-来进行按需加载"><a href="#使用-babel-plugin-import-来进行按需加载" class="headerlink" title="使用 babel-plugin-import 来进行按需加载"></a>使用 babel-plugin-import 来进行按需加载</h2><p><code>yarn add babel-plugin-import --save-dev</code></p>
+<h2 id="编辑package-json中babel配置项"><a href="#编辑package-json中babel配置项" class="headerlink" title="编辑package.json中babel配置项"></a>编辑<code>package.json</code>中<code>babel</code>配置项</h2><p>添加<code>plugins</code>, 如图<br><img src="https://supcoder.net/antdBabel.png" alt="antd"></p>
+<p>现在就可以按需引入了</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/React/">React</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/less/">less</a><a href="/tags/环境搭建/">环境搭建</a><a href="/tags/antd按需引入/">antd按需引入</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/05/17/react开启less支持以及antd按需引入/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/05/13/Python类装饰器/" title="Python类装饰器" itemprop="url">Python类装饰器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-05-13T08:32:48.000Z" itemprop="datePublished"> Published 2019-05-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="可调用对象"><a href="#可调用对象" class="headerlink" title="可调用对象"></a>可调用对象</h1><p>在Python中, 除开函数外, 调用运算符(<code>()</code>) 还可以应用到其他的对象上. 可以使用内置函数<code>callable()</code> 来判断对象是否可被调用. 任何对象都可以表现的像<br>Python函数, 只要定义了 <code>__call__</code>. 所以也可以用类来实现一个装饰器</p>
+<h1 id="类装饰器"><a href="#类装饰器" class="headerlink" title="类装饰器"></a>类装饰器</h1><p>实现一个函数执行时间的类装饰器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Timer</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, func)</span>:</span></span><br><span class="line">    self.func = func</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">    start = time.now()</span><br><span class="line">    res = self.func(*args, **kwargs)</span><br><span class="line">    after = time.now()</span><br><span class="line">    print(after-start)</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="meta">@Timer</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(x, y)</span>:</span></span><br><span class="line">  <span class="keyword">return</span> x+y</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/05/13/Python类装饰器/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/05/13/Python生成器/" title="Python生成器" itemprop="url">Python生成器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-05-13T03:52:36.000Z" itemprop="datePublished"> Published 2019-05-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/05/13/Python生成器/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/04/18/DRF填坑记/" title="DRF填坑记" itemprop="url">DRF填坑记</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-04-18T02:35:27.000Z" itemprop="datePublished"> Published 2019-04-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>基本情况. 现在使用DRF来返回序列化的结果, 其中相关的代码为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># blog/model.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Blog</span><span class="params">(models.Model, ReadNumExpandMethod)</span>:</span></span><br><span class="line">    title = models.CharField(max_length=<span class="number">50</span>, verbose_name=<span class="string">u'标题'</span>)</span><br><span class="line">    blog_type = models.ForeignKey(BlogType, on_delete=models.DO_NOTHING, verbose_name=<span class="string">u'博客类型'</span>)</span><br><span class="line">    content = models.TextField()</span><br><span class="line">    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name=<span class="string">u'作者'</span>)</span><br><span class="line">    created_time = models.DateTimeField(auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    updated_time = models.DateTimeField(auto_now=<span class="literal">True</span>)</span><br><span class="line">    read_details = GenericRelation(ReadDetail)</span><br><span class="line">    tags = models.ManyToManyField(<span class="string">'Tag'</span>, verbose_name=<span class="string">'标签'</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    overview = models.CharField(max_length=<span class="number">200</span>, default=<span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        verbose_name = <span class="string">u"博客"</span></span><br><span class="line">        verbose_name_plural = verbose_name</span><br><span class="line">        ordering = [<span class="string">'-created_time'</span>]</span><br><span class="line">        <span class="comment"># app_label = 'blog'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.title</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">tags_list</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">','</span>.join(i.name <span class="keyword">for</span> i <span class="keyword">in</span> self.tags.all())</span><br><span class="line"></span><br><span class="line"><span class="comment"># read_statistics/model.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ReadNum</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    read_num = models.IntegerField(default=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)</span><br><span class="line">    object_id = models.PositiveIntegerField()</span><br><span class="line">    content_object = GenericForeignKey(<span class="string">'content_type'</span>, <span class="string">'object_id'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ReadNumExpandMethod</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_read_num</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            ct = ContentType.objects.get_for_model(self)</span><br><span class="line">            readnum = ReadNum.objects.get(content_type=ct, object_id=self.pk)</span><br><span class="line">            <span class="keyword">return</span> readnum.read_num</span><br><span class="line">        <span class="keyword">except</span> exceptions.ObjectDoesNotExist:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ReadDetail</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    date = models.DateField(default=timezone.now)</span><br><span class="line">    read_num = models.IntegerField(default=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)</span><br><span class="line">    object_id = models.PositiveIntegerField()</span><br><span class="line">    content_object = GenericForeignKey(<span class="string">'content_type'</span>, <span class="string">'object_id'</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="1-CORS"><a href="#1-CORS" class="headerlink" title="1. CORS"></a>1. CORS</h1><p><code>Access to XMLHttpRequest at &#39;http://127.0.0.1:8000/blog/&#39; from origin &#39;http://localhost:3000&#39; has been blocked by CORS policy: No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.</code></p>
+<p>解决办法:<br>  安装<code>django-cors-headers</code>, <code>pip install django-cors-headers</code></p>
+<p>  配置<code>settings.py</code>,<br>  <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = (</span><br><span class="line">...</span><br><span class="line"><span class="string">'corsheaders'</span>,   </span><br><span class="line">...</span><br><span class="line">)</span><br><span class="line">MIDDLEWARE_CLASSES</span><br><span class="line">= (</span><br><span class="line"><span class="meta">... </span>  </span><br><span class="line"><span class="string">'corsheaders.middleware.CorsMiddleware'</span>,</span><br><span class="line"><span class="string">'django.middleware.common.CommonMiddleware'</span>,   </span><br><span class="line">...</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">CORS_ORIGIN_ALLOW_ALL = <span class="literal">False</span></span><br><span class="line">CORS_ORIGIN_WHITELIST = (</span><br><span class="line">  <span class="string">'127.0.0.1:3000'</span>,</span><br><span class="line">  <span class="string">'localhost:3000'</span></span><br><span class="line"></span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-TypeError-Object-of-type-‘GenericRelatedObjectManager’-is-not-JSON-serializable"><a href="#2-TypeError-Object-of-type-‘GenericRelatedObjectManager’-is-not-JSON-serializable" class="headerlink" title="2.TypeError: Object of type ‘GenericRelatedObjectManager’ is not JSON serializable"></a>2.TypeError: Object of type ‘GenericRelatedObjectManager’ is not JSON serializable</h1><p>通用视图序列化失败.</p>
+<p>这里的序列化器为:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlogSerializer</span><span class="params">(serializers.ModelSerializer)</span>:</span></span><br><span class="line">    created_time = serializers.DateTimeField(format=<span class="string">"%Y-%m-%d"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Blog</span><br><span class="line"></span><br><span class="line">        fields = (<span class="string">'url'</span>, <span class="string">'title'</span>, <span class="string">'content'</span>, <span class="string">'created_time'</span>, <span class="string">'blog_type'</span>, <span class="string">'tags'</span>, <span class="string">'id'</span>, <span class="string">'read_details'</span>)</span><br><span class="line">        depth = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>导致出错的字段为<code>read_details</code>, 这个字段的 <code>relation</code> 为 <code>GenericRelation</code>. 依据文档, 需要自定义返回字段的值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlogSerializer</span><span class="params">(serializers.ModelSerializer)</span>:</span></span><br><span class="line">    created_time = serializers.DateTimeField(format=<span class="string">"%Y-%m-%d"</span>)</span><br><span class="line">    read_num = serializers.SerializerMethodField()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 调用对象的 `get_read_num` 方法, 直接获取到对应的值</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_read_num</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> obj.get_read_num()</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = Blog</span><br><span class="line"></span><br><span class="line">        fields = (<span class="string">'url'</span>, <span class="string">'title'</span>, <span class="string">'content'</span>, <span class="string">'created_time'</span>, <span class="string">'blog_type'</span>, <span class="string">'tags'</span>, <span class="string">'id'</span>, <span class="string">'read_num'</span>)</span><br><span class="line">        depth = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>这样序列化成功</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"url"</span>: <span class="string">"http://127.0.0.1:8000/blog/53/"</span>,</span><br><span class="line">    <span class="attr">"title"</span>: <span class="string">"数据库事务"</span>,</span><br><span class="line">    <span class="attr">"content"</span>: <span class="string">"...."</span>,</span><br><span class="line">    <span class="attr">"created_time"</span>: <span class="string">"2019-03-20"</span>,</span><br><span class="line">    <span class="attr">"blog_type"</span>: &#123;</span><br><span class="line">        <span class="attr">"id"</span>: <span class="number">21</span>,</span><br><span class="line">        <span class="attr">"type_name"</span>: <span class="string">"数据库"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"tags"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"id"</span>: <span class="number">72</span>,</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"事务"</span>,</span><br><span class="line">            <span class="attr">"created_time"</span>: <span class="string">"2019-03-20T11:03:55Z"</span>,</span><br><span class="line">            <span class="attr">"last_modified_time"</span>: <span class="string">"2019-03-20T11:03:55Z"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"id"</span>: <span class="number">53</span>,</span><br><span class="line">    <span class="attr">"read_num"</span>: <span class="number">14</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/读书笔记/">读书笔记</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/drf/">drf</a><a href="/tags/实战/">实战</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/04/18/DRF填坑记/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/20/InnoDB存储引擎数据结构/" title="InnoDB存储引擎数据结构" itemprop="url">InnoDB存储引擎数据结构</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-20T03:06:23.000Z" itemprop="datePublished"> Published 2019-03-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="B树和B-树的区别"><a href="#B树和B-树的区别" class="headerlink" title="B树和B+树的区别"></a>B树和B+树的区别</h1><p><img src="http://supcoder.net/B-Tree.png" alt></p>
+<ul>
+<li><p>B+树中只有叶子节点会带有指向记录的指针（ROWID），而B树则所有节点都带有，在内部节点出现的索引项不会再出现在叶子节点中。</p>
+</li>
+<li><p>B+树中所有叶子节点都是通过指针连接在一起，而B树不会</p>
+</li>
+</ul>
+<h1 id="InnoDB-和-Myisam-的区别"><a href="#InnoDB-和-Myisam-的区别" class="headerlink" title="InnoDB 和 Myisam 的区别"></a>InnoDB 和 Myisam 的区别</h1><h2 id="存储结构的不同"><a href="#存储结构的不同" class="headerlink" title="存储结构的不同"></a>存储结构的不同</h2><ul>
+<li><p>MyISAM 每个MyISAM在磁盘上存储为三个文件, 表定义文件/数据文件/索引文件. 第一个文件的名字以表名开头, 扩展名指出文件类型. <code>.frm</code>文件存储表定义,<br><code>.MYD</code> 文件存储表数据, <code>.MYI</code>文件存储索引</p>
+</li>
+<li><p>InnoDB 基于磁盘的资源是InnoDB表空间数据文件和它的日志文件. 大小受限于操作系统的大小, 一般为2G</p>
+</li>
+</ul>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>InnoDB 提供事务/外键等支持, MyISAM不支持事务</p>
+<h2 id="select-update-insert-delete"><a href="#select-update-insert-delete" class="headerlink" title="select/update/insert/delete"></a>select/update/insert/delete</h2><p>如果主要表主要是提供查询, 比如报表系统, MyISAM更好; 如果对数据有大量的更新插入, 选择InnoDB</p>
+<h2 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h2><p>MyISAM 只支持表级锁, InnoDB支持事务和行级锁. 注意InnoDB的行级锁只在<code>where</code>主键有效的时候有用. 非主键的where都会锁表</p>
+<h2 id="select-count-from-table"><a href="#select-count-from-table" class="headerlink" title="select count(*) from table"></a>select count(*) from table</h2><p>MyISAM只要简单的读出保存好的行数，注意的是，当count(*)语句包含 where条件时，两种表的操作是一样的</p>
+<p>InnoDB 中不 保存表的具体行数，也就是说，执行select count(*) from table时，InnoDB要扫描一遍整个表来计算有多少行</p>
+<h2 id="自增"><a href="#自增" class="headerlink" title="自增"></a>自增</h2><ul>
+<li>MyISAM  可以和其他字段一起建立联合索引。引擎的自动增长列必须是索引，如果是组合索引，自动增长可以不是第一列，可以根据前面几列进行排序后递增</li>
+<li>InnoDB  InnoDB中必须包含只有该字段的索引。引擎的自动增长列必须是索引，如果是组合索引也必须是组合索引的第一列</li>
+</ul>
+<h1 id="InnoDB的关键特性"><a href="#InnoDB的关键特性" class="headerlink" title="InnoDB的关键特性"></a>InnoDB的关键特性</h1><h2 id="插入缓冲-insert-buffer"><a href="#插入缓冲-insert-buffer" class="headerlink" title="插入缓冲(insert buffer)"></a>插入缓冲(insert buffer)</h2><p>insert buffer 是一颗 B+树. 放在共享表空间中</p>
+<p>对于非聚集索引的插入或者更新操作, 不是一次直接插入到索引页中, 而是先判断插入的非聚集索引是否在缓冲池中, 若在则直接插入; 若不在, 则先放入到一个<br>Insert Buffer 中, 然后再以一定的频率和情况进行 Insert Buffer 和辅助索引叶子节点的合并操作, 这时通常能一次插入多个记录, 从而提高了效率.</p>
+<p>Insert Buffer的使用需要满足的条件为:</p>
+<ul>
+<li>索引是辅助索引</li>
+<li>索引不是唯一的</li>
+</ul>
+<p>change buffer 可以视为 Insert Buffer 的升级</p>
+<p>insert buffer 的合并操作可能发生的情况:</p>
+<ul>
+<li>辅助索引页被读取到缓冲池中</li>
+<li>Insert Buffer Bitmap页追踪到该辅助索引页已无可用空间</li>
+<li>Master Thread</li>
+</ul>
+<h2 id="两次写"><a href="#两次写" class="headerlink" title="两次写"></a>两次写</h2><p>数据页的可靠性.</p>
+<p>当发生写失效时, 先通过页的副本来还原该页, 再应用重做日志. </p>
+<h2 id="自适应哈希索引"><a href="#自适应哈希索引" class="headerlink" title="自适应哈希索引"></a>自适应哈希索引</h2><p>InnoDB 会监控对表上各索引页的查询, 如果观察到建立哈希索引可以带来速度提升, 则建立哈希索引. 称为自适应哈希索引</p>
+<h2 id="异步IO"><a href="#异步IO" class="headerlink" title="异步IO"></a>异步IO</h2><h2 id="刷新邻接页"><a href="#刷新邻接页" class="headerlink" title="刷新邻接页"></a>刷新邻接页</h2><p>当刷新一个脏页时, InnoDB会检测该页所在区的所有页, 如果是脏页, 那么一起刷新.</p>
+<h2 id="预读"><a href="#预读" class="headerlink" title="预读"></a>预读</h2><p>I/O的优化上有个比较重要的特性为预读，预读请求是一个i/o请求，它会异步地在缓冲池中预先回迁多个页面，预计很快就会需要这些页面，这些请求在一个范围内引入所有页面</p>
+<h1 id="InnoDB事务的实现方式"><a href="#InnoDB事务的实现方式" class="headerlink" title="InnoDB事务的实现方式"></a>InnoDB事务的实现方式</h1><p>事务的隔离性由锁实现, 原子性/一致性/持久性 由数据库的 <code>redo log</code> 和 <code>undo log</code>完成. 重做日志保证事务的原子性和持久性, undo log用来保证事事务的一致性</p>
+<p>redo 通常是物理日志, 记录页的物理操作; undo是逻辑日志, 根据每行记录进行记录</p>
+<h2 id="重做日志"><a href="#重做日志" class="headerlink" title="重做日志"></a>重做日志</h2><p>包括两部分, 内存中的重做日志缓冲 和 重做日志文件</p>
+<p>通过 <code>Force Log at Commit</code> 机制实现事务的持久性. 即当事务提交时, 必须先将事务的所有日志写入到重做日志文件进行持久化, 待事务的commit操作完成才算完成</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/InnoDB/">InnoDB</a><a href="/tags/数据结构/">数据结构</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/20/InnoDB存储引擎数据结构/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/20/数据库事务/" title="数据库事务" itemprop="url">数据库事务</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-20T02:30:50.000Z" itemprop="datePublished"> Published 2019-03-20</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>访问并可能更新数据库中各种数据项的一个程序执行单元(unit)</p>
+<h1 id="事务的4大属性"><a href="#事务的4大属性" class="headerlink" title="事务的4大属性"></a>事务的4大属性</h1><p>acid. </p>
+<ul>
+<li><p>原子性(Atomicity) 事务作为一个整体被执行，包含在其中的对数据库的操作要么全部被执行，要么都不执行</p>
+</li>
+<li><p>一致性(Consistency) 事务应确保数据库的状态从一个一致状态转变为另一个一致状态。一致状态的含义是数据库中的数据应满足完整性约束</p>
+</li>
+<li><p>隔离性（Isolation） 多个事务并发执行时，一个事务的执行不应影响其他事务的执行</p>
+</li>
+<li><p>持久性（Durability）一个事务一旦提交，他对数据库的修改应该永久保存在数据库中</p>
+</li>
+</ul>
+<h1 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h1><p><code>RAED UNCOMMITED</code> 读未提交, 使用查询语句不会加锁，可能会读到未提交的行（Dirty Read）</p>
+<p><code>READ COMMITED</code> 读已提交, 只对记录加记录锁，而不会在记录之间加间隙锁，所以允许新的记录插入到被锁定记录的附近，所以再多次使用查询语句时，可能得到不同的结果（Non-Repeatable Read）</p>
+<p><code>REPEATABLE READ</code> 可重复读, 多次读取同一范围的数据会返回第一次查询的快照，不会返回不同的数据行，但是可能发生幻读（Phantom Read）</p>
+<p><code>SERIALIZABLE</code> 可串行读, InnoDB 隐式地将全部的查询语句加上共享锁，解决了幻读的问题</p>
+<p>每个事务的隔离级别其实都比上一级多解决了一个问题</p>
+<p><strong>在MySQL数据库中，支持上面四种隔离级别，默认的为Repeatable read (可重复读)</strong></p>
+<p>InnoDB 的默认级别是可重复读, 并通过 <code>间隙锁</code> 策略防止幻读的出现</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/事务/">事务</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/20/数据库事务/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/19/Python描述符/" title="Python描述符" itemprop="url">Python描述符</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-19T07:09:20.000Z" itemprop="datePublished"> Published 2019-03-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>描述符是实现了特定协议的类, 这个协议包括<code>__get__</code>, <code>__set__</code>, <code>__del__</code></p>
+<p>property类实现了完整的描述符协议, 通常可以只实现部分协议. 描述符的用法是创建一个实例, 作为另一个类的类属性</p>
+<ul>
+<li><p>覆盖型描述符<br>实现 <code>__set__</code>方法的描述符属于覆盖型描述符</p>
+</li>
+<li><p>非覆盖型描述符</p>
+</li>
+</ul>
+<p>没有实现<code>__set__</code>方法的描述符</p>
+<p>不管描述符是不是覆盖型, 为类属性赋值都能覆盖描述符, 这是一种猴子补丁技术</p>
+<h2 id="方法是描述符"><a href="#方法是描述符" class="headerlink" title="方法是描述符"></a>方法是描述符</h2><p>在类中定义的方法属于绑定方法, 因为用户定义的函数都有<code>__get__</code>方法, 所以依附到类上, 就相当于描述符</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/19/Python描述符/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/18/Python协程/" title="Python协程" itemprop="url">Python协程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-18T07:41:27.000Z" itemprop="datePublished"> Published 2019-03-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Python2.5 以后, yield 关键字可在表达式中使用, 并在生成器的API中添加了 <code>.send(value)</code> 方法. 生成器的调用方可以使用<code>.send(...)</code> 发送数据, 发送的数据<br>会成为生成器函数中 <code>yield</code> 表达式的值. </p>
+<p>协程是指一个过程, 这个过程与调用方协作, 产出由调用方提供的值</p>
+<p>除开 send() 外, pep342 中还定义了 <code>.throw(...)</code> 用于调用方抛出异常, 在生成器中处理; <code>.close()</code> 终止生成器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;<span class="function"><span class="keyword">def</span> <span class="title">simple_coroutine</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"start coroutine"</span>)</span><br><span class="line">    x = <span class="keyword">yield</span></span><br><span class="line">    print(<span class="string">"recieve value:"</span>, x)</span><br><span class="line">    </span><br><span class="line">&gt;&gt;&gt;coro = simple_coroutine()</span><br><span class="line">&gt;&gt;&gt;coro</span><br><span class="line">&lt;generator object simple_coroutine at <span class="number">0x0000000003D47570</span>&gt;</span><br><span class="line">&gt;&gt;&gt;next(coro)</span><br><span class="line">start coroutine</span><br><span class="line">&gt;&gt;&gt;coro.send(<span class="number">42</span>)  <span class="comment">## 调用 send 后, yield表达式计算出 42. 协程恢复, 一直运行到下一个yield表达式, 或者终止</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;input&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">StopIteration</span><br><span class="line">recieve value: <span class="number">42</span></span><br></pre></td></tr></table></figure>
+
+<p>激活一个协程可以使用</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;next(coro)</span><br><span class="line">start coroutine</span><br><span class="line"></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line">&gt;&gt;&gt;coro.send(<span class="literal">None</span>)</span><br><span class="line">start coroutine</span><br></pre></td></tr></table></figure>
+
+<p>如果创建协程对象后不激活协程, 将 None 以外的值传递给它, 将会报错</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;coro = simple_coroutine()</span><br><span class="line">&gt;&gt;&gt;coro.send(<span class="number">5</span>)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;input&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">TypeError: can<span class="string">'t send non-None value to a just-started generator</span></span><br></pre></td></tr></table></figure>
+
+<p>另一个例子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">simple_coro2</span><span class="params">(a)</span>:</span></span><br><span class="line">    print(<span class="string">"-&gt; start a = "</span>, a)</span><br><span class="line">    b = <span class="keyword">yield</span> a  <span class="comment">## = 右边的代码先执行, 因此要在客户端代码再激活时才会复制给b</span></span><br><span class="line">    print(<span class="string">"-&gt; received b = "</span>, b)</span><br><span class="line">    c = <span class="keyword">yield</span> a + b</span><br><span class="line">    print(<span class="string">"-&gt; received c="</span>, c) </span><br><span class="line">coro2 = simple_coro2(<span class="number">14</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>&gt;&gt;next(coro2)</span><br><span class="line"><span class="meta">-&gt;</span> start a =  14</span><br><span class="line">14</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt;coro2.send(28)</span><br><span class="line"><span class="meta">-&gt;</span> received b =  28</span><br><span class="line">42</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; coro2.send(99)</span><br><span class="line"><span class="meta">-&gt;</span> received c= 99</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File "&lt;input&gt;", line 1, in &lt;module&gt;</span><br><span class="line">StopIteration</span><br></pre></td></tr></table></figure>
+
+<p>所有的协程都需要预激才能使用, 使用 <code>yield from</code> 语法时, 会自动预激. </p>
+<h2 id="yield-from"><a href="#yield-from" class="headerlink" title="yield from"></a>yield from</h2><p><code>yield from x</code> 表达式对x对象做的事情为:</p>
+<ol>
+<li>调用 iter(x) 从中获取迭代器. x是任何可迭代的对象</li>
+<li>打开双向通道, 把最外层的调用方与最内层的子生成器连接起来, 这样两者可以直接发送和产出值, 传入异常</li>
+</ol>
+<p>###术语<br><code>委派生成器</code> 包含 yield from <iterable> 表达式的生成器函数</iterable></p>
+<p><code>子生成器</code> 从yield from 表达式中, <iterable> 部分获取的生成器</iterable></p>
+<p><code>调用方</code> 调用委派生成器的客户端代码</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 子生成器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">averager</span><span class="params">()</span>:</span>  <span class="comment"># &lt;1&gt;</span></span><br><span class="line">    total = <span class="number">0.0</span></span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    average = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        term = <span class="keyword">yield</span>  <span class="comment"># &lt;2&gt;</span></span><br><span class="line">        <span class="keyword">if</span> term <span class="keyword">is</span> <span class="literal">None</span>:  <span class="comment"># &lt;3&gt;</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        total += term</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">        average = total/count</span><br><span class="line">    <span class="keyword">return</span> Result(count, average)  <span class="comment"># &lt;4&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 委派生成器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">grouper</span><span class="params">(results, key)</span>:</span>  <span class="comment"># &lt;5&gt;</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:  <span class="comment"># &lt;6&gt;</span></span><br><span class="line">        results[key] = <span class="keyword">yield</span> <span class="keyword">from</span> averager()  <span class="comment"># &lt;7&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用方</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(data)</span>:</span>  <span class="comment"># &lt;8&gt;</span></span><br><span class="line">    results = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> key, values <span class="keyword">in</span> data.items():</span><br><span class="line">        group = grouper(results, key)  <span class="comment"># &lt;9&gt;</span></span><br><span class="line">        next(group)  <span class="comment"># &lt;10&gt; </span></span><br><span class="line">        <span class="keyword">for</span> value <span class="keyword">in</span> values:</span><br><span class="line">            group.send(value)  <span class="comment"># &lt;11&gt;</span></span><br><span class="line">        group.send(<span class="literal">None</span>)  <span class="comment"># important! &lt;12&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># print(results)  # uncomment to debug</span></span><br><span class="line">    report(results)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># output report</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">report</span><span class="params">(results)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> key, result <span class="keyword">in</span> sorted(results.items()):</span><br><span class="line">        group, unit = key.split(<span class="string">';'</span>)</span><br><span class="line">        print(<span class="string">'&#123;:2&#125; &#123;:5&#125; averaging &#123;:.2f&#125;&#123;&#125;'</span>.format(</span><br><span class="line">              result.count, group, result.average, unit))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'girls;kg'</span>:</span><br><span class="line">        [<span class="number">40.9</span>, <span class="number">38.5</span>, <span class="number">44.3</span>, <span class="number">42.2</span>, <span class="number">45.2</span>, <span class="number">41.7</span>, <span class="number">44.5</span>, <span class="number">38.0</span>, <span class="number">40.6</span>, <span class="number">44.5</span>],</span><br><span class="line">    <span class="string">'girls;m'</span>:</span><br><span class="line">        [<span class="number">1.6</span>, <span class="number">1.51</span>, <span class="number">1.4</span>, <span class="number">1.3</span>, <span class="number">1.41</span>, <span class="number">1.39</span>, <span class="number">1.33</span>, <span class="number">1.46</span>, <span class="number">1.45</span>, <span class="number">1.43</span>],</span><br><span class="line">    <span class="string">'boys;kg'</span>:</span><br><span class="line">        [<span class="number">39.0</span>, <span class="number">40.8</span>, <span class="number">43.2</span>, <span class="number">40.8</span>, <span class="number">43.1</span>, <span class="number">38.6</span>, <span class="number">41.4</span>, <span class="number">40.6</span>, <span class="number">36.3</span>],</span><br><span class="line">    <span class="string">'boys;m'</span>:</span><br><span class="line">        [<span class="number">1.38</span>, <span class="number">1.5</span>, <span class="number">1.32</span>, <span class="number">1.25</span>, <span class="number">1.37</span>, <span class="number">1.48</span>, <span class="number">1.25</span>, <span class="number">1.49</span>, <span class="number">1.46</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Python/">Python</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a><a href="/tags/协程/">协程</a><a href="/tags/流畅的Python/">流畅的Python</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/03/18/Python协程/#disqus_thread" class="comments-count-link">Comments</a>
 	
 </div>
 
@@ -133,6 +810,10 @@
 
 
 
+  <nav id="page-nav" class="clearfix">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/2/">Next<span></span></a>
+  </nav>
+
 </div>
       <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
 
@@ -144,8 +825,282 @@
 
 
   
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
 
   
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
 
 </aside>
 </div>

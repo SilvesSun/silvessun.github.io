@@ -1,0 +1,771 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>IO复用select,poll | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="IO多路复用是指内核一旦发现进程指定的一个或者多个IO条件准备读取，它就通知该进程 使用场景:1) 客户处理多个描述符时, 必须使用IO复用2) 一个客户同时处理多个套接字3) 一个TCP服务器既要处理监听套接字, 又要处理已连接套接字4) 一个服务器既要处理TCP, 又要处理UDP5) 一个服务器要处理多个协议 原始客户端程序1234567891011121314151617181920212">
+<meta name="keywords" content="I&#x2F;O模型,并发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO复用select,poll">
+<meta property="og:url" content="http://sksun.com.cn/2018/06/20/IO复用select-poll/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="IO多路复用是指内核一旦发现进程指定的一个或者多个IO条件准备读取，它就通知该进程 使用场景:1) 客户处理多个描述符时, 必须使用IO复用2) 一个客户同时处理多个套接字3) 一个TCP服务器既要处理监听套接字, 又要处理已连接套接字4) 一个服务器既要处理TCP, 又要处理UDP5) 一个服务器要处理多个协议 原始客户端程序1234567891011121314151617181920212">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-20/7906302.jpg">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com/2018-06-22-10-54-06.png">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IO复用select,poll">
+<meta name="twitter:description" content="IO多路复用是指内核一旦发现进程指定的一个或者多个IO条件准备读取，它就通知该进程 使用场景:1) 客户处理多个描述符时, 必须使用IO复用2) 一个客户同时处理多个套接字3) 一个TCP服务器既要处理监听套接字, 又要处理已连接套接字4) 一个服务器既要处理TCP, 又要处理UDP5) 一个服务器要处理多个协议 原始客户端程序1234567891011121314151617181920212">
+<meta name="twitter:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-20/7906302.jpg">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/20/IO复用select-poll/" title="IO复用select,poll" itemprop="url">IO复用select,poll</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-20T06:25:07.000Z" itemprop="datePublished"> Published 2018-06-20</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#原始客户端程序"><span class="toc-number">1.</span> <span class="toc-text">原始客户端程序</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#问题"><span class="toc-number">1.1.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#select"><span class="toc-number">2.</span> <span class="toc-text">select</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#select函数"><span class="toc-number">2.1.</span> <span class="toc-text">select函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#timeout"><span class="toc-number">2.1.1.</span> <span class="toc-text">timeout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#readset-writeset-exceptset"><span class="toc-number">2.1.2.</span> <span class="toc-text">readset, writeset, exceptset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#maxfdp1"><span class="toc-number">2.1.3.</span> <span class="toc-text">maxfdp1</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select版本的str-cli函数"><span class="toc-number">2.2.</span> <span class="toc-text">select版本的str_cli函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select版本的服务器程序"><span class="toc-number">2.3.</span> <span class="toc-text">select版本的服务器程序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#poll"><span class="toc-number">3.</span> <span class="toc-text">poll</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#poll函数"><span class="toc-number">3.1.</span> <span class="toc-text">poll函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于poll的服务端程序"><span class="toc-number">3.2.</span> <span class="toc-text">基于poll的服务端程序</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-20/7906302.jpg" alt="I/O复用模型"></p>
+<p><strong>IO多路复用是指内核一旦发现进程指定的一个或者多个IO条件准备读取，它就通知该进程</strong></p>
+<p>使用场景:<br>1) 客户处理多个描述符时, 必须使用IO复用<br>2) 一个客户同时处理多个套接字<br>3) 一个TCP服务器既要处理监听套接字, 又要处理已连接套接字<br>4) 一个服务器既要处理TCP, 又要处理UDP<br>5) 一个服务器要处理多个协议</p>
+<h1 id="原始客户端程序"><a href="#原始客户端程序" class="headerlink" title="原始客户端程序"></a>原始客户端程序</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span>	<span class="meta-string">"unp.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span></span><br><span class="line">main(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span>					sockfd;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span>	<span class="title">servaddr</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">		err_quit(<span class="string">"usage: tcpcli &lt;IPaddress&gt;"</span>);</span><br><span class="line"></span><br><span class="line">	sockfd = Socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	bzero(&amp;servaddr, <span class="keyword">sizeof</span>(servaddr));</span><br><span class="line">	servaddr.sin_family = AF_INET;</span><br><span class="line">	servaddr.sin_port = htons(SERV_PORT);</span><br><span class="line">	Inet_pton(AF_INET, argv[<span class="number">1</span>], &amp;servaddr.sin_addr); <span class="comment">// 创建tcp套接字</span></span><br><span class="line"></span><br><span class="line">	Connect(sockfd, (SA *) &amp;servaddr, <span class="keyword">sizeof</span>(servaddr));  <span class="comment">// tcp连接</span></span><br><span class="line"></span><br><span class="line">	str_cli(<span class="built_in">stdin</span>, sockfd);		<span class="comment">/* str_cli完成具体的客户端处理 */</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">str_cli(FILE *fp, <span class="keyword">int</span> sockfd)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span>	sendline[MAXLINE], recvline[MAXLINE];</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (Fgets(sendline, MAXLINE, fp) != <span class="literal">NULL</span>) &#123;  </span><br><span class="line"></span><br><span class="line">		Writen(sockfd, sendline, <span class="built_in">strlen</span>(sendline)); <span class="comment">/* */</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (Readline(sockfd, recvline, MAXLINE) == <span class="number">0</span>)</span><br><span class="line">			err_quit(<span class="string">"str_cli: server terminated prematurely"</span>);</span><br><span class="line"></span><br><span class="line">		Fputs(recvline, <span class="built_in">stdout</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里<code>Fgets</code>如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *</span><br><span class="line">Fgets(<span class="keyword">char</span> *ptr, <span class="keyword">int</span> n, FILE *stream)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">char</span>	*rptr;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ( (rptr = fgets(ptr, n, stream)) == <span class="literal">NULL</span> &amp;&amp; ferror(stream))</span><br><span class="line">		err_sys(<span class="string">"fgets error"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (rptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到调用的是<code>fgets</code>, 这是一个<code>&lt;stdio.h&gt;</code>中的函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">fgets</span><span class="params">(<span class="keyword">char</span> *s, <span class="keyword">int</span> size, FILE *stream)</span></span>;</span><br><span class="line"></span><br><span class="line">返回值：成功时s指向哪返回的指针就指向哪，出错或者读到文件末尾时返回<span class="literal">NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>fgets从指定的文件中读一行字符到调用者提供的缓冲区中. 参数s是缓冲区的首地址，size是缓冲区的长度，该函数从stream所指的文件中读取以’\n’结尾的一行（包括’\n’在内）存到缓冲区s中，并且在该行末尾添加一个’\0’组成完整的字符串。</p>
+<p>具体到这个程序, 就是从标准输入读取一行文本到 sendline中, 然后使用<code>Writen</code> 将读取到的内容发送到sockfd中.</p>
+<p>然后Readline从sockfd中读取数据, 写入recvline, 最后使用Fputs将缓冲区中的类容输出到标准输出</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>可以看到, 上述代码同时处理两个输入: 标准输入和tcp套接字, 当客户阻塞于fgets调用时, 如果服务器进程被杀死, 这个时候虽然服务器给客户端发送了一个FIN, 但是因为客户端进程正阻塞于标准输入, 它将看不到这个EOF. 为了解决这个问题, 需要一种机制,可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作. 这个机制就是<strong>IO多路复用</strong>. 这种机制基于<code>select</code>, <code>poll</code> 这两个函数.</p>
+<h1 id="select"><a href="#select" class="headerlink" title="select"></a>select</h1><h2 id="select函数"><a href="#select函数" class="headerlink" title="select函数"></a>select函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">select</span><span class="params">(<span class="keyword">int</span> maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,struct timeval *timeout)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>该函数返回时, 结果将指示哪些哪些描述符已就绪. 函数返回后, 调用FD_ISSET来测试fd_set中的描述符. 描述符内任何与未就绪描述符对应的位返回时均清成0</p>
+<h3 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h3><p>timeout 可设置的值有三种<br>1) 空值, 表示一直等待下去, 直到某一个描述符就绪<br>2) 一定的时间<br>3) 根本不等待, 检查描述符后立即返回, 这称为轮询. 这种情况下该参数指向一个timeval结构, 其中的定时器值为0. 为此, 每次调用select时需要将自己关心的描述符置为1</p>
+<h3 id="readset-writeset-exceptset"><a href="#readset-writeset-exceptset" class="headerlink" title="readset, writeset, exceptset"></a>readset, writeset, exceptset</h3><p>这三个参数指定需要内核测试读, 写, 和异常条件的描述符</p>
+<p>select使用描述符集, 通常是一个整数数组, 每个整数的每一位对应一个描述符</p>
+<h3 id="maxfdp1"><a href="#maxfdp1" class="headerlink" title="maxfdp1"></a>maxfdp1</h3><p>待测试的描述符个数, 它的值是待测试的最大描述符加1, 描述符0, 1, …, maxfdp1-1均将被测试</p>
+<h2 id="select版本的str-cli函数"><a href="#select版本的str-cli函数" class="headerlink" title="select版本的str_cli函数"></a>select版本的str_cli函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">str_cli(FILE *fp, <span class="keyword">int</span> sockfd)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span>			maxfdp1;</span><br><span class="line">	fd_set		rset;</span><br><span class="line">	<span class="keyword">char</span>		sendline[MAXLINE], recvline[MAXLINE];</span><br><span class="line"></span><br><span class="line">	FD_ZERO(&amp;rset); <span class="comment">// FD_ZERO宏将一个 fd_set类型变量的所有位都设为 0</span></span><br><span class="line">	<span class="keyword">for</span> ( ; ; ) &#123;</span><br><span class="line">		FD_SET(fileno(fp), &amp;rset); <span class="comment">// FD_SET将变量的某个位置位1. 这里关心的是fileno 和sockfd</span></span><br><span class="line">		FD_SET(sockfd, &amp;rset);</span><br><span class="line">		maxfdp1 = max(fileno(fp), sockfd) + <span class="number">1</span>; <span class="comment">//获得maxfdp1</span></span><br><span class="line">		Select(maxfdp1, &amp;rset, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*如果sockfd准备就绪, 将sockfd中的类容读入recvline, 最终输出到标准输出 */</span></span><br><span class="line">		<span class="keyword">if</span> (FD_ISSET(sockfd, &amp;rset)) &#123;	<span class="comment">/* socket is readable */</span></span><br><span class="line">			<span class="keyword">if</span> (Readline(sockfd, recvline, MAXLINE) == <span class="number">0</span>)</span><br><span class="line">				err_quit(<span class="string">"str_cli: server terminated prematurely"</span>);</span><br><span class="line">			Fputs(recvline, <span class="built_in">stdout</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*在这里, 如果从标准输入读到数据, 就将输入写到sendline, 然后写入sockfd*/</span></span><br><span class="line">		<span class="keyword">if</span> (FD_ISSET(fileno(fp), &amp;rset)) &#123;  <span class="comment">/* input is readable */</span></span><br><span class="line">			<span class="keyword">if</span> (Fgets(sendline, MAXLINE, fp) == <span class="literal">NULL</span>)</span><br><span class="line">				<span class="keyword">return</span>;		<span class="comment">/* all done */</span></span><br><span class="line">			Writen(sockfd, sendline, <span class="built_in">strlen</span>(sendline));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这个方法已经足够应对单对单的请求, 但是如果是批量请求, 标准输入的EOF并不意味着可以关闭通道, 因为这时候可能套接字中依然还存在类容. 这种情况下可以通过shutdown来告诉服务器已经完成了数据的发送, 但是仍然保持套接字描述符打开以便于读取.</p>
+<p>unp中解决这个问题的代码如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">str_cli(FILE *fp, <span class="keyword">int</span> sockfd)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span>			maxfdp1, stdineof;</span><br><span class="line">	fd_set		rset;</span><br><span class="line">	<span class="keyword">char</span>		buf[MAXLINE];</span><br><span class="line">	<span class="keyword">int</span>		n;</span><br><span class="line"></span><br><span class="line">	stdineof = <span class="number">0</span>;</span><br><span class="line">	FD_ZERO(&amp;rset);</span><br><span class="line">	<span class="keyword">for</span> ( ; ; ) &#123;</span><br><span class="line">		<span class="keyword">if</span> (stdineof == <span class="number">0</span>)</span><br><span class="line">			FD_SET(fileno(fp), &amp;rset);</span><br><span class="line">		FD_SET(sockfd, &amp;rset);</span><br><span class="line">		maxfdp1 = max(fileno(fp), sockfd) + <span class="number">1</span>;</span><br><span class="line">		Select(maxfdp1, &amp;rset, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*当在套接字上读到EOF, 如果已经在标准输入中读到EOF, 则为正常终止, 否则为服务器过早关闭 */</span></span><br><span class="line">		<span class="keyword">if</span> (FD_ISSET(sockfd, &amp;rset)) &#123;	<span class="comment">/* socket is readable */</span></span><br><span class="line">			<span class="keyword">if</span> ( (n = Read(sockfd, buf, MAXLINE)) == <span class="number">0</span>) &#123;  <span class="comment">/*Read返回值：成功返回读取的字节数，出错返回-1并设置errno，如果在调read之前已到达文件末尾，则这次read返回0*/</span></span><br><span class="line">				<span class="keyword">if</span> (stdineof == <span class="number">1</span>) </span><br><span class="line">					<span class="keyword">return</span>;		<span class="comment">/* normal termination */</span></span><br><span class="line">				<span class="keyword">else</span></span><br><span class="line">					err_quit(<span class="string">"str_cli: server terminated prematurely"</span>);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			Write(fileno(<span class="built_in">stdout</span>), buf, n);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (FD_ISSET(fileno(fp), &amp;rset)) &#123;  <span class="comment">/* input is readable */</span></span><br><span class="line">			<span class="keyword">if</span> ( (n = Read(fileno(fp), buf, MAXLINE)) == <span class="number">0</span>) &#123; </span><br><span class="line">				stdineof = <span class="number">1</span>; <span class="comment">// 标准输入EOF, 标志位置1,发送FIN</span></span><br><span class="line">				Shutdown(sockfd, SHUT_WR);	<span class="comment">/* send FIN */</span></span><br><span class="line">				FD_CLR(fileno(fp), &amp;rset);</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			Writen(sockfd, buf, n);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="select版本的服务器程序"><a href="#select版本的服务器程序" class="headerlink" title="select版本的服务器程序"></a>select版本的服务器程序</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">main(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span><br><span class="line">&#123;   </span><br><span class="line">    ... <span class="comment">// 省略创建套接字并连接的部分</span></span><br><span class="line">    maxfd = listenfd;			<span class="comment">/* initialize */</span></span><br><span class="line">    maxi = <span class="number">-1</span>;					<span class="comment">/* index into client[] array */</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FD_SETSIZE; i++)</span><br><span class="line">        client[i] = <span class="number">-1</span>;			<span class="comment">/* -1 indicates available entry */</span></span><br><span class="line">    FD_ZERO(&amp;allset);</span><br><span class="line">    FD_SET(listenfd, &amp;allset);</span><br><span class="line">    <span class="keyword">for</span> ( ; ; ) &#123;</span><br><span class="line">		rset = allset;		<span class="comment">/* structure assignment */</span></span><br><span class="line">		nready = Select(maxfd+<span class="number">1</span>, &amp;rset, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>); <span class="comment">/* select等待某个事件的发生*/</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (FD_ISSET(listenfd, &amp;rset)) &#123;	<span class="comment">/* new client connection. 监听套接字可读, 说明建立了一个新连接 */</span> </span><br><span class="line">			clilen = <span class="keyword">sizeof</span>(cliaddr);</span><br><span class="line">			connfd = Accept(listenfd, (SA *) &amp;cliaddr, &amp;clilen); <span class="comment">//调用Accept</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span>	NOTDEF</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">"new client: %s, port %d\n"</span>,</span><br><span class="line">					Inet_ntop(AF_INET, &amp;cliaddr.sin_addr, <span class="number">4</span>, <span class="literal">NULL</span>),</span><br><span class="line">					ntohs(cliaddr.sin_port));</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// 更新数据结构</span></span><br><span class="line">			<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; FD_SETSIZE; i++)  <span class="comment">//  client[FD_SETSIZE]</span></span><br><span class="line">				<span class="keyword">if</span> (client[i] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">					client[i] = connfd;	<span class="comment">/* save descriptor, 使用第一个未用项记录这个已连接描述符, 然后跳出循环.  */</span> </span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			<span class="keyword">if</span> (i == FD_SETSIZE)</span><br><span class="line">				err_quit(<span class="string">"too many clients"</span>);</span><br><span class="line"></span><br><span class="line">			FD_SET(connfd, &amp;allset);	<span class="comment">/* add new descriptor to set */</span></span><br><span class="line">			<span class="keyword">if</span> (connfd &gt; maxfd)</span><br><span class="line">				maxfd = connfd;			<span class="comment">/* for select */</span></span><br><span class="line">			<span class="keyword">if</span> (i &gt; maxi)</span><br><span class="line">				maxi = i;				<span class="comment">/* max index in client[] array */</span></span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (--nready &lt;= <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">continue</span>;				<span class="comment">/* no more readable descriptors */</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt;= maxi; i++) &#123;	<span class="comment">/* check all clients for data */</span></span><br><span class="line">			<span class="keyword">if</span> ( (sockfd = client[i]) &lt; <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			<span class="keyword">if</span> (FD_ISSET(sockfd, &amp;rset)) &#123;</span><br><span class="line">				<span class="keyword">if</span> ( (n = Read(sockfd, buf, MAXLINE)) == <span class="number">0</span>) &#123;</span><br><span class="line">						<span class="comment">/*4connection closed by client */</span></span><br><span class="line">					Close(sockfd);</span><br><span class="line">					FD_CLR(sockfd, &amp;allset);</span><br><span class="line">					client[i] = <span class="number">-1</span>;</span><br><span class="line">				&#125; <span class="keyword">else</span></span><br><span class="line">					Writen(sockfd, buf, n);</span><br><span class="line"></span><br><span class="line">				<span class="keyword">if</span> (--nready &lt;= <span class="number">0</span>)</span><br><span class="line">					<span class="keyword">break</span>;				<span class="comment">/* no more readable descriptors */</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h1><h2 id="poll函数"><a href="#poll函数" class="headerlink" title="poll函数"></a>poll函数</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">poll</span><span class="params">(struct pollfd *fdarray, <span class="keyword">unsigned</span> <span class="keyword">long</span> nfds, <span class="keyword">int</span> timeout)</span></span>;  </span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">- fdarray. 指向一个poofd结构的第一个元素的指针, 用于指定某个给定描述符的测试条件. </span><br><span class="line"></span><br><span class="line">```c</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> fd;</span><br><span class="line">    <span class="keyword">short</span> events;</span><br><span class="line">    <span class="keyword">short</span> revents;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>每一个 pollfd 结构体指定了一个被监视的文件描述符</li>
+<li>events：指定监测fd的事件（输入、输出、错误），每一个事件有多个取值</li>
+</ul>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-06-22-10-54-06.png" alt="events取值"></p>
+<ul>
+<li><p>revents 域是文件描述符的操作结果事件  </p>
+</li>
+<li><p>nfds:用来指定第一个参数数组元素个数</p>
+</li>
+<li><p>timeout: 指定等待的毫秒数，无论 I/O 是否准备好，poll() 都会返回.</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>timeout值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>INFTIM</td>
+<td>永远等待</td>
+</tr>
+<tr>
+<td>0</td>
+<td>立即返回 ,不阻塞进程</td>
+</tr>
+<tr>
+<td>&gt;0</td>
+<td>等待指定数目的毫秒数</td>
+</tr>
+</tbody></table>
+<ul>
+<li>poll函数的返回值: 成功时，poll() 返回结构体中 revents 域不为 0 的文件描述符个数；如果在超时前没有任何事件发生，poll()返回 0；失败时，poll() 返回 -1，并设置 errno </li>
+</ul>
+<h2 id="基于poll的服务端程序"><a href="#基于poll的服务端程序" class="headerlink" title="基于poll的服务端程序"></a>基于poll的服务端程序</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">main(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span><br><span class="line">&#123;   </span><br><span class="line">    ... <span class="comment">// 省略初始化相关代码, listen函数将一个主动套接字转化为监听套接字</span></span><br><span class="line">    client[<span class="number">0</span>].fd = listenfd;</span><br><span class="line">	client[<span class="number">0</span>].events = POLLRDNORM; <span class="comment">//client[0] 固定用于监听套接字</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; OPEN_MAX; i++)</span><br><span class="line">		client[i].fd = <span class="number">-1</span>;		<span class="comment">/* -1 indicates available entry */</span></span><br><span class="line">	maxi = <span class="number">0</span>;					<span class="comment">/* max index into client[] array */</span></span><br><span class="line">    <span class="keyword">for</span> ( ; ; ) &#123;</span><br><span class="line">		nready = Poll(client, maxi+<span class="number">1</span>, INFTIM);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (client[<span class="number">0</span>].revents &amp; POLLRDNORM) &#123;	<span class="comment">/* new client connection */</span></span><br><span class="line">			clilen = <span class="keyword">sizeof</span>(cliaddr);</span><br><span class="line">			connfd = Accept(listenfd, (SA *) &amp;cliaddr, &amp;clilen);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span>	NOTDEF</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">"new client: %s\n"</span>, Sock_ntop((SA *) &amp;cliaddr, clilen));</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">			<span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; OPEN_MAX; i++)</span><br><span class="line">				<span class="keyword">if</span> (client[i].fd &lt; <span class="number">0</span>) &#123;</span><br><span class="line">					client[i].fd = connfd;	<span class="comment">/* save descriptor */</span></span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			<span class="keyword">if</span> (i == OPEN_MAX)</span><br><span class="line">				err_quit(<span class="string">"too many clients"</span>);</span><br><span class="line"></span><br><span class="line">			client[i].events = POLLRDNORM;</span><br><span class="line">			<span class="keyword">if</span> (i &gt; maxi)</span><br><span class="line">				maxi = i;				<span class="comment">/* max index in client[] array */</span></span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (--nready &lt;= <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">continue</span>;				<span class="comment">/* no more readable descriptors */</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= maxi; i++) &#123;	<span class="comment">/* check all clients for data */</span></span><br><span class="line">			<span class="keyword">if</span> ( (sockfd = client[i].fd) &lt; <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			<span class="keyword">if</span> (client[i].revents &amp; (POLLRDNORM | POLLERR)) &#123;</span><br><span class="line">				<span class="keyword">if</span> ( (n = read(sockfd, buf, MAXLINE)) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">					<span class="keyword">if</span> (errno == ECONNRESET) &#123;</span><br><span class="line">							<span class="comment">/*4connection reset by client */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span>	NOTDEF</span></span><br><span class="line">						<span class="built_in">printf</span>(<span class="string">"client[%d] aborted connection\n"</span>, i);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">						Close(sockfd);</span><br><span class="line">						client[i].fd = <span class="number">-1</span>;</span><br><span class="line">					&#125; <span class="keyword">else</span></span><br><span class="line">						err_sys(<span class="string">"read error"</span>);</span><br><span class="line">				&#125; <span class="keyword">else</span> <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">						<span class="comment">/*4connection closed by client */</span></span><br><span class="line">#ifdef	NOTDEF</span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">"client[%d] closed connection\n"</span>, i);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">					Close(sockfd);</span><br><span class="line">					client[i].fd = <span class="number">-1</span>;</span><br><span class="line">				&#125; <span class="keyword">else</span></span><br><span class="line">					Writen(sockfd, buf, n);</span><br><span class="line"></span><br><span class="line">				<span class="keyword">if</span> (--nready &lt;= <span class="number">0</span>)</span><br><span class="line">					<span class="keyword">break</span>;				<span class="comment">/* no more readable descriptors */</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pollfd结构包含了要监视的event和发生的event，不再使用select“参数-值”传递的方式。同时，pollfd并没有最大数量限制（但是数量过大后性能也是会下降）。 和select函数一样，poll返回后，需要轮询pollfd来获取就绪的描述符。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/网络编程/">网络编程</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/I-O模型/">I/O模型</a><a href="/tags/并发/">并发</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2018/06/20/IO复用select-poll/" data-title="IO复用select,poll | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/06/22/非阻塞式IO/" title="非阻塞式IO">
+  <strong>上一篇：</strong><br/>
+  <span>
+  非阻塞式IO</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/13/nsq源码阅读-nsqd/"  title="nsq源码阅读(nsqd)">
+ <strong>下一篇：</strong><br/> 
+ <span>nsq源码阅读(nsqd)
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#原始客户端程序"><span class="toc-number">1.</span> <span class="toc-text">原始客户端程序</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#问题"><span class="toc-number">1.1.</span> <span class="toc-text">问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#select"><span class="toc-number">2.</span> <span class="toc-text">select</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#select函数"><span class="toc-number">2.1.</span> <span class="toc-text">select函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#timeout"><span class="toc-number">2.1.1.</span> <span class="toc-text">timeout</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#readset-writeset-exceptset"><span class="toc-number">2.1.2.</span> <span class="toc-text">readset, writeset, exceptset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#maxfdp1"><span class="toc-number">2.1.3.</span> <span class="toc-text">maxfdp1</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select版本的str-cli函数"><span class="toc-number">2.2.</span> <span class="toc-text">select版本的str_cli函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select版本的服务器程序"><span class="toc-number">2.3.</span> <span class="toc-text">select版本的服务器程序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#poll"><span class="toc-number">3.</span> <span class="toc-text">poll</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#poll函数"><span class="toc-number">3.1.</span> <span class="toc-text">poll函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于poll的服务端程序"><span class="toc-number">3.2.</span> <span class="toc-text">基于poll的服务端程序</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

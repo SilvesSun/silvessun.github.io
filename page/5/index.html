@@ -1,0 +1,1301 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://sksun.com.cn/page/5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/03/初识redis/" title="初识redis" itemprop="url">初识redis</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-03T03:31:08.000Z" itemprop="datePublished"> Published 2018-09-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Redis,  Remote Dictionary Server（远程数据服务） 是一个开源的, 基于内存的存储系统. 主要用于缓存, 消息中间件以及数据库. 支持的常见数据结构包括: 字符串, 散列, 列表, 集合, 有序集合这五种.</p>
+<p>redis 的速度很快, 官方的数据时可以达到100000+的QPS（每秒内查询次数）. redis 这么快的理由主要有以下几点:</p>
+<ul>
+<li>纯内存数据库, 决定了绝大部分操作都是纯内存操作, 读取速度快</li>
+<li>采用单线程，避免了不必要的上下文切换和竞争条件，也不存在多进程或者多线程导致的切换而消耗 CPU，不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗</li>
+<li>采用非阻塞IO, IO多路复用. </li>
+<li>数据结构简单</li>
+</ul>
+<h2 id="客户端通信协议"><a href="#客户端通信协议" class="headerlink" title="客户端通信协议"></a>客户端通信协议</h2><p>redis 客户端和服务端通信采用的是基于tcp协议制定的 <code>RESP</code>(Redis Serialization Protocol, Redis序列化协议). </p>
+<h3 id="1-发送命令的格式"><a href="#1-发送命令的格式" class="headerlink" title="1. 发送命令的格式"></a>1. 发送命令的格式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">*&lt;参数数量&gt; CRLF</span><br><span class="line">$&lt;参数 1 的字节数量&gt; CRLF</span><br><span class="line">&lt;参数 1 的数据&gt; CRLF</span><br><span class="line">...</span><br><span class="line">$&lt;参数 N 的字节数量&gt; CRLF</span><br><span class="line">&lt;参数 N 的数据&gt; CRLF</span><br></pre></td></tr></table></figure>
+
+<p>以<code>set hello world</code> 为例</p>
+<p>参数有3个, 所以第一行为<code>*3</code>, 三个参数的字节数分别为355, 所以后几行为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$3</span><br><span class="line">SET</span><br><span class="line">$5</span><br><span class="line">hello</span><br><span class="line">$5</span><br><span class="line">world</span><br></pre></td></tr></table></figure>
+
+<p>在实际传输过程中的显示为<br><code>*3\r\n$3\r\n\SET\r\n\$5\r\nhello\r\n$5\r\nworld\r\n</code></p>
+<h3 id="2-返回结果的格式"><a href="#2-返回结果的格式" class="headerlink" title="2. 返回结果的格式"></a>2. 返回结果的格式</h3><ul>
+<li><p>状态回复, 第一个字节为<code>+</code></p>
+</li>
+<li><p>错误回复, 第一个字节为<code>-</code></p>
+</li>
+<li><p>整数回复, 第一个字节为<code>:</code></p>
+</li>
+<li><p>字符串回复, 第一个字节为<code>$</code></p>
+</li>
+<li><p>多条字符串回复, 第一个字节为 <code>*</code></p>
+</li>
+</ul>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-09-03-14-36-05.png" alt="2018-09-03-14-36-05"></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/缓存/">缓存</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/03/初识redis/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/03/Django自定义tag/" title="Django自定义tag" itemprop="url">Django自定义tag</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-03T02:11:52.000Z" itemprop="datePublished"> Published 2018-09-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Django 提供了一系列的內建的模板标签来完成模板中基本的显示, 但在实际的使用过程中不可避免的会出现 Django 提供的标签不能满足现有需求的情况. 这个时候就需要自定义标签</p>
+<p>建立一个自定义标签, 首先需要在当前 app 目录下新建一个<code>templatetags</code> 模块. </p>
+<p>Django 提供的自定义标签包括三种</p>
+<ul>
+<li><p><strong>simple_tag</strong>: 返回值为字符串</p>
+</li>
+<li><p><strong>inclusion_tag</strong>: 返回一个渲染过的模板</p>
+</li>
+<li><p><strong>assignment_tag</strong>: 设置请求上下文</p>
+</li>
+</ul>
+<p>示例</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> template</span><br><span class="line"><span class="meta">@register.simple_tag()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">muti</span><span class="params">(*args)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> args:</span><br><span class="line">        <span class="keyword">return</span> reduce(<span class="keyword">lambda</span> x, y: x * y, list(args))</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/web/">web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Django/">Django</a><a href="/tags/tag/">tag</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/03/Django自定义tag/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/08/22/scala函数式编程/" title="scala函数式编程" itemprop="url">scala函数式编程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-08-22T01:53:58.000Z" itemprop="datePublished"> Published 2018-08-22</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>函数也是值, 可以赋值给一个变量, 存储在数据结构或者作为参数传递给另一个函数</p>
+<h2 id="高阶函数"><a href="#高阶函数" class="headerlink" title="高阶函数"></a>高阶函数</h2><p>把一个函数当做参数传递给另一个函数. 这样的函数叫做高阶函数</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">formatResult</span></span>(name:<span class="type">String</span>, n:<span class="type">Int</span>, f:<span class="type">Int</span> =&gt; <span class="type">Int</span>) = &#123;</span><br><span class="line">    <span class="keyword">val</span> msg = <span class="string">"The %s of %d is %d"</span></span><br><span class="line">    msg.format(name, n, f(n))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 formatResult 就是一个高阶函数, 接受一个 f 函数作为参数. 这个函数 f 的类型是 Int =&gt; Int, 表示接收一个整型参数并返回一个整型结果</p>
+<h2 id="多态函数"><a href="#多态函数" class="headerlink" title="多态函数"></a>多态函数</h2><p>函数式编程的多态意味着<code>参数化多态</code>. </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">findFirst</span></span>[<span class="type">A</span>](as: <span class="type">Array</span>[<span class="type">A</span>], p: <span class="type">A</span> =&gt; <span class="type">Boolean</span>): <span class="type">Int</span> = &#123;</span><br><span class="line">    <span class="meta">@annotation</span>.tailrec</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loop</span></span>(n: <span class="type">Int</span>):<span class="type">Int</span> =</span><br><span class="line">        <span class="keyword">if</span> (n &gt;= as.length) <span class="number">-1</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p(as(n))) n</span><br><span class="line">        <span class="keyword">else</span> loop(n+<span class="number">1</span>)</span><br><span class="line">    loop(<span class="number">0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这就是一个多态函数. 将逗号分隔的类型参数, 紧跟在函数名称后面使用中括号括起来. </p>
+<p>调用foreach组合器并不会在计算值可用的时候阻塞当前的进程去获取计算值。恰恰相反，只有当future对象成功计算完成了，foreach所迭代的函数才能够被异步的执行。这意味着foreach与onSuccess回调意义完全相同</p>
+<p>如果我们想让我们的Future对象返回0而不是抛出那个该死的异常，那我们需要使用recover组合器</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/scala/">scala</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/函数式/">函数式</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/08/22/scala函数式编程/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/08/17/play框架学习-应用结构/" title="play框架学习(应用结构)" itemprop="url">play框架学习(应用结构)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-08-17T06:22:18.000Z" itemprop="datePublished"> Published 2018-08-17</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-08-17-14-45-31.png" alt="2018-08-17-14-45-31"></p>
+<p>执行sbt new applicationName 后生成的文件结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">app                      → Application sources</span><br><span class="line"> └ assets                → Compiled asset sources</span><br><span class="line">    └ stylesheets        → Typically LESS CSS sources</span><br><span class="line">    └ javascripts        → Typically CoffeeScript sources</span><br><span class="line"> └ controllers           → Application controllers</span><br><span class="line"> └ models                → Application business layer</span><br><span class="line"> └ views                 → Templates</span><br><span class="line">build.sbt                → Application build script</span><br><span class="line">conf                     → Configurations files and other non-compiled resources (on classpath)</span><br><span class="line"> └ application.conf      → Main configuration file</span><br><span class="line"> └ routes                → Routes definition</span><br><span class="line">dist                     → Arbitrary files to be included in your projects distribution</span><br><span class="line">public                   → Public assets</span><br><span class="line"> └ stylesheets           → CSS files</span><br><span class="line"> └ javascripts           → Javascript files</span><br><span class="line"> └ images                → Image files</span><br><span class="line">project                  → sbt configuration files</span><br><span class="line"> └ build.properties      → Marker for sbt project</span><br><span class="line"> └ plugins.sbt           → sbt plugins including the declaration for Play itself</span><br><span class="line">lib                      → Unmanaged libraries dependencies</span><br><span class="line">logs                     → Logs folder</span><br><span class="line"> └ application.log       → Default log file</span><br><span class="line">target                   → Generated stuff</span><br><span class="line"> └ resolution-cache      → Info about dependencies</span><br><span class="line"> └ scala-2.11</span><br><span class="line">    └ api                → Generated API docs</span><br><span class="line">    └ classes            → Compiled class files</span><br><span class="line">    └ routes             → Sources generated from routes</span><br><span class="line">    └ twirl              → Sources generated from templates</span><br><span class="line"> └ universal             → Application packaging</span><br><span class="line"> └ web                   → Compiled web assets</span><br><span class="line">test                     → source folder for unit or functional tests</span><br></pre></td></tr></table></figure>
+
+<h2 id="app"><a href="#app" class="headerlink" title="app"></a>app</h2><p>app目录是项目的源码位置, 包括 controllers, models, views 三个文件夹, 分别对应 MVC 架构的三个模块. 在实际的项目开发中, 也可以手动添加其他的模块</p>
+<h2 id="public"><a href="#public" class="headerlink" title="public"></a>public</h2><p>public 文件夹用来存放直接由 web server 提供的文件, 例如 images, CSS, js 文件. 在新建应用中, public 对应的 url 映射是 /assets</p>
+<h2 id="conf"><a href="#conf" class="headerlink" title="conf"></a>conf</h2><p>conf 文件夹主要是项目配置信息, 主要包括两个配置文件: application.conf 和 routes. application.conf 定义了绝大部分参数值, routes 定义了路有关系</p>
+<h2 id="lib"><a href="#lib" class="headerlink" title="lib"></a>lib</h2><p>可选的 lib 文件夹用来放置额外的依赖</p>
+<h2 id="project"><a href="#project" class="headerlink" title="project"></a>project</h2><p>定义 sbt 构建选项</p>
+<ul>
+<li><p>plugins.sbt 定义了 sbt 的插件</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[plugins.sbt ]</span><br><span class="line"></span><br><span class="line">addSbtPlugin(&quot;com.typesafe.play&quot; % &quot;sbt-plugin&quot; % &quot;2.6.17&quot;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>build.properties 定义了 sbt 版本</p>
+</li>
+</ul>
+<h2 id="target"><a href="#target" class="headerlink" title="target"></a>target</h2><p>应用编译完成后的所有文件</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/play2/">play2</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/scala/">scala</a><a href="/tags/play/">play</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/08/17/play框架学习-应用结构/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/08/07/Python源码解读-一切皆对象/" title="Python源码解读(一切皆对象)" itemprop="url">Python源码解读(一切皆对象)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-08-07T02:30:36.000Z" itemprop="datePublished"> Published 2018-08-07</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在Python中, 人们常说一切皆对象. 不论是基本的数据类型如int, str, 还是Python中的一等公民函数, 或者是面向对象编程中的类, 在Python中都是一个个的对象. 那么什么是对象? 为什么说Python中一切都是对象? 对象的实现原理是什么? 我想这三个问题或多或少都曾在每一个接触过Python的人的心里思考过. 前段时间也阅读了<img src="https://book.douban.com/subject/3117898/" alt="Python源码剖析">一书中相关内容, 这里想把自己的一些理解记录下来.</p>
+<p>什么是对象? 对于人来说, 对象是一个形象的可以感知的词. 比如说我们说一只笔, 这里笔就是一个对象; 一本书, 书也是一个对象等等. 但是对于计算机来说, 事情可能并没有这么直观. 在计算机的世界里, 一切都是字节, 人们将对象的概念抽象出来, 反应到计算机的世界里就是一个个不同的字节. 所以不同的对象, 对于计算机来说也就是在内存中占用的不同的位置. 所以对于计算机来说, 对象可创建, 可销毁. </p>
+<p>谈到对象这个概念, 还想多说一句<em>鸭子类型</em>(duck type)</p>
+<blockquote>
+<p>当看到一只鸟走起来像鸭子、游泳起来像鸭子、叫起来也像鸭子，那么这只鸟就可以被称为鸭子</p>
+</blockquote>
+<p>我们知道, 鸭子类型是动态类型的一种风格. 描述一个对象, 不像静态语言一样是继承自特定的类, 实现特定的接口; 而是说由当前方法和属性的集合来决定.</p>
+<p>不同的语言描述这块内存的方式也不一样. 就对象来说, c中可以用struct这样的结构体来模拟. 这块内存可能是连续的, 也可能是离散的, 但是这些都不是重点, 重点是我们可以用结构体这样的一个概念来代替这块内存, 也就是这个对象. 我们知道, Python的底层实现语言是c, 这也就意味着Python中的对象其本质也就是用一个结构体描述的一块内存空间. </p>
+<h2 id="一切皆对象"><a href="#一切皆对象" class="headerlink" title="一切皆对象"></a>一切皆对象</h2><p>当我们说Python中一切皆对象的时候, 背后的意思是在Python中, 或者说在Python的底层实现中, 有着一个同样的东西用来标识这是一个对象. 比如说整数对象的结构体定义:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    PyObject_HEAD</span><br><span class="line">    <span class="keyword">long</span> ob_ival;</span><br><span class="line">&#125; PyIntObject;</span><br></pre></td></tr></table></figure>
+
+<p>或者说列表</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    PyObject_VAR_HEAD</span><br><span class="line"></span><br><span class="line">    PyObject **ob_item;</span><br><span class="line"></span><br><span class="line">    Py_ssize_t allocated;</span><br><span class="line">&#125; PyListObject;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到, 不同的对象结构体中都有相同的东西. 直观来看就是PyObject这个结构体了. 可以说, Python对象的基础就是PyObject. PyObject这个结构体的本身是对一个宏变量的引用, 这个宏变量就是PyObject_HEAD.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[object.h]</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> Py_TRACE_REFS</span></span><br><span class="line"><span class="comment">/* Define pointers to support a doubly-linked list of all live heap objects. */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _PyObject_HEAD_EXTRA            \</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">object</span> *_<span class="title">ob_next</span>;</span>           \</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">object</span> *_<span class="title">ob_prev</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _PyObject_EXTRA_INIT 0, 0,</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _PyObject_HEAD_EXTRA</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _PyObject_EXTRA_INIT</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* PyObject_HEAD defines the initial segment of every PyObject. */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PyObject_HEAD                   \</span></span><br><span class="line">    _PyObject_HEAD_EXTRA                \</span><br><span class="line">    Py_ssize_t ob_refcnt;               \</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">typeobject</span> *<span class="title">ob_type</span>;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果不考虑Py_TRACE_REFS时, PyObject的定义可以简化为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">object</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> ob_refcnt;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">typeobject</span> *<span class="title">ob_type</span>;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里, 整型变量 ob_refcnt 与Python的内存管理机制有关, 它实现了基于引用计数的垃圾收集机制;ob_type是一个指向_typeobject结构体的指针, 这个结构体用来指定一个对象类型的类型对象.</p>
+<p>所以说, Python对象的核心机制就是引用计数和类型信息. 在PyObject中定义的类容将出现在每一个Python对象所占有的内存的开始的字节中, 同时对于任何一个特定的对象, 还有一些额外的信息来表明这些对象. 比如说整数对象定义中的长整型ob_ival.</p>
+<h2 id="可变对象"><a href="#可变对象" class="headerlink" title="可变对象"></a>可变对象</h2><p>在上面考虑整型对象和list对象时, 有一个明显的区别就是对于列表来说, 其定义中开头为 PyObject_VAR_HEAD. PyObject_HEAD和 PyObject_VAR_HEAD 分别对应于P定长对象和变长对象. 很明显, 定长对象是定义后其分配的内存大小就保持不变, 而变长对象就存在变的可能. 比如说list中添加元素, 删除元素等. PyObject_VAR_HEAD 这个对象描述了变长对象相关的信息. 其中 ob_size 描述了实际对象中保存的元素数量. </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PyObject_VAR_HEAD               \</span></span><br><span class="line">    PyObject_HEAD                       \</span><br><span class="line">    Py_ssize_t ob_size; <span class="comment">/* Number of items in variable part */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Py_INVALID_SIZE (Py_ssize_t)-1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Nothing is actually declared to be a PyObject, but every pointer to</span></span><br><span class="line"><span class="comment"> * a Python object can be cast to a PyObject*.  This is inheritance built</span></span><br><span class="line"><span class="comment"> * by hand.  Similarly every pointer to a variable-size Python object can,</span></span><br><span class="line"><span class="comment"> * in addition, be cast to PyVarObject*.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"> <span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">     PyObject_VAR_HEAD</span><br><span class="line"> &#125; PyVarObject;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类型对象"><a href="#类型对象" class="headerlink" title="类型对象"></a>类型对象</h2><p>在上面我们说过, 包含在每一个对象内存开始字节的相关类容描述了对象共有的信息. 但是具体到每一个对象, 在创建对象的时候, 还需要知道对象的大小, 对象的类型等元信息, 这些信息伴随着对象的整个生命周期. 这些相关的信息在类型对象中描述(_typeobject)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">typeobject</span> &#123;</span></span><br><span class="line">    PyObject_VAR_HEAD</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *tp_name;</span><br><span class="line">    Py_ssize_t tp_basicsize, tp_itemsize;</span><br><span class="line"></span><br><span class="line">    destructor tp_dealloc;</span><br><span class="line">    printfunc tp_print;</span><br><span class="line">    ...</span><br><span class="line">&#125; PyTypeObject</span><br></pre></td></tr></table></figure>
+
+<p>在 _typeobject 中定义的信息包括</p>
+<ul>
+<li>类型名 tp_name, 主要是Python内部以及调试的时候使用</li>
+<li>创建该类型对象时分配的内存空间大小的信息, 即 tp_basicsize, tp_itemsize</li>
+<li>该对象相关联的操作信息</li>
+<li>类型的类型信息</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/08/07/Python源码解读-一切皆对象/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/13/Django表单/" title="Django表单" itemprop="url">Django表单</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-13T04:25:25.000Z" itemprop="datePublished"> Published 2018-07-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-26/12332190.jpg" alt></p>
+<p>今天把Django中表单相关知识总结下, 以作备忘.</p>
+<p>html表单的存在使得用户可以和网站进行交互, 从而使得网站并不仅仅作为内容展示, 而是有了更具有实际意义的意义</p>
+<h1 id="登录表单"><a href="#登录表单" class="headerlink" title="登录表单"></a>登录表单</h1><p>首先以一个登录表单作为例子, 来看看表单在Django中的使用.</p>
+<p>常见的最简单的html表单如下所示:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/login"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"username"</span>&gt;</span>Your name: <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"username"</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"username"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; current_name &#125;&#125;"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"password"</span>&gt;</span>Your name: <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"password"</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"&#123;&#123; password &#125;&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"OK"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>要生成这样的一个表单, 在Django中常见的做法是新建一个forms.py文件, 然后继承自form.Form, 然后加入需要的字段, 如下所示:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[forms.py]</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserForm</span><span class="params">(forms.Form)</span>:</span></span><br><span class="line">    username = forms.CharField(label=<span class="string">'User Name'</span>)</span><br><span class="line">    password = forms.CharField(widget=forms.PasswordInput())</span><br></pre></td></tr></table></figure>
+
+<p>这里label是提供给前端方便读取的表头项, Widgets定义了html中input的type项[Each form field has a corresponding Widget class, which in turn corresponds to an HTML form widget such as <input type="text">]<br>这样就创建了一个简单的登录表单. 然后可以在views.py中使用它. 常见的用法是</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[views.py]</span><br><span class="line"><span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">    user_form = UserForm(request.POST)</span><br><span class="line">    ....</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    user_form = UserForm()</span><br></pre></td></tr></table></figure>
+
+<p>这里的逻辑是如果是post请求, 就用提交的数据实例化表单, 否则返回一个全新的表单给前端</p>
+<p>完成表单的实例化后, 就可以在前端模板中使用它</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[login.html]</span><br><span class="line">&#123;% for field in login_form %&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">td</span>  <span class="attr">height</span>=<span class="string">"30"</span>&gt;</span><span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">"&#123;&#123; field.id_for_label &#125;&#125;"</span>&gt;</span>&#123;&#123; field.label &#125;&#125;<span class="tag">&lt;/<span class="name">label</span>&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; field &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="ModelForm和Form"><a href="#ModelForm和Form" class="headerlink" title="ModelForm和Form"></a>ModelForm和Form</h1><p>form在Django源码中的位置结构如图所示:</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-07-16-11-02-44.png" alt></p>
+<p>在Django中常用的Form有两种, 一种就是上面提到的forms.Form, 一种是ModelForm. 其中ModelForm将用户定义的模型和HTML表单直接联系起来(这是Django admin的基础所在.)</p>
+<p>不论是ModelForm还是forms.Form, 都继承自BaseForm. BaseForm中定义了一系列基础的方法, 比如init, clean, add_error等. </p>
+<h1 id="自定义初始化表单"><a href="#自定义初始化表单" class="headerlink" title="自定义初始化表单"></a>自定义初始化表单</h1><p>有时候需要自定义或者动态的初始化表单. 我遇到的场景就是表单中包含一个多选框, 但是多选框的选项是动态的, 不可能一开始就写死.</p>
+<p>对于选择框, 常见的写法可能是这样的</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkflowJob</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    ADJUST_CHOICE=((<span class="string">u'是'</span>,<span class="string">u'是'</span>),(<span class="string">u'否'</span>,<span class="string">u'否'</span>),)</span><br><span class="line">    projectteam = models.ForeignKey(ProjectTeam,verbose_name=<span class="string">u'项目组'</span>,related_name=<span class="string">'WorkflowJob_projectteam'</span>,default=<span class="number">7</span>)</span><br><span class="line">    adjust = models.CharField (<span class="string">u'是否可调整'</span>,max_length=<span class="number">30</span>,choices=ADJUST_CHOICE,default=<span class="string">'否'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>先将选项的所有可能以元组的形式列出, 然后指定相关的input的选项. </p>
+<p>如果是要动态获取选项, 比如想要动态获取分组信息, 则代码为:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserForm</span><span class="params">(forms.Form)</span>:</span></span><br><span class="line">    role = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        super().__init__(*args, **kwargs)</span><br><span class="line">        self.fields[<span class="string">'role'</span>].choices = Group.objects.all().values_list(<span class="string">'id'</span>, <span class="string">'name'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>对应生成的表单如下</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-07-16-11-31-04.png" alt></p>
+<p>这里生成的表单中的value对应的就是用户组的id值, 当post请求的时候如果是多选, 传回的是一个id组成的列表, 所以后端代码为:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">    user_edit_form = UserEditForm(request.POST)</span><br><span class="line">    context = &#123;&#125;</span><br><span class="line">    <span class="keyword">if</span> user_edit_form.is_valid():</span><br><span class="line">        username = user_edit_form.cleaned_data.get(<span class="string">'username'</span>, <span class="string">''</span>)</span><br><span class="line">        displayname = user_edit_form.cleaned_data.get(<span class="string">'displayname'</span>, <span class="string">''</span>)</span><br><span class="line">        password = user_edit_form.cleaned_data.get(<span class="string">'password'</span>, <span class="string">''</span>)</span><br><span class="line">        email = user_edit_form.cleaned_data.get(<span class="string">'email'</span>, <span class="string">''</span>)</span><br><span class="line">        role = user_edit_form.cleaned_data.get(<span class="string">'role'</span>, <span class="string">''</span>)</span><br><span class="line">        agent = user_edit_form.cleaned_data.get(<span class="string">'agent_code'</span>, <span class="string">''</span>)</span><br><span class="line">        vendor = user_edit_form.cleaned_data.get(<span class="string">'vendor_code'</span>, <span class="string">''</span>)</span><br><span class="line">        factory = user_edit_form.cleaned_data.get(<span class="string">'factory_code'</span>, <span class="string">''</span>)</span><br><span class="line"></span><br><span class="line">        user = User.objects.get(username=username)</span><br><span class="line">        user.display_name = displayname</span><br><span class="line">        user.password = make_password(password)</span><br><span class="line">        user.email = email</span><br><span class="line">        user.agent_code = agent</span><br><span class="line">        user.vendor_code = vendor</span><br><span class="line">        user.factory_code = factory</span><br><span class="line"></span><br><span class="line">        role_ids = [int(_id) <span class="keyword">for</span> _id <span class="keyword">in</span> role]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> _id <span class="keyword">in</span> role_ids:</span><br><span class="line">            group = Group.objects.get(pk=_id)</span><br><span class="line">            user.groups.add(group)</span><br><span class="line"></span><br><span class="line">        user.save()</span><br></pre></td></tr></table></figure>
+
+<p>这里提到了post传回的role是一个列表形式的, 所以当有需要修改数据的时候, 相应的也要将对应的数据取出来后以列表传给role. </p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">role = user.groups.values_list()</span><br><span class="line"></span><br><span class="line">role_ids = [_role[<span class="number">0</span>] <span class="keyword">for</span> _role <span class="keyword">in</span> role]</span><br><span class="line"></span><br><span class="line">user_dict = &#123;</span><br><span class="line">        ....</span><br><span class="line">        <span class="string">'role'</span>: role_ids,</span><br><span class="line">        ....</span><br><span class="line">    &#125;</span><br><span class="line">edit_form = UserEditForm(user_dict)</span><br></pre></td></tr></table></figure>
+
+<h1 id="is-valid-的验证逻辑"><a href="#is-valid-的验证逻辑" class="headerlink" title="is_valid() 的验证逻辑"></a>is_valid() 的验证逻辑</h1><p>在post请求中, 完成实例化后就需要对数据进行验证, 也就是form.is_valid()方法. </p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_valid</span><span class="params">(self)</span>:</span></span><br><span class="line">   <span class="string">"""</span></span><br><span class="line"><span class="string">   Returns True if the form has no errors. Otherwise, False. If errors are</span></span><br><span class="line"><span class="string">   being ignored, returns False.</span></span><br><span class="line"><span class="string">   """</span></span><br><span class="line">   <span class="keyword">return</span> self.is_bound <span class="keyword">and</span> <span class="keyword">not</span> self.errors</span><br></pre></td></tr></table></figure>
+
+<p>这里self.errors调用的是self.full_clean()</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">full_clean</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Cleans all of self.data and populates self._errors and</span></span><br><span class="line"><span class="string">    self.cleaned_data.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    self._errors = ErrorDict()</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> self.is_bound:  <span class="comment"># Stop further processing.</span></span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    self.cleaned_data = &#123;&#125;</span><br><span class="line">    <span class="comment"># If the form is permitted to be empty, and none of the form data has</span></span><br><span class="line">    <span class="comment"># changed from the initial data, short circuit any validation.</span></span><br><span class="line">    <span class="keyword">if</span> self.empty_permitted <span class="keyword">and</span> <span class="keyword">not</span> self.has_changed():</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    self._clean_fields()</span><br><span class="line">    self._clean_form()</span><br><span class="line">    self._post_clean()</span><br></pre></td></tr></table></figure>
+
+<p>可以看到验证表单的过程是 is_bound -&gt; self._clean_fields() -&gt; self._clean_form()</p>
+<p>重点看下 <code>self._clean_fields()</code></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_clean_fields</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> name, field <span class="keyword">in</span> self.fields.items():</span><br><span class="line">        <span class="comment"># value_from_datadict() gets the data from the data dictionaries.</span></span><br><span class="line">        <span class="comment"># Each widget type knows how to retrieve its own data, because some</span></span><br><span class="line">        <span class="comment"># widgets split data over several HTML fields.</span></span><br><span class="line">        <span class="keyword">if</span> field.disabled:</span><br><span class="line">            value = self.initial.get(name, field.initial)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">if</span> isinstance(field, FileField):</span><br><span class="line">                initial = self.initial.get(name, field.initial)</span><br><span class="line">                value = field.clean(value, initial)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                value = field.clean(value)</span><br><span class="line">            self.cleaned_data[name] = value</span><br><span class="line">            <span class="keyword">if</span> hasattr(self, <span class="string">'clean_%s'</span> % name):</span><br><span class="line">                value = getattr(self, <span class="string">'clean_%s'</span> % name)()</span><br><span class="line">                self.cleaned_data[name] = value</span><br><span class="line">        <span class="keyword">except</span> ValidationError <span class="keyword">as</span> e:</span><br><span class="line">            self.add_error(name, e)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到, 经过一系列的验证后, 这一句</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> hasattr(self, <span class="string">'clean_%s'</span> % name):</span><br><span class="line">    value = getattr(self, <span class="string">'clean_%s'</span> % name)()</span><br><span class="line">    self.cleaned_data[name] = value</span><br></pre></td></tr></table></figure>
+
+<p>指明了如何自定义字段的验证方式. 只需要复写一个clean_前缀的name方法即可. 例如</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserAddForm</span><span class="params">(forms.Form)</span>:</span></span><br><span class="line">    username = forms.CharField(label=<span class="string">'User Name'</span>,</span><br><span class="line">                               widget=forms.TextInput(attrs=&#123;<span class="string">'class'</span>: <span class="string">'form-control'</span>,</span><br><span class="line">                                                             <span class="string">'style'</span>: <span class="string">'width: 254px;height:21px'</span>&#125;))</span><br><span class="line">    ....</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clean_username</span><span class="params">(self)</span>:</span></span><br><span class="line">        username = self.cleaned_data.get(<span class="string">'username'</span>)</span><br><span class="line">        <span class="keyword">if</span> len(username) &lt; <span class="number">3</span>:</span><br><span class="line">            <span class="keyword">raise</span> forms.ValidationError(<span class="string">'username should more than 3 words'</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> User.objects.filter(username=username).exists():</span><br><span class="line">            <span class="keyword">raise</span> forms.ValidationError(<span class="string">'user already exist'</span>)</span><br><span class="line">        <span class="keyword">return</span> username</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Web/">Web</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Django/">Django</a><a href="/tags/表单/">表单</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/07/13/Django表单/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/11/数据库基础概念/" title="数据库基础概念" itemprop="url">数据库基础概念</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-11T02:00:48.000Z" itemprop="datePublished"> Published 2018-07-11</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h1 id="with"><a href="#with" class="headerlink" title="with"></a>with</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> max_budget(<span class="keyword">value</span>) <span class="keyword">as</span> </span><br><span class="line">    (<span class="keyword">select</span> <span class="keyword">max</span>(budget) <span class="keyword">from</span> department)</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> budget <span class="keyword">from</span> department, max_budget <span class="keyword">where</span> department.budget=max_budget.value</span><br></pre></td></tr></table></figure>
+
+<p>with 语句提供定义临时关系的方法</p>
+<h1 id="on"><a href="#on" class="headerlink" title="on"></a>on</h1><p>on允许在参与连接的关系上设置通用的谓语, on条件出现再连接表达式的末尾</p>
+<p>在on中指定连接条件, 在where中指定过滤条件更容易懂</p>
+<h2 id="外连接"><a href="#外连接" class="headerlink" title="外连接"></a>外连接</h2><p>通过在结果集中创建包含空值元组的方式, 保留了那些在连接中丢失的元组</p>
+<ul>
+<li>左外连接</li>
+<li>右外连接</li>
+<li>全外连接</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/07/11/数据库基础概念/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/10/Questions/" title="Questions" itemprop="url">Questions</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-10T00:59:28.000Z" itemprop="datePublished"> Published 2018-07-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>问题1: 当表单中含有选择框时如何实例化</p>
+<p>问题2: 从数据库查询的结果, 选择框如何实例化</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-07-10-12-08-31.png" alt="2018-07-10-12-08-31"></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/07/10/Questions/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/06/关系模型介绍/" title="关系模型介绍" itemprop="url">关系模型介绍</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-06T01:49:27.000Z" itemprop="datePublished"> Published 2018-07-06</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在关系模型的术语中, 关系(relation)用来指代表, 而元组(tuple)用来指代行, 属性(attribute)指代表中的列</p>
+<p>关系实例(relation instance)表示一个关系的特定实例, 也就是所包含的一组特定的行.</p>
+<p>关系中允许取值的集合称为关系的域, 域中元素如果不可再分, 则称域是原子的(atomic)</p>
+<ul>
+<li><p>数据库模式(databse schema) 是数据库的逻辑设计</p>
+</li>
+<li><p>数据库实例(database instance) 是给定时刻数据库中数据的一个快照</p>
+</li>
+<li><p>超码 一个或者多个属性的组合, 这个属性的组合可以使我们在一个关系中唯一的标识一个元组</p>
+</li>
+<li><p>候选码 最小超码</p>
+</li>
+<li><p>主码(primary key) 被数据库设计者选中的, 主要在一个关系中用来区分不同元组的候选码</p>
+</li>
+<li><p>外码(foreign key)</p>
+</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/数据库概念/">数据库概念</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/07/06/关系模型介绍/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/07/03/sql调优/" title="sql调优" itemprop="url">sql调优</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-07-03T06:31:06.000Z" itemprop="datePublished"> Published 2018-07-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="在update的过程中-通过sum子表更新head表某个值"><a href="#在update的过程中-通过sum子表更新head表某个值" class="headerlink" title="在update的过程中, 通过sum子表更新head表某个值"></a>在update的过程中, 通过sum子表更新head表某个值</h2><p>最近在开发的工程中, 遇到一个问题. 最开始建表时未将需要在主表展示的部分数据从从表更新到主表, 然后现在因为业务需要将从表的qty求和后根据对应的外键更新到主表.</p>
+<p>两张表分别为 order_header, order_detail. 其中相关的列为 order_header(id, total_qty), order_detail(qty, header_id). order_header表有17406条记录, detail表有 511732 条记录</p>
+<p>第一映像感觉很简单. 只要根据外键做聚合就好, 所以写出下面语句</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> kohls_order_header h <span class="keyword">set</span> total_qty= (<span class="keyword">select</span> <span class="keyword">sum</span>(d.po_qty) <span class="keyword">from</span> kohls_order_detail d <span class="keyword">where</span> d.header_id=h.id)</span><br></pre></td></tr></table></figure>
+
+<p>然后发现执行速度特别慢, 本地测试超过30分钟. 说明语句存在问题. 执行explain查看结果</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-07-03-15-03-33.png" alt="2018-07-03-15-03-33"></p>
+<p>上面这条语句相当于针对每个head id, 都需要从子表中查找到对应的detail后然后sum, 耗时较多.</p>
+<p>优化思路:</p>
+<p>首先将detail中需要的数据先统计出来, 然后和head表关联. 优化后语句为:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> kohls_order_header h</span><br><span class="line"><span class="keyword">set</span> total_qty=detail_res.sum_qty </span><br><span class="line"><span class="keyword">from</span>  (<span class="keyword">SELECT</span> <span class="keyword">sum</span>(d.po_qty) <span class="keyword">as</span> sum_qty, d.header_id <span class="keyword">FROM</span> kohls_order_detail d <span class="keyword">GROUP</span> <span class="keyword">BY</span> d.header_id) <span class="keyword">as</span> detail_res</span><br><span class="line"><span class="keyword">WHERE</span> h.id=detail_res.header_id</span><br></pre></td></tr></table></figure>
+
+<p>执行耗时为1.7秒.</p>
+<p>执行计划为:</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-07-03-15-11-49.png" alt="2018-07-03-15-11-49"></p>
+<p>可以说优化的不错了.</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/SQL优化/">SQL优化</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/07/03/sql调优/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/4/"><span></span>Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/6/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

@@ -1,0 +1,1295 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://sksun.com.cn/page/4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/16/数据库三范式/" title="数据库三范式" itemprop="url">数据库三范式</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-16T02:29:44.000Z" itemprop="datePublished"> Published 2018-11-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>第一范式（1NF）：</p>
+<p>数据表中的每一列(字段)，必须是不可拆分的最小单元，也就是确保每一列的原子性。</p>
+<p>第二范式（2NF）：</p>
+<p>满足1NF后要求表中的所有列，都必需依赖于主键，而不能有 任何一列与主键没有关系（一个表只描述一件事情）。</p>
+<p>第三范式（3NF）：</p>
+<p>满足2NF后，要求：表中的每一列都要与主键直接相关，而不是间接相关（表中的每一列只能依赖于主键）</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/数据库/">数据库</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/数据库基础/">数据库基础</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/11/16/数据库三范式/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/23/host问题解决/" title="unknown host问题解决" itemprop="url">unknown host问题解决</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-23T01:52:57.000Z" itemprop="datePublished"> Published 2018-10-23</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>最近两天在服务器安装包时发现DNS解析出了问题. 所有的DNS无法解析, 但是网络能ping通IP地址.</p>
+<p>解决办法:</p>
+<p>##1 检查 <code>/etc/resolv.conf</code>. 但是我的<code>resolv.conf</code>解析没有问题.</p>
+<p>##2 检查网卡相关配置</p>
+<p><code>cat /etc/sysconfig/network-scripts/ifcfg-vnet0</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">DEVICE=venet0</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">ONBOOT=yes</span><br><span class="line">ARPCHECK="no"</span><br><span class="line">IPADDR=127.0.0.1</span><br><span class="line">NETMASK=255.255.255.255</span><br><span class="line">BROADCAST=0.0.0.0</span><br><span class="line">ARPCHECK="no"</span><br><span class="line">IPV6INIT="yes"</span><br><span class="line">GATEWAY=192.168.0.1</span><br></pre></td></tr></table></figure>
+
+<p>##3 检查dns解析服务<br><code>grep hosts /etc/nsswitch.conf</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>hosts:     db files nisplus nis dns</span><br><span class="line">hosts:      files dns myhostname</span><br></pre></td></tr></table></figure>
+
+<p>我这里就是第三步缺少了dns这个配置选项, 修改后即正常</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/linux踩坑记录/">linux踩坑记录</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/DNS解析/">DNS解析</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/10/23/host问题解决/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/10/08/修改cmd的默认启动路径/" title="修改cmd的默认启动路径" itemprop="url">修改cmd的默认启动路径</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-10-08T07:50:28.000Z" itemprop="datePublished"> Published 2018-10-08</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>打开注册表<code>win+r</code> &gt; <code>regedit</code></p>
+<p>找到 <code>HKEY_CURRENT_USER\Software\Microsoft\Command Processor</code></p>
+<p>新建字符串项<code>autorun</code></p>
+<p>并修改值为想要的路径<code>cd /d C:\Users\veahow\Desktop（字符串cd /d之后接空格加上你想修改的默认路径</code></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/windwos/">windwos</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/实用技巧/">实用技巧</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/10/08/修改cmd的默认启动路径/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/26/记一次数据导入调优过程/" title="记一次数据导入调优过程" itemprop="url">记一次数据导入调优过程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-26T02:12:34.000Z" itemprop="datePublished"> Published 2018-09-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://p3euxxfa8.bkt.clouddn.com//18-9-26/41057982.jpg" alt></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>先说一下线上服务器的情况: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">配置为 E5-2420(2 processor), 8G内存. 在上面正在运行的和数据导入相关的脚本有32个. 已占用资源为 cpu 10%, 内存 40%.</span><br><span class="line"></span><br><span class="line">导入缓慢的脚本为一个解析 xml(每天生成的文件为1G左右大小的xml, 包含100000条左右的订单记录) 到数据库的脚本. 相关数据库为 postgresql, 数据表有三张, 分别为 wp_impt_order(368618条记录), wp_impt_order_style(4688006条记录, 每条记录20个字段), wp_impt_order_detail(3753845条记录, 每条记录15个字段). 这三张表主表为wp_impt_order, 其他两张表通过指向主表id 的外键 impt_order_id 关联. 所用的ORM 为SQLAlchemy.</span><br><span class="line"></span><br><span class="line">主要的导入过程是每天的订单文件为客户批量生成的文件, 这个文件中有可能包含已在数据库中的订单或者存在更新的订单. 导入逻辑为存在已最新的为准. 当前的问题是每天的导入耗时为8个小时左右. 耗时过长导致生产部门时常处于等待的过程.</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>先来看看数据处理的逻辑. 在处理文本出具入库的过程中, 有两个思路: </p>
+<ol>
+<li><p>边解析文本, 边入库. </p>
+<p>这个思路的伪代码如下:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sax_parser(xml) <span class="comment"># 流式获取数据</span></span><br><span class="line"><span class="keyword">for</span> each_order:</span><br><span class="line">   query_db</span><br><span class="line">   <span class="keyword">if</span> exist:</span><br><span class="line">       delete <span class="keyword">and</span> update</span><br><span class="line">   <span class="keyword">else</span>:</span><br><span class="line">       insert</span><br></pre></td></tr></table></figure>
+
+<p>这个解析过程的好处是使用内存少(可维持在200M的内存消耗), 但是因为频繁的与数据库交互, 导致数据库 IO 的压力巨大</p>
+</li>
+<li><p>解析完成后, 批量入库</p>
+<p>伪代码如下</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sax_parser(xml)</span><br><span class="line">globle_list = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将所有数据解析为字典形式组成的列表, 存入内存</span></span><br><span class="line"><span class="keyword">for</span> each_order:</span><br><span class="line">   globle_list.append(each_order)</span><br><span class="line"></span><br><span class="line">bulk_delete(keys) <span class="comment"># keys为主键组成的列表, 直接删除存在记录的记录</span></span><br><span class="line">bulk_update <span class="keyword">or</span> save <span class="comment"># 批量更新插入</span></span><br></pre></td></tr></table></figure>
+
+<p>这个思路的优点是减少了数据库交互, 缺点是会增加内存.</p>
+</li>
+</ol>
+<p>在最开始, 这个项目采用的是思路1, 在数据量少的时候可以正常运行, 即使数据更新不及时, 延迟也在客户接受的程度内. 然而随着数据库中数据的增多, 频繁查询删除插入带来的是数据库操作时间的增长(删除和插入都涉及数据库主键索引的重建等过程). 最终导致入库时间越来越慢.</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>通过上面的分析, 当主要矛盾在数据库交互时间过长的时候, 就要考虑减少相关操作的时间. 能减少与数据库交互的过程就尽量的减少或者放在一起操作. 同时针对待解析的文件来说, 文件本身在前后两个文件中存在相同也存在不同的数据. 对于相同的数据, 在第二天的文件导入过程中其实可以不导入(未做更新, 数据库中已经存在相关的记录). 即主要思路就是将能在内存中完成的工作全在内存中完成. 最终优化的效果是内存一次解析占用在1.5G-2G. 入库完成时间为10分钟.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在这个过程中, 也接触到SQLAlchemy 的一些少用的接口. 比如在批量删除中使用的语句为:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DBSession.query(MandSOrderStyle).filter(MandSOrderStyle.impt_order_id.in_(ids)).delete(</span><br><span class="line">                    synchronize_session=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这里对查询的结果在session中并不保存而是直接删除, 减少了内存的占用. 同时针对大批量插入过程, 使用 <code>bulk_save_objects</code>. 这里 <code>bulk_save_objects</code> 是在牺牲 flush 过程中对插入更新过程的维护已经安全性稳定性的前提下来提升插入速率的. 相关文章可<a href="https://docs.sqlalchemy.org/en/rel_1_0/orm/persistence_techniques.html#bulk-operations" target="_blank" rel="noopener">参考</a></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/系统调优/">系统调优</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/sqlalchemy/">sqlalchemy</a><a href="/tags/批量导入/">批量导入</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/26/记一次数据导入调优过程/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/19/多线程/" title="多线程" itemprop="url">多线程</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-19T06:46:08.000Z" itemprop="datePublished"> Published 2018-09-19</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="线程的状态"><a href="#线程的状态" class="headerlink" title="线程的状态"></a>线程的状态</h2><p>线程可以分为以下几种状态:</p>
+<ol>
+<li>新建  要使用一个线程, 首先要创建一个线程. 完成创建的线程就进入可执行的状态.</li>
+<li>Runnable 进入此状态的线程还并未开始运行,一旦CPU分配时间片给这个线程后,该线程才正式的开始运行</li>
+<li>running 线程正式开始运行,在运行过程中线程可能会进入阻塞的状态,即Blocked</li>
+<li>Blocked 在该状态下,线程暂停运行,解除阻塞后,线程会进入Runnable状态,等待CPU再次分配时间片给它</li>
+<li>结束 线程方法执行完毕或者因为异常终止返回</li>
+</ol>
+<p>有三种情况会导致线程进入blocked状态, 分别是</p>
+<ol>
+<li>睡眠:线程主动调用sleep()或join()方法后.</li>
+<li>等待:线程中调用wait()方法,此时需要有其他线程通过notify()方法来唤醒</li>
+<li>同步:线程中获取线程锁,但是因为资源已经被其他线程占用时.</li>
+</ol>
+<h2 id="线程示例"><a href="#线程示例" class="headerlink" title="线程示例"></a>线程示例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(number)</span>:</span></span><br><span class="line">    print(threading.currentThread().getName() + <span class="string">'\n'</span>)</span><br><span class="line">    print(number)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        t = threading.Thread(target=run, args=(i, ))</span><br><span class="line">        t.start()</span><br></pre></td></tr></table></figure>
+
+<h2 id="同步与通信"><a href="#同步与通信" class="headerlink" title="同步与通信"></a>同步与通信</h2><p>所谓的通信指的是线程之间如何交换消息,而同步则用于控制不同线程之间操作发生的相对顺序. Python中实现同步的最简单的方案就是使用锁机制,实现通信最简单的方案就是Event.</p>
+<h3 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h3><p>Python的threading 模块提供了线程锁功能(RLock, 这是一个可重入锁). 对于Lock对象而言，如果一个线程连续两次进行acquire操作，那么由于第一次acquire之后没有release，第二次acquire将挂起线程。这会导致Lock对象永远不会release，使得线程死锁。而RLock对象允许一个线程多次对其进行acquire操作，因为在其内部通过一个counter变量维护着线程acquire的次数。而且每一次的acquire操作必须有一个release操作与之对应，在所有的release操作完成之后，别的线程才能申请该RLock对象.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line">mylock = threading.RLock()</span><br><span class="line">num = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WorkThread</span><span class="params">(threading.Thread)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line">        threading.Thread.__init__(self)</span><br><span class="line">        self.t_name = name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">global</span> num</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            mylock.acquire()</span><br><span class="line">            print(<span class="string">'\n%s locked, number: %d'</span> % (self.t_name, num))</span><br><span class="line">            <span class="keyword">if</span> num &gt;= <span class="number">4</span>:</span><br><span class="line">                mylock.release()</span><br><span class="line">                print(<span class="string">'\n%s released, number: %d'</span> % (self.t_name, num))</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            num += <span class="number">1</span></span><br><span class="line">            print(<span class="string">'\n%s released, number: %d'</span> % (self.t_name, num))</span><br><span class="line">            mylock.release()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    thread1 = WorkThread(<span class="string">'A-Worker'</span>)</span><br><span class="line">    thread2 = WorkThread(<span class="string">'B-Worker'</span>)</span><br><span class="line">    thread1.start()</span><br><span class="line">    thread2.start()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+
+<h3 id="线程通信"><a href="#线程通信" class="headerlink" title="线程通信"></a>线程通信</h3><p>使用threading.Event可以使一个线程等待其他线程的通知，我们把这个Event传递到线程对象中，Event默认内置了一个标志，初始值为False。一旦该线程通过wait()方法进入等待状态，直到另一个线程调用该Event的set()方法将内置标志设置为True时，该Event会通知所有等待状态的线程恢复运行</p>
+<p><img src="https://i.imgur.com/YkYsPRL.jpg" alt="Imgur"></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/并发/">并发</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/19/多线程/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/14/scala结构类型/" title="scala结构类型" itemprop="url">scala结构类型</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-14T01:35:23.000Z" itemprop="datePublished"> Published 2018-09-14</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>在 scala 中, 可以通过 type 关键字声明为 <strong>结构类型</strong></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="title">X</span> </span>= &#123; <span class="function"><span class="keyword">def</span> <span class="title">close</span></span>():<span class="type">Unit</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样当需要约束参数实现了 close 方法的时候, 只需要这样写:</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span></span>(res:<span class="type">X</span>) = res.close</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/scala类型系统/">scala类型系统</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/14/scala结构类型/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/12/scala类型和类/" title="scala类型和类" itemprop="url">scala类型和类</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-12T03:11:33.000Z" itemprop="datePublished"> Published 2018-09-12</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://p3euxxfa8.bkt.clouddn.com//18-9-12/56872846.jpg" alt></p>
+<h2 id="class-和-type"><a href="#class-和-type" class="headerlink" title="class 和 type"></a>class 和 type</h2><p>scala 有一个统一的类型系统. 如图所示<br><img src="http://p3euxxfa8.bkt.clouddn.com//18-9-12/42518128.jpg" alt></p>
+<p>通过 Any 这个类, 将对应于对象的 AnyRef 和对应于值的 AnyVal 统一起来. 以及一个底类型 Nothing, 形成了统一的系统类型.</p>
+<p>对于一个类, 可以通过 <code>typeOf</code> 获取类型信息, 通过 <code>classOf</code> 获取类信息.</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; <span class="keyword">import</span> scala.reflect.runtime.universe._</span><br><span class="line"></span><br><span class="line">scala&gt; <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">classOf</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">res0</span></span>: <span class="type">Class</span>[<span class="type">A</span>] = <span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">scala&gt;</span> <span class="title">typeOf</span>[<span class="type">A</span>]</span></span><br><span class="line"><span class="class"><span class="title">res1</span></span>: reflect.runtime.universe.<span class="type">Type</span> = <span class="type">A</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到, 在scala中类与类型是两个不一样的概念. 类型比类更具体, 任何数据都有类型. 类型一致的对象其类也是一致的, 但是类一致的其类型不一定一致</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scala&gt; classOf[<span class="type">List</span>[<span class="type">Int</span>]] == classOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res16: <span class="type">Boolean</span> = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">scala&gt; typeOf[<span class="type">List</span>[<span class="type">Int</span>]] == typeOf[<span class="type">List</span>[<span class="type">String</span>]]</span><br><span class="line">res17: <span class="type">Boolean</span> = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/scala类型系统/">scala类型系统</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/class/">class</a><a href="/tags/type/">type</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/12/scala类型和类/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/06/redis异步队列/" title="redis异步队列" itemprop="url">redis异步队列</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-06T02:55:41.000Z" itemprop="datePublished"> Published 2018-09-06</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="1-列表"><a href="#1-列表" class="headerlink" title="1.列表"></a>1.列表</h2><p>列表的特点: 有序, 允许重复的元素</p>
+<p>列表命令:</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>添加</td>
+<td>rpush lpush linsert</td>
+</tr>
+<tr>
+<td>查</td>
+<td>lrange lindex llen</td>
+</tr>
+<tr>
+<td>删除</td>
+<td>lpop rpop lrem ltrim</td>
+</tr>
+<tr>
+<td>修改</td>
+<td>lset</td>
+</tr>
+<tr>
+<td>阻塞操作</td>
+<td>blpop brpop</td>
+</tr>
+</tbody></table>
+<h2 id="2-异步消息队列"><a href="#2-异步消息队列" class="headerlink" title="2.异步消息队列"></a>2.异步消息队列</h2><p>使用列表作为异步消息队列, 使用rpush/lpush操作入队列，使用lpop 和 rpop来出队列。</p>
+<h3 id="2-1-队列为空的处理"><a href="#2-1-队列为空的处理" class="headerlink" title="2.1 队列为空的处理"></a>2.1 队列为空的处理</h3><p>如果队列为空, 就会陷入pop的死循环. 这就是空轮询, 空轮询不但会浪费客户端的CPU, 还会拉高redis的QPS, 影响查询性能</p>
+<p>解决这个问题的办法是让线程睡眠一段时间, 一般为1s. 或者使用blpop或brpop, 这样一有消息就会处理</p>
+<h2 id="延时队列"><a href="#延时队列" class="headerlink" title="延时队列"></a>延时队列</h2><p>延时队列可以通过 Redis 的 zset(有序列表) 来实现。我们将消息序列化成一个字符串作为 zset 的value，这个消息的到期处理时间作为score，然后用多个线程轮询 zset 获取到期的任务进行处理</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/队列/">队列</a><a href="/tags/列表/">列表</a><a href="/tags/有序集合/">有序集合</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/06/redis异步队列/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/05/redis持久化/" title="redis持久化" itemprop="url">redis持久化</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-05T02:09:25.000Z" itemprop="datePublished"> Published 2018-09-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>redis 支持 RDB 和 AOF 两种持久化机制.</p>
+<h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><p>在 Redis 运行时， RDB 程序将当前内存中的数据库快照保存到磁盘文件中， 在 Redis 重启动时， RDB 程序可以通过载入 RDB 文件来还原数据库的状态。</p>
+<p>RDB 持久化的核心是 <code>rdbsave</code> 和 <code>rdbload</code> 两个函数, 分别用于生成 rdb 文件和将存储的文件加载到内存中</p>
+<p>触发 RDB 持久化分为手动触发和自动触发. 手动触发对应的是 <code>save</code> 和 <code>bgsave</code> 命令</p>
+<p>save 命令会阻塞当前 redis 服务器, 直到RDB过程完成. bgsave 会执行 fork 操作创建子进程, RDB 持久化过程由子进程完成, 阻塞发生在 fork 阶段. </p>
+<p>自动持久化发生的情况如下:</p>
+<ul>
+<li>配置<code>save m n</code>, 这样当在m秒内发生n次修改时, 就会自动触发 bgsave</li>
+<li>节点执行全量复制, 主节点会自动执行 bgsave 生成 RBD 文件发送给节点</li>
+<li><code>debug reload</code> 命令会自动触发save操作</li>
+<li>默认情况下执行 <code>shutdown</code>, 如果没有开启 AOF 持久化功能, 就会自动执行 bgsave</li>
+</ul>
+<h3 id="bgsave-的基本原理"><a href="#bgsave-的基本原理" class="headerlink" title="bgsave 的基本原理"></a>bgsave 的基本原理</h3><p>redis通过创建子进程来进行bgsave操作, 使用写时复制(copy-on-write)策略, 即fork函数发生的一刻父子进程共享同一内存数据，当父进程要更改其中某片数据时（如执行一个写命令 ），操作系统会将该片数据复制一份以保证子进程的数据不受影响，所以新的RDB文件存储的是执行fork那一刻的内存数据</p>
+<p>Redis在进行快照的过程中不会修改RDB文件，只有快照结束后才会将旧的文件替换成新的，也就是说任何时候RDB文件都是完整的。这使得我们可以通过定时备份RDB文件来实 现Redis数据库备份。RDB文件是经过压缩（可以配置rdbcompression参数以禁用压缩节省CPU占用）的二进制格式，所以占用的空间会小于内存中的数据大小，更加利于传输。</p>
+<h2 id="AOF-append-only-file"><a href="#AOF-append-only-file" class="headerlink" title="AOF(append only file)"></a>AOF(append only file)</h2><p>以独立日志的方式记录每次写命令, 重启时再重新执行AOF文件中的命令达到恢复数据的目的.</p>
+<p>AOF 主要是解决了数据持久化的实时性问题</p>
+<p>AOF 的工作流程:</p>
+<blockquote>
+<p>命令写入(append) -&gt; 文件同步(sync) -&gt; 文件重写(rewrite) -&gt; 重启加载(load)</p>
+</blockquote>
+<p>所有的写入命令会追加到 aof_buf 中, 然后根据对应的策略向硬盘中作同步操作, 随着AOF 文件增大, 定期对AOF进行重写, 压缩文件. 然后当重启服务器时, 可以加载 AOF 文件进行数据恢复.</p>
+<p>appendfsync 参数指明了 aof_buf 同步到硬盘中的策略, 分为三种</p>
+<ul>
+<li>always    每一个redis写命令都会被写入到aof文件中，这样会严重降低redis的速度</li>
+<li>everysec    每秒钟执行一次同步，将这一秒钟之内接受到的命令写入aof文件中</li>
+<li>no    并不是不进行aof持久化，而是让操作系统决定什么时候将命令写入aof文件中，这样我们丢失的数据将不可控</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>bgsave做镜像全量持久化，aof做增量持久化。因为bgsave会耗费较长时间，不够实时，在停机的时候会导致大量丢失数据，所以需要aof来配合使用。在redis实例重启时，会使用bgsave持久化文件重新构建内存，再使用aof重放近期的操作指令来实现完整恢复重启之前的状态。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/数据库/">数据库</a><a href="/tags/RDB/">RDB</a><a href="/tags/AOF/">AOF</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/05/redis持久化/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/09/04/Redis作为LRU缓存/" title="Redis作为LRU缓存" itemprop="url">Redis作为LRU缓存</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-09-04T03:30:23.000Z" itemprop="datePublished"> Published 2018-09-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>此文基于<a href="https://redis.io/topics/lru-cache" target="_blank" rel="noopener">Using Redis as an LRU cache</a></p>
+<p>当 redis 作为缓存使用时, 当有内存限制的时候, 添加数据的时候, 需要淘汰一部分旧的数据. </p>
+<p>LRU(Least Recently Used) 是 redis 支持的内存回收策略的一种. 本文将要讲述用于配置redis内存大小的<code>maxmemory</code>配置选项, 并深入讨论 LRU(确切的说只是近似实现) 在redis中的使用.</p>
+<h2 id="maxmemory-配置选项"><a href="#maxmemory-配置选项" class="headerlink" title="maxmemory 配置选项"></a>maxmemory 配置选项</h2><p>maxmemory 配置选项使用来配置 Redis 的存储数据所能使用的最大内存限制. 可以通过在内置文件redis.conf中配置，也可在Redis运行时通过命令CONFIG SET来配置。例如，我们要配置内存上限是100M的Redis缓存，那么我们可以在 redis.conf 配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">maxmemory 100mb</span><br></pre></td></tr></table></figure>
+
+<p>当 maxmemory 设置为0表示没有内存限制. 在64位系统中, 默认0为无限制, 而在32位系统中, 默认是3GB</p>
+<p>当存储的数据到达内存上限时, 如果有新的数据, redis 会基于不同的策略, 来决定是直接返回错误还是清楚部分老的数据而使新的数据能够加入.</p>
+<h2 id="回收策略"><a href="#回收策略" class="headerlink" title="回收策略"></a>回收策略</h2><p>可用的策略如下:</p>
+<ul>
+<li><p><code>noenviction</code>：不清除数据，只是返回错误，这样会导致浪费掉更多的内存，适用于大多数写命令（DEL 命令和其他的少数命令例外）</p>
+</li>
+<li><p><code>allkeys-lru</code>：从所有的数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰，以供新数据使用</p>
+</li>
+<li><p><code>volatile-lru</code>：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰，以供新数据使用</p>
+</li>
+<li><p><code>allkeys-random</code>：从所有数据集（server.db[i].dict）中任意选择数据淘汰，以供新数据使用</p>
+</li>
+<li><p><code>volatile-random</code>：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰，以供新数据使用</p>
+</li>
+<li><p><code>volatile-ttl</code>：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰，以供新数据使用</p>
+</li>
+</ul>
+<p>redis使用 <code>maxmemory-policy</code>配置具体的回收策略</p>
+<p>当缓存中没有符合条件的键时, volatile-lru, volatile-random 和volatile-ttl 将会和 noeviction 一样返回错误. 正确的选择回收策略取决于应用程序的访问模式. 可以在程序运行时, 根据<code>INFO</code>命令的监控结果, 动态的选择回收策略, 从而调优配置.</p>
+<p>根据使用经验, 一般来说回收策略可以这样来配置:</p>
+<ul>
+<li><p>如果期望用户请求呈现幂律分布(power-law distribution)，也就是，期望一部分子集元素被访问得远比其他元素多时，可以使用allkeys-lru策略。在你不确定时这是一个好的选择</p>
+</li>
+<li><p>如果期望是循环周期的访问，所有的键被连续扫描，或者期望请求符合平均分布(每个元素以相同的概率被访问)，可以使用allkeys-random策略。</p>
+</li>
+<li><p>如果你期望能让 Redis 通过使用你创建缓存对象的时候设置的TTL值，确定哪些对象应该是较好的清除候选项，可以使用volatile-ttl策略。</p>
+</li>
+</ul>
+<p>另外值得注意的是，为键设置过期时间需要消耗内存，所以使用像allkeys-lru这样的策略会更高效，因为在内存压力下没有必要为键的回收设置过期时间。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/缓存/">缓存</a><a href="/tags/翻译/">翻译</a><a href="/tags/LRU/">LRU</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/09/04/Redis作为LRU缓存/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/3/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/5/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

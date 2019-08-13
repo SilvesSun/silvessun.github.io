@@ -1,0 +1,732 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Dockerfile编写的最佳实践 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="通用规则和建议通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂使用 .dockerignore 文件来提高效率避免安装不需要的依赖每个镜像应该只关注一个问题将应用解耦有助于横向扩展和镜像复用. 举例来说, 一个web应用应该分离为三个镜像, 应用本身/数据库/缓存 你可能听过”一个容器只运行一个进程”, 大部分情况下这是很好的, 但是这并不是必须的.  如果容器相互依赖, 可以使用">
+<meta name="keywords" content="读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dockerfile编写的最佳实践">
+<meta property="og:url" content="http://sksun.com.cn/2019/03/05/Dockerfile编写的最佳实践/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="通用规则和建议通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂使用 .dockerignore 文件来提高效率避免安装不需要的依赖每个镜像应该只关注一个问题将应用解耦有助于横向扩展和镜像复用. 举例来说, 一个web应用应该分离为三个镜像, 应用本身/数据库/缓存 你可能听过”一个容器只运行一个进程”, 大部分情况下这是很好的, 但是这并不是必须的.  如果容器相互依赖, 可以使用">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.262Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dockerfile编写的最佳实践">
+<meta name="twitter:description" content="通用规则和建议通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂使用 .dockerignore 文件来提高效率避免安装不需要的依赖每个镜像应该只关注一个问题将应用解耦有助于横向扩展和镜像复用. 举例来说, 一个web应用应该分离为三个镜像, 应用本身/数据库/缓存 你可能听过”一个容器只运行一个进程”, 大部分情况下这是很好的, 但是这并不是必须的.  如果容器相互依赖, 可以使用">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/05/Dockerfile编写的最佳实践/" title="Dockerfile编写的最佳实践" itemprop="url">Dockerfile编写的最佳实践</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-05T07:35:46.000Z" itemprop="datePublished"> Published 2019-03-05</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#通用规则和建议"><span class="toc-number">1.</span> <span class="toc-text">通用规则和建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂"><span class="toc-number">1.1.</span> <span class="toc-text">通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-dockerignore-文件来提高效率"><span class="toc-number">1.2.</span> <span class="toc-text">使用 .dockerignore 文件来提高效率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免安装不需要的依赖"><span class="toc-number">1.3.</span> <span class="toc-text">避免安装不需要的依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#每个镜像应该只关注一个问题"><span class="toc-number">1.4.</span> <span class="toc-text">每个镜像应该只关注一个问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#最小化容器的层数"><span class="toc-number">1.5.</span> <span class="toc-text">最小化容器的层数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多行参数排序"><span class="toc-number">1.6.</span> <span class="toc-text">多行参数排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#构建缓存"><span class="toc-number">1.7.</span> <span class="toc-text">构建缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile指令使用建议"><span class="toc-number">2.</span> <span class="toc-text">Dockerfile指令使用建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FROM"><span class="toc-number">2.1.</span> <span class="toc-text">FROM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LABEL"><span class="toc-number">2.2.</span> <span class="toc-text">LABEL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RUN"><span class="toc-number">2.3.</span> <span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CMD"><span class="toc-number">2.4.</span> <span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXPOSE"><span class="toc-number">2.5.</span> <span class="toc-text">EXPOSE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ENV"><span class="toc-number">2.6.</span> <span class="toc-text">ENV</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ADD-COPY"><span class="toc-number">2.7.</span> <span class="toc-text">ADD/COPY</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-number">2.8.</span> <span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VOLUME"><span class="toc-number">2.9.</span> <span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#USER"><span class="toc-number">2.10.</span> <span class="toc-text">USER</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WORKDIR"><span class="toc-number">2.11.</span> <span class="toc-text">WORKDIR</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li></ol>
+		
+		</div>
+		
+		<h2 id="通用规则和建议"><a href="#通用规则和建议" class="headerlink" title="通用规则和建议"></a>通用规则和建议</h2><h3 id="通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂"><a href="#通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂" class="headerlink" title="通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂"></a>通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂</h3><h3 id="使用-dockerignore-文件来提高效率"><a href="#使用-dockerignore-文件来提高效率" class="headerlink" title="使用 .dockerignore 文件来提高效率"></a>使用 .dockerignore 文件来提高效率</h3><h3 id="避免安装不需要的依赖"><a href="#避免安装不需要的依赖" class="headerlink" title="避免安装不需要的依赖"></a>避免安装不需要的依赖</h3><h3 id="每个镜像应该只关注一个问题"><a href="#每个镜像应该只关注一个问题" class="headerlink" title="每个镜像应该只关注一个问题"></a>每个镜像应该只关注一个问题</h3><p>将应用解耦有助于横向扩展和镜像复用. 举例来说, 一个web应用应该分离为三个镜像, 应用本身/数据库/缓存</p>
+<p>你可能听过”一个容器只运行一个进程”, 大部分情况下这是很好的, 但是这并不是必须的. </p>
+<p>如果容器相互依赖, 可以使用容器网络来保证容器间通信</p>
+<h3 id="最小化容器的层数"><a href="#最小化容器的层数" class="headerlink" title="最小化容器的层数"></a>最小化容器的层数</h3><h3 id="多行参数排序"><a href="#多行参数排序" class="headerlink" title="多行参数排序"></a>多行参数排序</h3><p>将需要安装的包安装字母排序, 有助于避免安装重复的包, 并易于阅读. “&quot; 前加入空格便于阅读</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">  bzr \</span><br><span class="line">  cvs \</span><br><span class="line">  git \</span><br><span class="line">  mercurial \</span><br><span class="line">  subversion</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建缓存"><a href="#构建缓存" class="headerlink" title="构建缓存"></a>构建缓存</h3><p>构建镜像的过程中, Docker 会遍历 Dockerfile 并按顺序执行. 在执行每条命令之前, 都会检查是否有缓存可用而不是重新生成一个新的镜像. 可用使用 <code>--no-cache=true</code><br>来禁用缓存</p>
+<ul>
+<li>从一个基础镜像开始（FROM 指令指定），下一条指令将和该基础镜像的所有子镜像进行匹配，检查这些子镜像被创建时使用的指令是否和被检查的指令完全一样。如果不是，则缓存失效</li>
+<li>多数情况只需要对比Dockerfile 中镜像的指令, 特殊情况需要更详细的标注</li>
+<li>对于 ADD 和 COPY 指令，镜像中对应文件的内容也会被检查，每个文件都会计算出一个校验和。文件的最后修改时间和最后访问时间不会纳入校验。在缓存的查找过程中，会将这些校验和和已存在镜像中的文件校验和进行对比。如果文件有任何改变，比如内容和元数据，则缓存失效</li>
+<li>除了 ADD 和 COPY 指令，缓存匹配过程不会查看临时容器中的文件来决定缓存是否匹配。例如，当执行完 RUN apt-get -y update 指令后，容器中一些文件被更新，但 Docker 不会检查这些文件。这种情况下，只有指令字符串本身被用来匹配缓存</li>
+</ul>
+<h2 id="Dockerfile指令使用建议"><a href="#Dockerfile指令使用建议" class="headerlink" title="Dockerfile指令使用建议"></a>Dockerfile指令使用建议</h2><h3 id="FROM"><a href="#FROM" class="headerlink" title="FROM"></a>FROM</h3><p>尽可能使用官方镜像作为基础镜像</p>
+<h3 id="LABEL"><a href="#LABEL" class="headerlink" title="LABEL"></a>LABEL</h3><p>一个镜像可包含多个标签, 建议将多个标签放到一个 LABEL 中</p>
+<h3 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h3><p>永远将 RUN apt-get update 和 apt-get install 组合成一条 RUN 声明. </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">        package-bar \</span><br><span class="line">        package-baz \</span><br><span class="line">        package-foo</span><br></pre></td></tr></table></figure>
+
+<p>将 apt-get update 放在一条单独的 RUN 声明中会导致缓存问题以及可能后续的 apt-get install 失败.</p>
+<p>使用 RUN apt-get update &amp;&amp; apt-get install -y 可以确保你的 Dockerfiles 每次安装的都是包的最新的版本，而且这个过程不需要进一步的编码或额外干预。<br>这项技术叫作 cache busting。你也可以显示指定一个包的版本号来达到 cache-busting，这就是所谓的固定版本</p>
+<h3 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h3><p>CMD 大多数情况下都应该以 CMD [“executable”, “param1”, “param2”…] 的形式使用. </p>
+<h3 id="EXPOSE"><a href="#EXPOSE" class="headerlink" title="EXPOSE"></a>EXPOSE</h3><p>为应用程序使用常见的端口</p>
+<h3 id="ENV"><a href="#ENV" class="headerlink" title="ENV"></a>ENV</h3><p>为了方便新程序运行，你可以使用 ENV 来为容器中安装的程序更新 PATH 环境变量。例如使用 ENV PATH /usr/local/nginx/bin:$PATH 来确保 CMD [“nginx”] 能正确运行</p>
+<p>ENV 指令也可用于为你想要容器化的服务提供必要的环境变量，比如 Postgres 需要的 PGDATA</p>
+<h3 id="ADD-COPY"><a href="#ADD-COPY" class="headerlink" title="ADD/COPY"></a>ADD/COPY</h3><p>优先使用 COPY, 它比ADD更透明. COPY 只支持简单将本地文件拷贝到容器中, ADD 的最佳用例是将本地 tar 文件自动提取到镜像中 <code>ADD rootfs.tar.xz</code></p>
+<p>如果你的 Dockerfile 有多个步骤需要使用上下文中不同的文件。单独 COPY 每个文件，而不是一次性的 COPY 所有文件，这将保证每个步骤的构建缓存只在特定的文件变化时失效</p>
+<p>为了让镜像尽量小，最好不要使用 ADD 指令从远程 URL 获取包，而是使用 curl 和 wget. 这样你可以在文件提取完之后删掉不再需要的文件来避免在镜像中额外添加一层</p>
+<h3 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h3><p>ENTRYPOINT 的最佳用处是设置镜像的主命令. ENTRYPOINT 指令也可以结合一个辅助脚本使用</p>
+<h3 id="VOLUME"><a href="#VOLUME" class="headerlink" title="VOLUME"></a>VOLUME</h3><p>VOLUME 指令用于暴露任何数据库存储文件，配置文件，或容器创建的文件和目录。强烈建议使用 VOLUME 来管理镜像中的可变部分和用户可以改变的部分</p>
+<h3 id="USER"><a href="#USER" class="headerlink" title="USER"></a>USER</h3><p>如果某个服务不需要特权执行，建议使用 USER 指令切换到非 root 用户</p>
+<p>你应该避免使用 sudo，因为它不可预期的 TTY 和信号转发行为可能造成的问题比它能解决的问题还多。如果你真的需要和 sudo 类似的功能（例如，以 root 权限初始化某个守护进程，以非 root 权限执行它），你可以使用 gosu。</p>
+<p>最后，为了减少层数和复杂度，避免频繁地使用 USER 来回切换用户。</p>
+<h3 id="WORKDIR"><a href="#WORKDIR" class="headerlink" title="WORKDIR"></a>WORKDIR</h3><p>使用绝对路径. 使用 WORKDIR 来替代类似于 RUN cd … &amp;&amp; do-something 的指令，后者难以阅读、排错和维护</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">FROM buildpack-deps:stretch-scm</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gcc for cgo</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y --no-install-recommends \</span><br><span class="line">		g++ \</span><br><span class="line">		gcc \</span><br><span class="line">		libc6-dev \</span><br><span class="line">		make \</span><br><span class="line">		pkg-config \</span><br><span class="line">	&amp;&amp; rm -rf /var/lib/apt/lists/*</span><br><span class="line"></span><br><span class="line">ENV GOLANG_VERSION 1.12</span><br><span class="line"></span><br><span class="line">RUN set -eux; \</span><br><span class="line">	\</span><br><span class="line"><span class="meta">#</span> this "case" statement is generated via "update.sh"</span><br><span class="line">	dpkgArch="$(dpkg --print-architecture)"; \</span><br><span class="line">	case "$&#123;dpkgArch##*-&#125;" in \</span><br><span class="line">		amd64) goRelArch='linux-amd64'; goRelSha256='750a07fef8579ae4839458701f4df690e0b20b8bcce33b437e4df89c451b6f13' ;; \</span><br><span class="line">		armhf) goRelArch='linux-armv6l'; goRelSha256='ea0636f055763d309437461b5817452419411eb1f598dc7f35999fae05bcb79a' ;; \</span><br><span class="line">		arm64) goRelArch='linux-arm64'; goRelSha256='b7bf59c2f1ac48eb587817a2a30b02168ecc99635fc19b6e677cce01406e3fac' ;; \</span><br><span class="line">		i386) goRelArch='linux-386'; goRelSha256='3ac1db65a6fa5c13f424b53ee181755429df0c33775733cede1e0d540440fd7b' ;; \</span><br><span class="line">		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='5be21e7035efa4a270802ea04fb104dc7a54e3492641ae44632170b93166fb68' ;; \</span><br><span class="line">		s390x) goRelArch='linux-s390x'; goRelSha256='c0aef360b99ebb4b834db8b5b22777b73a11fa37b382121b24bf587c40603915' ;; \</span><br><span class="line">		*) goRelArch='src'; goRelSha256='09c43d3336743866f2985f566db0520b36f4992aea2b4b2fd9f52f17049e88f2'; \</span><br><span class="line">			echo &gt;&amp;2; echo &gt;&amp;2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo &gt;&amp;2 ;; \</span><br><span class="line">	esac; \</span><br><span class="line">	\</span><br><span class="line">	url="https://golang.org/dl/go$&#123;GOLANG_VERSION&#125;.$&#123;goRelArch&#125;.tar.gz"; \</span><br><span class="line">	wget -O go.tgz "$url"; \</span><br><span class="line">	echo "$&#123;goRelSha256&#125; *go.tgz" | sha256sum -c -; \</span><br><span class="line">	tar -C /usr/local -xzf go.tgz; \</span><br><span class="line">	rm go.tgz; \</span><br><span class="line">	\</span><br><span class="line">	if [ "$goRelArch" = 'src' ]; then \</span><br><span class="line">		echo &gt;&amp;2; \</span><br><span class="line">		echo &gt;&amp;2 'error: UNIMPLEMENTED'; \</span><br><span class="line">		echo &gt;&amp;2 'TODO install golang-any from jessie-backports for GOROOT_BOOTSTRAP (and uninstall after build)'; \</span><br><span class="line">		echo &gt;&amp;2; \</span><br><span class="line">		exit 1; \</span><br><span class="line">	fi; \</span><br><span class="line">	\</span><br><span class="line">	export PATH="/usr/local/go/bin:$PATH"; \</span><br><span class="line">	go version</span><br><span class="line"></span><br><span class="line">ENV GOPATH /go</span><br><span class="line">ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH</span><br><span class="line"></span><br><span class="line">RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" &amp;&amp; chmod -R 777 "$GOPATH"</span><br><span class="line">WORKDIR $GOPATH</span><br></pre></td></tr></table></figure>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2019/03/05/Dockerfile编写的最佳实践/" data-title="Dockerfile编写的最佳实践 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/03/07/使用多级构建/" title="使用多级构建">
+  <strong>上一篇：</strong><br/>
+  <span>
+  使用多级构建</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/03/05/打家劫舍/"  title="打家劫舍">
+ <strong>下一篇：</strong><br/> 
+ <span>打家劫舍
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#通用规则和建议"><span class="toc-number">1.</span> <span class="toc-text">通用规则和建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通过-Dockerfile-构建的镜像所启动的容器应该尽可能短暂"><span class="toc-number">1.1.</span> <span class="toc-text">通过 Dockerfile 构建的镜像所启动的容器应该尽可能短暂</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-dockerignore-文件来提高效率"><span class="toc-number">1.2.</span> <span class="toc-text">使用 .dockerignore 文件来提高效率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免安装不需要的依赖"><span class="toc-number">1.3.</span> <span class="toc-text">避免安装不需要的依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#每个镜像应该只关注一个问题"><span class="toc-number">1.4.</span> <span class="toc-text">每个镜像应该只关注一个问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#最小化容器的层数"><span class="toc-number">1.5.</span> <span class="toc-text">最小化容器的层数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多行参数排序"><span class="toc-number">1.6.</span> <span class="toc-text">多行参数排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#构建缓存"><span class="toc-number">1.7.</span> <span class="toc-text">构建缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile指令使用建议"><span class="toc-number">2.</span> <span class="toc-text">Dockerfile指令使用建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FROM"><span class="toc-number">2.1.</span> <span class="toc-text">FROM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LABEL"><span class="toc-number">2.2.</span> <span class="toc-text">LABEL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RUN"><span class="toc-number">2.3.</span> <span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CMD"><span class="toc-number">2.4.</span> <span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXPOSE"><span class="toc-number">2.5.</span> <span class="toc-text">EXPOSE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ENV"><span class="toc-number">2.6.</span> <span class="toc-text">ENV</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ADD-COPY"><span class="toc-number">2.7.</span> <span class="toc-text">ADD/COPY</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-number">2.8.</span> <span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VOLUME"><span class="toc-number">2.9.</span> <span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#USER"><span class="toc-number">2.10.</span> <span class="toc-text">USER</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WORKDIR"><span class="toc-number">2.11.</span> <span class="toc-text">WORKDIR</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#例子"><span class="toc-number">3.</span> <span class="toc-text">例子</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

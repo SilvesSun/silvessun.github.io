@@ -1,0 +1,1338 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://sksun.com.cn/page/3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/18/centos安装Python3/" title="centos安装Python3" itemprop="url">centos安装Python3</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-18T01:38:58.000Z" itemprop="datePublished"> Published 2019-01-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/centos7.jpg" alt></p>
+<h2 id="yum源更新"><a href="#yum源更新" class="headerlink" title="yum源更新"></a>yum源更新</h2><p>除了os类的yum源，还需要配置几个常用的源：epel、ius</p>
+<p><code>EPEL</code>是专门为RHEL、CentOS等Linux发行版提供额外rpm包的。很多os中没有或比较旧的rpm，在epel仓库中可以找到<br><code>IUS</code>只为RHEL和CentOS这两个发行版提供较新版本的rpm包</p>
+<h3 id="安装yum源"><a href="#安装yum源" class="headerlink" title="安装yum源"></a>安装yum源</h3><p><code>IUS</code>源依赖<code>epel</code>源, 首先安装<code>epel</code>源, 再安装<code>ius</code>源</p>
+<p><code>yum -y install epel-release</code></p>
+<p><code>rpm -ivh https://centos7.iuscommunity.org/ius-release.rpm  # CentOS 7</code></p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>安装epel源后, 有时候epel在yum源的禁用列表中, 需要修改配置文件. 将epel源配置文件中的<code>enabled</code>从0改为1</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/yum.repos.d/epel.repo</span><br><span class="line">[epel]</span><br><span class="line">name=Extra Packages for Enterprise Linux 7 - $basearch</span><br><span class="line"><span class="meta">#</span>baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch</span><br><span class="line">mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=1 # 修改此处</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7</span><br><span class="line"></span><br><span class="line">[epel-debuginfo]</span><br><span class="line">name=Extra Packages for Enterprise Linux 7 - $basearch - Debug</span><br><span class="line"><span class="meta">#</span>baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch/debug</span><br><span class="line">mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=0</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7</span><br><span class="line">gpgcheck=1</span><br><span class="line"></span><br><span class="line">[epel-source]</span><br><span class="line">name=Extra Packages for Enterprise Linux 7 - $basearch - Source</span><br><span class="line"><span class="meta">#</span>baseurl=http://download.fedoraproject.org/pub/epel/7/SRPMS</span><br><span class="line">mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&amp;arch=$basearch</span><br><span class="line">failovermethod=priority</span><br><span class="line">enabled=1  # 修改此处</span><br><span class="line">gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7</span><br><span class="line">gpgcheck=1</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装python3"><a href="#安装python3" class="headerlink" title="安装python3"></a>安装python3</h2><ul>
+<li><p>1.依赖安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum install wget gcc make # 下载,编译</span><br><span class="line">yum install zlib-devel  # 内建模块 zipimport依赖</span><br><span class="line">yum install readline-devel # 解决python中方向键等乱码问题</span><br><span class="line">yum install  bzip2-devel # 解决 import bz2 报错</span><br><span class="line">yum install  ncurses-devel # 解决 import curses 报错</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2.1源码安装<br><a href="https://www.python.org/downloads/" target="_blank" rel="noopener">官网</a></p>
+</li>
+</ul>
+<p>下载解压缩后进入文件目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd Python-3.6.1</span><br><span class="line">./configure --prefix=/usr/local/python3.6 --enable-optimizations</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>2.2 使用ius源安装最新的python<br><img src="http://supcoder.net/yum%E5%AE%89%E8%A3%85python36.png" alt="yum安装python36"></li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Linux配置/">Linux配置</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/python3安装/">python3安装</a><a href="/tags/yum源配置/">yum源配置</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/18/centos安装Python3/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/16/Manacher算法/" title="Manacher算法" itemprop="url">Manacher算法</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-16T07:06:03.000Z" itemprop="datePublished"> Published 2019-01-16</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><code>Manacher算法</code>是为了改进回文字符串查找过程中重复访问字符串这一缺陷而使用的算法, 由一个叫Manacher的人在1975年发明. 其基本思路是在原字符串上添加额外的<br>字符来避免对奇偶回文字符串的判断, 以及利用回文中心降低访问字符串的频率, 将算法复杂度降低到 <code>O(n)</code>的算法</p>
+<h1 id="字符串预处理"><a href="#字符串预处理" class="headerlink" title="字符串预处理"></a>字符串预处理</h1><p>在所有的空隙位置(包括首尾)插入同样的符号，要求这个符号是不会在原串中出现的。这样会使得所有的串都是奇数长度的. 同时为了防止越界, 在字符串开头和结尾也添加<br>特殊字符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aba  ———&gt;  #a#b#a#</span><br><span class="line">abba ———&gt;  #a#b#b#a#</span><br></pre></td></tr></table></figure>
+
+<h1 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h1><p>定义<code>回文半径</code>, 回文串中最左或最右位置的字符与其对称轴的距离。算法中以<code>RL</code>表示. 我们在这里用一个长度为经过处理的字符串的长度的数组RL表示每个不同字符位置<br>所对应的最大的回文字符串半径</p>
+<p>定义 <code>MaxRight</code>，表示当前访问到的所有回文子串，所能触及的最右一个字符的位置, 将<code>MaxRight</code>对应的回文串的对称轴所在的位置，记为<code>pos</code></p>
+<p>遍历字符串的过程中, 将当前位置记为<code>i</code>. </p>
+<h2 id="i-lt-MaxRight-的两种情况"><a href="#i-lt-MaxRight-的两种情况" class="headerlink" title="i &lt; MaxRight 的两种情况"></a>i &lt; MaxRight 的两种情况</h2><h3 id="MaxRight-i-gt-RL-2-pos-i"><a href="#MaxRight-i-gt-RL-2-pos-i" class="headerlink" title="MaxRight - i &gt; RL[2*pos-i]"></a>MaxRight - i &gt; RL[2*pos-i]</h3><p><img src="http://supcoder.net/MaxRightgti1.png" alt="MaxRight - i &gt; RL[2*pos-i]"></p>
+<p>如上图所示, 以S[j]为中心的回文子串包含在以S[id]为中心的回文子串中，由于 i 和 j 对称，以S[i]为中心的回文子串必然包含在以S[id]为中心的回文子串中，所以必有 P[i] = P[j]</p>
+<h3 id="MaxRight-i-＜-RL-2-pos-i"><a href="#MaxRight-i-＜-RL-2-pos-i" class="headerlink" title="MaxRight - i ＜ RL[2*pos-i]"></a>MaxRight - i ＜ RL[2*pos-i]</h3><p><img src="http://supcoder.net/MaxRightgti2.png" alt="MaxRightgti2"><br>以S[j]为中心的回文子串不一定完全包含于以S[id]为中心的回文子串中，但是基于对称性可知，下图中两个绿框所包围的部分是相同的，也就是说以S[i]为中心的回文子串，其向右至少会扩张到mx的位置，也就是说 P[i] &gt;= mx - i</p>
+<h2 id="i-＞-MaxRight"><a href="#i-＞-MaxRight" class="headerlink" title="i ＞ MaxRight"></a>i ＞ MaxRight</h2><p>无法对 P[i]做更多的假设，只能P[i] = 1，然后再去慢慢匹配了</p>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">manacher</span><span class="params">(s)</span>:</span></span><br><span class="line">    s_new = <span class="string">""</span>.join((<span class="string">"$#"</span>, <span class="string">"#"</span>.join(s), <span class="string">"#"</span>))</span><br><span class="line">    p = [<span class="number">0</span>]</span><br><span class="line">    center = <span class="number">0</span></span><br><span class="line">    mx = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(s_new)):</span><br><span class="line">        <span class="comment"># i ＞ MaxRight</span></span><br><span class="line">        <span class="keyword">if</span> i &gt; mx:</span><br><span class="line">            p.append(<span class="number">0</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 取 min(RL[2*pos-i], MaxRight-i)</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            p.append(min(mx - i, p[<span class="number">2</span> * center - i]))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 逐步匹配的过程    </span></span><br><span class="line">        <span class="keyword">while</span> (i - p[i] - <span class="number">1</span>) &gt; <span class="number">0</span> <span class="keyword">and</span> (i + p[i] + <span class="number">1</span>) &lt; len(s_new) <span class="keyword">and</span> s_new[i - p[i] - <span class="number">1</span>] == s_new[i + p[i] + <span class="number">1</span>]:</span><br><span class="line">            p[i] += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> p[i] &gt; mx - center:</span><br><span class="line">            center = i</span><br><span class="line">            mx = i + p[i]</span><br><span class="line">    <span class="keyword">return</span> p</span><br></pre></td></tr></table></figure>
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/字符串/">字符串</a><a href="/tags/回文字符串/">回文字符串</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/16/Manacher算法/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/05/es6笔记之数组扩展/" title="es6笔记之数组扩展" itemprop="url">es6笔记之数组扩展</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-05T06:47:41.000Z" itemprop="datePublished"> Published 2019-01-05</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/es6.png" alt></p>
+<h2 id="扩展运算符"><a href="#扩展运算符" class="headerlink" title="扩展运算符"></a>扩展运算符</h2><p><code>...</code> 可理解为<code>Python</code> 中的 <code>*</code>. 该运算符主要用于函数调用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">push</span>(<span class="params">array, ...items</span>) </span>&#123;</span><br><span class="line">  array.push(...items);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>与Python不同的是， 在扩展运算符后还可以跟表达式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> arr = [</span><br><span class="line">  ...(x &gt; <span class="number">0</span> ? [<span class="string">'a'</span>] : []),</span><br><span class="line">  <span class="string">'b'</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h2 id="不再使用-apply将数组转换为函数的参数"><a href="#不再使用-apply将数组转换为函数的参数" class="headerlink" title="不再使用 apply将数组转换为函数的参数"></a>不再使用 <code>apply</code>将数组转换为函数的参数</h2><p>由于扩展运算符可以展开数组， 不再需要apply方法将数组转换为函数的参数。 </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params">x, y, z</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//es5</span></span><br><span class="line"><span class="keyword">var</span> args = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line">f.apply(<span class="literal">null</span>, args);</span><br><span class="line"></span><br><span class="line"><span class="comment">//es6</span></span><br><span class="line"><span class="keyword">let</span> args = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];</span><br><span class="line">f(...args);</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展运算符的应用"><a href="#扩展运算符的应用" class="headerlink" title="扩展运算符的应用"></a>扩展运算符的应用</h2><ul>
+<li>复制数组</li>
+<li>合并数组<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> arr1 = [<span class="string">'a'</span>, <span class="string">'b'</span>];</span><br><span class="line"><span class="keyword">const</span> arr2 = [<span class="string">'c'</span>];</span><br><span class="line"><span class="keyword">const</span> arr3 = [<span class="string">'d'</span>, <span class="string">'e'</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// ES5 的合并数组</span></span><br><span class="line">arr1.concat(arr2, arr3);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ES6 的合并数组</span></span><br><span class="line">[...arr1, ...arr2, ...arr3]</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>这两种都是浅拷贝</p>
+<h1 id="Array-from"><a href="#Array-from" class="headerlink" title="Array.from()"></a>Array.from()</h1><p>将类似数组的对象和可遍历的对象转化为真正的数组</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> arrayLike = &#123;</span><br><span class="line">    <span class="string">'0'</span>: <span class="string">'a'</span>,</span><br><span class="line">    <span class="string">'1'</span>: <span class="string">'b'</span>,</span><br><span class="line">    <span class="string">'2'</span>: <span class="string">'c'</span>,</span><br><span class="line">    length: <span class="number">3</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ES5的写法</span></span><br><span class="line"><span class="keyword">var</span> arr1 = [].slice.call(arrayLike); <span class="comment">// ['a', 'b', 'c']</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ES6的写法</span></span><br><span class="line"><span class="keyword">let</span> arr2 = <span class="built_in">Array</span>.from(arrayLike); <span class="comment">// ['a', 'b', 'c']</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>所谓类似数组的对象，本质特征只有一点，即必须有length属性。因此，任何有length属性的对象，都可以通过Array.from方法转为数组</strong></p>
+<h1 id="Array-of"><a href="#Array-of" class="headerlink" title="Array.of()"></a>Array.of()</h1><p>用于将一组值，转换为数组。</p>
+<p>Array.of基本上可以用来替代Array()或new Array()，并且不存在由于参数不同而导致的重载。它的行为非常统一. Array.of总是返回参数值组成的数组。如果没有参数，就返回一个空数组。</p>
+<p>Array.of 的模拟实现</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ArrayOf</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> [].slice.call(<span class="built_in">arguments</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="数组实例的-find-和-findIndex"><a href="#数组实例的-find-和-findIndex" class="headerlink" title="数组实例的 find() 和 findIndex()"></a>数组实例的 find() 和 findIndex()</h1><p>数组实例的find方法，用于找出第一个符合条件的数组成员。它的参数是一个回调函数，所有数组成员依次执行该回调函数，直到找出第一个返回值为true的成员，然后返回该成员。如果没有符合条件的成员，则返回undefined</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">4</span>, <span class="number">-5</span>, <span class="number">10</span>].find(<span class="function">(<span class="params">n</span>) =&gt;</span> n &lt; <span class="number">0</span>)</span><br><span class="line"><span class="comment">// -5</span></span><br></pre></td></tr></table></figure>
+
+<p>数组实例的findIndex方法的用法与find方法非常类似，返回第一个符合条件的数组成员的位置，如果所有成员都不符合条件，则返回-1。</p>
+<h1 id="数组实例的-entries-，keys-和-values"><a href="#数组实例的-entries-，keys-和-values" class="headerlink" title="数组实例的 entries()，keys() 和 values()"></a>数组实例的 entries()，keys() 和 values()</h1><h1 id="includes"><a href="#includes" class="headerlink" title="includes()"></a>includes()</h1><p>Array.prototype.includes方法返回一个布尔值，表示某个数组是否包含给定的值. 该方法的第二个参数表示搜索的起始位置，默认为0。如果第二个参数为负数，则表示倒数的位置，如果这时它大于数组长度（比如第二个参数为-4，但数组长度为3），则会重置为从0开始</p>
+<h1 id="flat-，flatMap"><a href="#flat-，flatMap" class="headerlink" title="flat()，flatMap()"></a>flat()，flatMap()</h1><p><code>Array.prototype.flat()</code>用于将嵌套的数组“拉平”，变成一维的数组。该方法返回一个新数组，对原数据没有影响</p>
+<p>flat() 的参数为想要拉平的层数， 默认为1. 如果不管有多少层嵌套， 都要转成一维数组， 使用 <code>Infinity</code> 关键字</p>
+<p>如果原数组有空位， flat会跳过该空位</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, , <span class="number">4</span>, <span class="number">5</span>].flat()</span><br><span class="line"><span class="comment">// [1, 2, 4, 5]</span></span><br></pre></td></tr></table></figure>
+
+<p>flatMap()方法对原数组的每个成员执行一个函数（相当于执行Array.prototype.map()），然后对返回值组成的数组执行flat()方法。该方法返回一个新数组，不改变原数组。flatMap()只能展开一层数组。</p>
+<h1 id="数组中的空位"><a href="#数组中的空位" class="headerlink" title="数组中的空位"></a>数组中的空位</h1><p>ES6 则是明确将空位转为undefined。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/JavaScript/">JavaScript</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/数组/">数组</a><a href="/tags/es6/">es6</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/05/es6笔记之数组扩展/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/01/02/我的工具集/" title="我的工具集" itemprop="url">我的工具集</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-01-02T02:03:39.000Z" itemprop="datePublished"> Published 2019-01-02</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>本文主要收录工作学习中自己使用比较顺手的工具, 以作备忘.</p>
+<h2 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h2><p>时常有查单词的需要, 但是有道单词使用的不是很习惯. 所以找了个开源的桌面单词 <strong>GoldenDic</strong></p>
+<p>这个单词好处是可以自己下载需要的字典. </p>
+<ul>
+<li><p>地址 <a href="http://goldendict.org/dictionaries.php" target="_blank" rel="noopener">goldendict</a></p>
+</li>
+<li><p>说明<br>推荐下载时使用源码方式, 然后在解压后的文件夹中添加一个 <code>portable</code> 文件夹, 同时将需要的字典放到content目录即可</p>
+</li>
+<li><p>截图</p>
+</li>
+</ul>
+<p><img src="http://supcoder.net/goldendic%E6%88%AA%E5%9B%BE.png" alt="goldendic截图"></p>
+<h2 id="Listary"><a href="#Listary" class="headerlink" title="Listary"></a>Listary</h2><p>Listary 是 Windows 上的一款革命性的搜索和应用启动软件。</p>
+<h3 id="即打即搜"><a href="#即打即搜" class="headerlink" title="即打即搜"></a>即打即搜</h3><p>在 Windows 资源管理器中, 直接输入 <strong>关键词</strong> 就可以启动 Listary 搜索<br><img src="http://supcoder.net/listary%E6%96%87%E4%BB%B6%E5%A4%B9%E6%90%9C%E7%B4%A2.png" alt="listary文件夹搜索"></p>
+<p>不仅仅在资源管理器中, 在其他的软件中也支持快速搜索. 比如当navicat中表过多的时候, 直接搜索想要查看的表</p>
+<p><img src="http://supcoder.net/listaryNavicat%E6%90%9C%E7%B4%A2.png" alt="listaryNavicat搜索"></p>
+<h3 id="网络搜索"><a href="#网络搜索" class="headerlink" title="网络搜索"></a>网络搜索</h3><p>定义web关键字后就可以在命令模式中快速的搜索了. 比如 gg + 关键字 就可以使用谷歌搜索</p>
+<p><img src="http://supcoder.net/listary%E7%BD%91%E7%BB%9C%E6%90%9C%E7%B4%A2.png" alt="listary网络搜索"></p>
+<h2 id="wox-everything"><a href="#wox-everything" class="headerlink" title="wox + everything"></a>wox + everything</h2><p>和Listary差不多, 记录一下</p>
+<h2 id="视频下载"><a href="#视频下载" class="headerlink" title="视频下载"></a>视频下载</h2><p>硕鼠 <img src="http://download.flvcd.com/" alt></p>
+<h2 id="系统剪切板工具"><a href="#系统剪切板工具" class="headerlink" title="系统剪切板工具"></a>系统剪切板工具</h2><p><a href="https://www.clipboardfusion.com/" target="_blank" rel="noopener">clipboardfusion</a></p>
+<p><img src="http://supcoder.net/clipboardfusioni%E6%88%AA%E5%9B%BE.png" alt="clipboardfusioni截图"></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/效率/">效率</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/tools/">tools</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2019/01/02/我的工具集/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/28/redis之布隆过滤器/" title="redis之布隆过滤器" itemprop="url">redis之布隆过滤器</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-28T08:01:51.000Z" itemprop="datePublished"> Published 2018-12-28</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/12/28/redis之布隆过滤器/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/27/redis之HyperLogLog/" title="redis之HyperLogLog" itemprop="url">redis之HyperLogLog</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-27T04:00:32.000Z" itemprop="datePublished"> Published 2018-12-27</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p>Redis HyperLogLog 是用来做基数统计的算法. HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定的、并且是很小的。</p>
+<p>在Redis里面，每个Hyperloglog键只需要12Kb的大小就能计算接近2^64个不同元素的基数. 但是，因为 HyperLogLog 只会根据输入元素来计算基数，而不会储存输入元素本身，所以 HyperLogLog 不能像集合那样，返回输入的各个元素</p>
+<p>这里有一个新的概念: 基数统计.</p>
+<h2 id="基数"><a href="#基数" class="headerlink" title="基数"></a>基数</h2><p>比如数据集 {1, 3, 5, 7, 5, 7, 8}， 那么这个数据集的基数集为 {1, 3, 5 ,7, 8}, 基数(不重复元素)为5。 基数估计就是在误差可接受的范围内，快速计算基数</p>
+<h2 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h2><p>可以非常省内存的去统计各种计数，比如注册ip数、每日访问IP数、页面实时UV（PV肯定字符串就搞定了）、在线用户数</p>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>redis 提供 pfadd 和 pfcount 两个指令, 分别用于增加计数和获取计数</p>
+<h3 id="pfadd"><a href="#pfadd" class="headerlink" title="pfadd"></a>pfadd</h3><p>PFADD key element [element …] 添加指定元素到 HyperLogLog 中</p>
+<p>如果 HyperLogLog 估计的近似基数（approximated cardinality）在命令执行之后出现了变化， 那么命令返回 1 ， 否则返回 0 。 如果命令执行时给定的键不存在， 那么程序将先创建一个空的 HyperLogLog 结构， 然后再执行命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; PFADD test user1</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; pfadd test user2</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; pfadd test user1</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到第二次向test中添加user1 后, 由于近似基数没有发生变化, 所以返回值为0</p>
+<h3 id="pfcount"><a href="#pfcount" class="headerlink" title="pfcount"></a>pfcount</h3><p>PFCOUNT key [key …]</p>
+<p>当 PFCOUNT 命令作用于单个键时， 返回储存在给定键的 HyperLogLog 的近似基数， 如果键不存在， 那么返回 0 。</p>
+<p>当 PFCOUNT 命令作用于多个键时， 返回所有给定 HyperLogLog 的并集的近似基数， 这个近似基数是通过将所有给定 HyperLogLog 合并至一个临时 HyperLogLog 来计算得出的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; pfcount test</span><br><span class="line">(integer) 2</span><br></pre></td></tr></table></figure>
+
+<h2 id="pf-的内存占用为什么是-12k？"><a href="#pf-的内存占用为什么是-12k？" class="headerlink" title="pf 的内存占用为什么是 12k？"></a>pf 的内存占用为什么是 12k？</h2><p>在 Redis 的 HyperLogLog 用到的是 16384 个桶，也就是 2^14，每个桶的 maxbits 需要 6 个 bits 来存储，最大可以表示 maxbits=63，于是总共占用内存就是2^14 * 6 / 8 = 12k字节。</p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/基数统计/">基数统计</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/12/27/redis之HyperLogLog/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/18/redis字符串/" title="redis字符串" itemprop="url">redis字符串</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-18T01:29:41.000Z" itemprop="datePublished"> Published 2018-12-18</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <h2 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h2><p>Redis 自己构建一种名为<code>简单动态字符串</code>(SDS)的抽象类型, 这是 Redis 的默认字符串表示. 传统的 C 字符串只用在无需对字符串进行修改的地方. 其他可能修改<br>的地方都使用 SDS 字符串</p>
+<p>除了用来保存数据库中的字符串值以外, SDS 还被用作缓冲区: AOF 缓冲区和 客户端状态中的输入缓冲区都是由 SDS 实现的</p>
+<h3 id="结构定义"><a href="#结构定义" class="headerlink" title="结构定义"></a>结构定义</h3><p>一个 sdshdr 表示一个 SDS 值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">int</span> len; <span class="comment">//记录buf数组中已使用的字节数量</span></span><br><span class="line"><span class="keyword">int</span> <span class="built_in">free</span>; <span class="comment">// 未使用字节的数量</span></span><br><span class="line"><span class="keyword">char</span> buf[]; <span class="comment">//字节数组, 用于保存字符串    </span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://supcoder.net/sds.png" alt></p>
+<h3 id="SDS-和-C-字符串的区别"><a href="#SDS-和-C-字符串的区别" class="headerlink" title="SDS 和 C 字符串的区别"></a>SDS 和 C 字符串的区别</h3><h4 id="常数复杂度获取字符串长度"><a href="#常数复杂度获取字符串长度" class="headerlink" title="常数复杂度获取字符串长度"></a>常数复杂度获取字符串长度</h4><p>C 语言使用长度为 N+ 1 的字符数组来表示长度为 N 的字符串， 并且字符数组的最后一个元素总是空字符’\0’。</p>
+<p>这里, C字符串因为没有记录字符串的长度, 所以当需要获取字符串长度的时候需要遍历数组知道找到一个代表字符串结束的字符为止. 这里SDS获取字符串长度的复杂度为 O(1)</p>
+<h4 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h4><p>SDS 的空间分配策略: 当需要对SDS 进行修改时, 首先检查 SDS 空间是否满足修改所需的要求, 不满足的情况下会自动扩展空间至执行修改时所需的大小, 避免了溢出</p>
+<h4 id="减少修改字符串带来的内存重分配次数"><a href="#减少修改字符串带来的内存重分配次数" class="headerlink" title="减少修改字符串带来的内存重分配次数"></a>减少修改字符串带来的内存重分配次数</h4><p>通过未使用空间, SDS 实现了空间预分配和惰性空间释放两种优化策略</p>
+<ol>
+<li><p>空间预分配策略用于优化 SDS 字符串增长操作<br>当对一个 SDS 进行修改且需要进行空间扩展的时候, 程序会为SDS 分配额外的空间</p>
+<p>如果修改后的长度小于 1MB, 那么程序分配和 len 一样大小的未使用空间; 如果大于1MB, 分配1MB的未使用空间</p>
+</li>
+<li><p>惰性空间释放<br>当需要缩短 SDS 保存的字符串时, 程序不会立即回收多出来的字节, 而是使用free 记录, 等待将来再用. 当真正需要释放内存时, 也有相应的 API 可操作</p>
+</li>
+</ol>
+<h3 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h3><p>所有SDS API 都会以处理二进制的方式来处理SDS存放在buf数组里的数据. 通过使用二进制安全的 SDS, 使得Redis不仅可以保存文本数据, 还可以保存任意格式的数据</p>
+<h1 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h1><p><code>set key value [ex seconds] [px milliseconds] [nx|xx]</code></p>
+<ul>
+<li>ex seconds 为键设置秒级过期时间</li>
+<li>px milliseconds 为键设置毫秒级过期时间</li>
+<li>nx|xx nx键必须不存在时才能添加, 用于增加; xx键必须存在才能设置, 用于更新</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/redis/">redis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/字符串/">字符串</a><a href="/tags/基本数据结构/">基本数据结构</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/12/18/redis字符串/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/10/二叉搜索树与双向链表/" title="二叉搜索树与双向链表" itemprop="url">二叉搜索树与双向链表</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-10T06:51:20.000Z" itemprop="datePublished"> Published 2018-12-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://supcoder.net/%E5%89%91%E6%8C%87offer.png" alt="剑指offer"></p>
+<p>输入一颗二叉搜索树, 将该二叉搜索树转换成为一个排序的双向链表. 要求不能创建任何新的节点, 只能调整树种节点指针的方向</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>在二叉查找树中, 左子节点的值总是小于父节点的值. 右子节点的值总是大于父节点的值</p>
+<p>要求创建的链表是排序好的, 所以应该使用中序遍历. </p>
+<p>以以下二叉树为例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">     10</span><br><span class="line">   /    \</span><br><span class="line">  6      14</span><br><span class="line"> / \    /  \</span><br><span class="line">4   8  12   16</span><br></pre></td></tr></table></figure>
+
+<p>当遍历到根节点的时候, 可以将树看成三部分, 即值为10的节点, 根值为6的左节点和根值为14的右节点. 这个时候, 左节点应该已经完成了转换, 并且节点值为8的节点<br>处于链表的最后. 对于右节点, 由于步骤和之前的一样, 所以可以考虑使用递归的形式.</p>
+<p>首先定义两个辅助节点, listHead, listTail用来表示链表的头节点和尾节点</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.listHead = <span class="literal">None</span></span><br><span class="line">    self.listTail = <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<p>以根节点为6的左子树来说明转换的思路</p>
+<p>首先来到节点4, 此时listHead和listTail都为空, 且节点4为叶子节点. 此时将首尾节点设置为4节点</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> self.listHead <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">    self.listHead = pRootOfTree</span><br><span class="line">    self.listTail = pRootOfTree</span><br></pre></td></tr></table></figure>
+
+<p>对于节点4, 此时head, tail都为其本身. 来到节点6, 依上文所述, 此时要将tail指向6.</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">self.listTail.right = pRootOfTree  <span class="comment"># 尾节点的右节点为root节点</span></span><br><span class="line">pRootOfTree.left = self.listTail  <span class="comment"># root节点的左节点为尾节点</span></span><br><span class="line">self.listTail = pRootOfTree  <span class="comment"># 更新listTail的位置, 到root节点</span></span><br></pre></td></tr></table></figure>
+
+<p>然后右节点按照同样的方式转换</p>
+<p>完整的代码如下:</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># class TreeNode:</span></span><br><span class="line"><span class="comment">#     def __init__(self, x):</span></span><br><span class="line"><span class="comment">#         self.val = x</span></span><br><span class="line"><span class="comment">#         self.left = None</span></span><br><span class="line"><span class="comment">#         self.right = None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.listHead = <span class="literal">None</span></span><br><span class="line">        self.listTail = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">convert</span><span class="params">(self, pRootOfTree)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> pRootOfTree:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        self.convert(pRootOfTree.left)</span><br><span class="line">        <span class="keyword">if</span> self.listHead <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            self.listHead = pRootOfTree</span><br><span class="line">            self.listTail = pRootOfTree</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.listTail.right = pRootOfTree</span><br><span class="line">            pRootOfTree.left = self.listTail</span><br><span class="line">            self.listTail = pRootOfTree</span><br><span class="line"></span><br><span class="line">        self.convert(pRootOfTree.right)</span><br><span class="line">        <span class="keyword">return</span> self.listHead</span><br></pre></td></tr></table></figure>
+
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/链表/">链表</a><a href="/tags/剑指offer/">剑指offer</a><a href="/tags/二叉搜索树/">二叉搜索树</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/12/10/二叉搜索树与双向链表/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/12/03/kafka可靠的数据传递/" title="kafka可靠的数据传递" itemprop="url">kafka可靠的数据传递</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-12-03T06:21:51.000Z" itemprop="datePublished"> Published 2018-12-03</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://blogsk.oss-us-west-1.aliyuncs.com/kafka.png" alt></p>
+<h2 id="可靠性保证"><a href="#可靠性保证" class="headerlink" title="可靠性保证"></a>可靠性保证</h2><p><code>ACID</code> 原子性, 一致性, 隔离性和持久性</p>
+<ul>
+<li>kafka 可以保证分区消息的顺序</li>
+<li>只有当消息被写入分区的所有同步副本时, 它才被认为是 “已提交的”</li>
+<li>只要还有一个副本时活跃的, 那么已经提交的数据就不会丢失</li>
+<li>消费者只能读取已经提交的数据</li>
+</ul>
+<h2 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h2><p>kafka 的复制机制和分区的多副本架构是kafka可靠性保证的核心</p>
+<p>消息写入多个副本可以使kafka在发生崩溃时仍能保持消息的持久性</p>
+<p>复制功能是kafka架构的核心, 它可以在个别节点失效时仍能保持kafka 的可用性和持久性</p>
+<p>kafka使用主题来组织数据, 每个主题分为若干分区, 每个分区存在若干副本. 副本保存在 broker 上</p>
+<p>副本分为 <em>首领副本</em> 和 <em>跟随者副本</em>. </p>
+<ul>
+<li>每个分区都有一个首领副本, 为了保证一致性, 所有生产者请求和消费者请求都会经过这个副本</li>
+<li>跟随者副本不处理来自客户端的请求. 他们唯一的任务就是从首领那里复制消息, 保持与首领一致的状态.</li>
+</ul>
+<p>首领需要弄清哪个跟随者的状态与自己是一致的. 跟随者为了与首领保持消息的同步, 向首领发送获取数据的请求. 请求消息里包含了跟随者想要获取消息的偏移量,<br>而且这些偏移量是有序的</p>
+<p>通过查看每个跟随者请求的最新偏移量, 首领就会知道每个跟随者复制的进度. 如果跟随者在10s内没有请求任何消息或者没有请求最新的消息, 那么跟随者就会被认为<br>是不同步的. 持续得到最新消息的副本被称为同步的副本. 在首领发生失效时, 只有同步的副本才有可能称为新的首领</p>
+<p>除了当前首领外, 每个分区还有一个 <em>首选首领</em>. 创建主题时选定的首领就是首选首领. </p>
+<h2 id="生产者可靠性"><a href="#生产者可靠性" class="headerlink" title="生产者可靠性"></a>生产者可靠性</h2><h3 id="发送确认"><a href="#发送确认" class="headerlink" title="发送确认"></a>发送确认</h3><ul>
+<li><ol>
+<li>acks=0 意味着如果生产者能够通过网络把消息发送出去, 就认为已经成功写入kafka</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>acks=1 首领收到消息并写入到分区数据文件时会返回确认或者错误响应</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>acks=all  和 min.insync,replicas 结合, 就可以确定在返回确认之前至少有多少个副本收到消息.</li>
+</ol>
+</li>
+</ul>
+<h3 id="生产者的重试参数"><a href="#生产者的重试参数" class="headerlink" title="生产者的重试参数"></a>生产者的重试参数</h3><p>如果 broker 返回的错误可以通过重试来解决, 那么生产者会自动处理这些错误</p>
+<h2 id="消费者可靠性"><a href="#消费者可靠性" class="headerlink" title="消费者可靠性"></a>消费者可靠性</h2><p>只有那些被提交到kafka的数据, 也就是那些已经被写入所有同步副本的数据, 对消费者是可用的, 这意味着消费者得到的消息已经具备了一致性</p>
+<p>消费者需要记录哪些消息是已经读取过的, 哪些消息是没有读取的. 这是在读取消息时不丢失消息的关键</p>
+<p>消费者会获取一批事件中的最大偏移量, 然后从这个最大偏移量开始读取另外一批事件. 这样保证了消费者总能以正确的顺序获取新数据</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ul>
+<li>group.id 如果两个消费者有相同的 group.id, 并且订阅了同一个主题, 那么每个消费者会分到主题分区的一个子集</li>
+<li>auto.offset.reset 当没有偏移量可提交或者提交的偏移量在broker上不存在时消费者会做些什么</li>
+<li>enable.auto.commit  可以让消费者基于任务调度自动提交偏移量, 也可以在代码里手动提交偏移量</li>
+<li>auto.commit.interval.ms  确定自动提交的间隔时间</li>
+</ul>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/消息队列/">消息队列</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/kafka原理/">kafka原理</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/12/03/kafka可靠的数据传递/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/11/21/glide踩坑记录/" title="glide踩坑记录" itemprop="url">glide踩坑记录</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-11-21T01:25:30.000Z" itemprop="datePublished"> Published 2018-11-21</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
+        <p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-26/73283110.jpg" alt="go图标"></p>
+<p>这里作为golang glide使用过程中遇到的问题及解决办法的记录. 不定期更新</p>
+<ol>
+<li><code>Error looking for golang.org/x/sys/unix: Cannot detect VCS</code></li>
+</ol>
+<p>由于众所周知的原因, 国内无法直接获取golang.org 相关的包. 解决办法如下:</p>
+<ul>
+<li>设置mirror</li>
+</ul>
+<p><code>glide mirror set https://golang.org/x/sys https://github.com/golang/sys --vcs git</code></p>
+<p>将golang官网相关的包使用 GitHub 的镜像地址来下载.</p>
+<ul>
+<li>设置repo</li>
+</ul>
+<p>在 <code>glide.yaml</code> 中, 一个 <code>package</code> 相关的记录通常包括: package, version, repo, vcs. 其中只有package 是必须的. 当在官网无法下载对应的包时, 可以指定<br>repo 来达到下载的目的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- package: golang.org/x/sys</span><br><span class="line">  repo: git@github.com:golang/sys.git</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://blogsk.oss-us-west-1.aliyuncs.com/golang.png" alt></p>
+
+        
+        
+        <p class="article-more-link">
+          
+       </p>
+    </div>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/golang/">golang</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/glide/">glide</a>
+  </div>
+
+</div>
+
+
+
+
+<div class="comments-count">
+	
+	  	<span></span>
+		<a href="/2018/11/21/glide踩坑记录/#disqus_thread" class="comments-count-link">Comments</a>
+	
+</div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/2/"><span></span>Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/4/">Next<span></span></a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>

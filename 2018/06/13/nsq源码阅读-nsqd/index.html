@@ -1,0 +1,763 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>nsq源码阅读(nsqd) | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="nsqd是一个负责接收、排队、转发消息到客户端的守护进程，它可以独立运行，不过通常它是由 nsqlookupd 实例所在集群配置的 一个nsqd可以同时处理多个数据流. 我们把数据流称为topics, 一个topic含有至少一个channels. 当producer向nsqd某个topic发送一条消息时，该消息会被复制发送到该topic下的所有channel。当某个channel对应着多个cli">
+<meta name="keywords" content="源码阅读,nsqd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nsq源码阅读(nsqd)">
+<meta property="og:url" content="http://sksun.com.cn/2018/06/13/nsq源码阅读-nsqd/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="nsqd是一个负责接收、排队、转发消息到客户端的守护进程，它可以独立运行，不过通常它是由 nsqlookupd 实例所在集群配置的 一个nsqd可以同时处理多个数据流. 我们把数据流称为topics, 一个topic含有至少一个channels. 当producer向nsqd某个topic发送一条消息时，该消息会被复制发送到该topic下的所有channel。当某个channel对应着多个cli">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-13/16523494.jpg">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-13/33988289.jpg">
+<meta property="og:image" content="http://p3euxxfa8.bkt.clouddn.com/2018-06-13-14-57-04.png">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.278Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nsq源码阅读(nsqd)">
+<meta name="twitter:description" content="nsqd是一个负责接收、排队、转发消息到客户端的守护进程，它可以独立运行，不过通常它是由 nsqlookupd 实例所在集群配置的 一个nsqd可以同时处理多个数据流. 我们把数据流称为topics, 一个topic含有至少一个channels. 当producer向nsqd某个topic发送一条消息时，该消息会被复制发送到该topic下的所有channel。当某个channel对应着多个cli">
+<meta name="twitter:image" content="http://p3euxxfa8.bkt.clouddn.com//18-6-13/16523494.jpg">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/06/13/nsq源码阅读-nsqd/" title="nsq源码阅读(nsqd)" itemprop="url">nsq源码阅读(nsqd)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2018-06-13T04:17:02.000Z" itemprop="datePublished"> Published 2018-06-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#投递消息"><span class="toc-number">1.</span> <span class="toc-text">投递消息</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#启动"><span class="toc-number">1.1.</span> <span class="toc-text">启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#start"><span class="toc-number">1.2.</span> <span class="toc-text">start()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sync-atomic-加锁"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">sync/atomic 加锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#读取node-id文件-对比并从中获取数据"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">读取node.id文件, 对比并从中获取数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#将data以-json-解析出-meta-结构"><span class="toc-number">1.2.0.3.</span> <span class="toc-text">将data以 json 解析出 meta 结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#遍历meta，获取topic-name以及chanel-name，对需要暂停的topic-chanel-进行暂停操作"><span class="toc-number">1.2.0.4.</span> <span class="toc-text">遍历meta，获取topic name以及chanel name，对需要暂停的topic/chanel 进行暂停操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PersistMetadata"><span class="toc-number">1.2.1.</span> <span class="toc-text">PersistMetadata()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#根据nsqd-结构获取对应的topic和channel"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">根据nsqd 结构获取对应的topic和channel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#将topic和channel-持久化到文件中"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">将topic和channel 持久化到文件中</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nsqd-Main"><span class="toc-number">1.3.</span> <span class="toc-text">nsqd.Main</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-IOLoop"><span class="toc-number">1.3.1.</span> <span class="toc-text">protocolV2.IOLoop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-Exec"><span class="toc-number">1.3.2.</span> <span class="toc-text">protocolV2.Exec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-PUB"><span class="toc-number">1.3.3.</span> <span class="toc-text">protocolV2.PUB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#topic-PutMessage"><span class="toc-number">1.3.4.</span> <span class="toc-text">topic.PutMessage</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetTopic"><span class="toc-number">1.3.5.</span> <span class="toc-text">GetTopic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NewTopic"><span class="toc-number">1.3.6.</span> <span class="toc-text">NewTopic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#topic-messagePump"><span class="toc-number">1.3.7.</span> <span class="toc-text">topic.messagePump</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#消费消息"><span class="toc-number">2.</span> <span class="toc-text">消费消息</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#channel-PutMessage"><span class="toc-number">2.1.</span> <span class="toc-text">channel.PutMessage</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#protocolV2-messagePump"><span class="toc-number">2.2.</span> <span class="toc-text">protocolV2.messagePump</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-13/16523494.jpg" alt></p>
+<p>nsqd是一个负责接收、排队、转发消息到客户端的守护进程，它可以独立运行，不过通常它是由 nsqlookupd 实例所在集群配置的</p>
+<p>一个nsqd可以同时处理多个数据流. 我们把数据流称为topics, 一个topic含有至少一个channels. 当producer向nsqd某个topic发送一条消息时，该消息会被复制发送到该topic下的所有channel。当某个channel对应着多个client时，这时channel随机选择一个client，并由该client处理该消息.</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com//18-6-13/33988289.jpg" alt="nsqd执行流程"></p>
+<h1 id="投递消息"><a href="#投递消息" class="headerlink" title="投递消息"></a>投递消息</h1><p>官网的启动命令为: <code>nsqd --lookupd-tcp-address=127.0.0.1:4160</code></p>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><p>图1:</p>
+<p><img src="http://p3euxxfa8.bkt.clouddn.com/2018-06-13-14-57-04.png" alt="启动"></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	prg := &amp;program&#123;&#125;</span><br><span class="line">	<span class="keyword">if</span> err := svc.Run(prg, syscall.SIGINT, syscall.SIGTERM); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和之前讨论的nsqlookupd一样, nsqd也是通过go-svc启动. 和nsqlookupd不同的是, 在加载完配置生成对应的实例后, nsqd执行完LoadMetadata() 和 PersistMetadata() 后才执行Main方法. 如代码的1, 2所示</p>
+<h2 id="start"><a href="#start" class="headerlink" title="start()"></a>start()</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *program)</span> <span class="title">Start</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	opts := nsqd.NewOptions()</span><br><span class="line"></span><br><span class="line">	flagSet := nsqdFlagSet(opts)</span><br><span class="line">	flagSet.Parse(os.Args[<span class="number">1</span>:])</span><br><span class="line"></span><br><span class="line">	rand.Seed(time.Now().UTC().UnixNano())</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> flagSet.Lookup(<span class="string">"version"</span>).Value.(flag.Getter).Get().(<span class="keyword">bool</span>) &#123;</span><br><span class="line">		fmt.Println(version.String(<span class="string">"nsqd"</span>))</span><br><span class="line">		os.Exit(<span class="number">0</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> cfg config</span><br><span class="line">	configFile := flagSet.Lookup(<span class="string">"config"</span>).Value.String()</span><br><span class="line">	<span class="keyword">if</span> configFile != <span class="string">""</span> &#123;</span><br><span class="line">		_, err := toml.DecodeFile(configFile, &amp;cfg)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">"ERROR: failed to load config file %s - %s"</span>, configFile, err.Error())</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	cfg.Validate()</span><br><span class="line"></span><br><span class="line">	options.Resolve(opts, flagSet, cfg)</span><br><span class="line">	nsqd := nsqd.New(opts)</span><br><span class="line"></span><br><span class="line">	err := nsqd.LoadMetadata() <span class="comment">// 1</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"ERROR: %s"</span>, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	err = nsqd.PersistMetadata() <span class="comment">// 2</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"ERROR: failed to persist metadata - %s"</span>, err.Error())</span><br><span class="line">	&#125;</span><br><span class="line">	nsqd.Main()</span><br><span class="line"></span><br><span class="line">	p.nsqd = nsqd</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="string">``</span><span class="string">` </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">### LoadMetadata()</span></span><br><span class="line"><span class="string">先来看看 LoadMetadata() 的过程. </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span><span class="keyword">go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *NSQD)</span> <span class="title">LoadMetadata</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	atomic.StoreInt32(&amp;n.isLoading, <span class="number">1</span>)  <span class="comment">// 1</span></span><br><span class="line">	<span class="keyword">defer</span> atomic.StoreInt32(&amp;n.isLoading, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">	fn := newMetadataFile(n.getOpts())</span><br><span class="line">	<span class="comment">// old metadata filename with ID, maintained in parallel to enable roll-back</span></span><br><span class="line">	fnID := oldMetadataFile(n.getOpts())</span><br><span class="line"></span><br><span class="line">	data, err := readOrEmpty(fn)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	dataID, errID := readOrEmpty(fnID)</span><br><span class="line">	<span class="keyword">if</span> errID != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errID</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> data == <span class="literal">nil</span> &amp;&amp; dataID == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span> <span class="comment">// fresh start</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> data != <span class="literal">nil</span> &amp;&amp; dataID != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> bytes.Compare(data, dataID) != <span class="number">0</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">"metadata in %s and %s do not match (delete one)"</span>, fn, fnID)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> data == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// only old metadata file exists, use it</span></span><br><span class="line">		fn = fnID</span><br><span class="line">		data = dataID</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> m meta</span><br><span class="line">	err = json.Unmarshal(data, &amp;m)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"failed to parse metadata in %s - %s"</span>, fn, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, t := <span class="keyword">range</span> m.Topics &#123;</span><br><span class="line">		<span class="keyword">if</span> !protocol.IsValidTopicName(t.Name) &#123;</span><br><span class="line">			n.logf(LOG_WARN, <span class="string">"skipping creation of invalid topic %s"</span>, t.Name)</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		topic := n.GetTopic(t.Name)</span><br><span class="line">		<span class="keyword">if</span> t.Paused &#123;</span><br><span class="line">			topic.Pause()</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> _, c := <span class="keyword">range</span> t.Channels &#123;</span><br><span class="line">			<span class="keyword">if</span> !protocol.IsValidChannelName(c.Name) &#123;</span><br><span class="line">				n.logf(LOG_WARN, <span class="string">"skipping creation of invalid channel %s"</span>, c.Name)</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			channel := topic.GetChannel(c.Name)</span><br><span class="line">			<span class="keyword">if</span> c.Paused &#123;</span><br><span class="line">				channel.Pause()</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码的1处, 使用go标准库的sync/atomic 来进行加锁. </p>
+<h4 id="sync-atomic-加锁"><a href="#sync-atomic-加锁" class="headerlink" title="sync/atomic 加锁"></a>sync/atomic 加锁</h4><p>atomic包提供了底层的原子级内存操作</p>
+<blockquote>
+<p>CAS操作的优势是，可以在不形成临界区和创建互斥量的情况下完成并发安全的值替换操作。<br>这可以大大的减少同步对程序性能的损耗。  </p>
+</blockquote>
+<h4 id="读取node-id文件-对比并从中获取数据"><a href="#读取node-id文件-对比并从中获取数据" class="headerlink" title="读取node.id文件, 对比并从中获取数据"></a>读取node.id文件, 对比并从中获取数据</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> data == <span class="literal">nil</span> &amp;&amp; dataID == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span> <span class="comment">// fresh start</span></span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">if</span> data != <span class="literal">nil</span> &amp;&amp; dataID != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> bytes.Compare(data, dataID) != <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">"metadata in %s and %s do not match (delete one)"</span>, fn, fnID)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> data == <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// only old metadata file exists, use it</span></span><br><span class="line">    fn = fnID</span><br><span class="line">    data = dataID</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果新旧数据皆为空, 说明这是新启动的; 如果存在data, 将会比较两者, 若不一样则抛出不匹配错误; 如果仅有旧数据存在, 使用旧数据</p>
+<h4 id="将data以-json-解析出-meta-结构"><a href="#将data以-json-解析出-meta-结构" class="headerlink" title="将data以 json 解析出 meta 结构"></a>将data以 json 解析出 meta 结构</h4><h4 id="遍历meta，获取topic-name以及chanel-name，对需要暂停的topic-chanel-进行暂停操作"><a href="#遍历meta，获取topic-name以及chanel-name，对需要暂停的topic-chanel-进行暂停操作" class="headerlink" title="遍历meta，获取topic name以及chanel name，对需要暂停的topic/chanel 进行暂停操作"></a>遍历meta，获取topic name以及chanel name，对需要暂停的topic/chanel 进行暂停操作</h4><h3 id="PersistMetadata"><a href="#PersistMetadata" class="headerlink" title="PersistMetadata()"></a>PersistMetadata()</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *NSQD)</span> <span class="title">PersistMetadata</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// persist metadata about what topics/channels we have, across restarts</span></span><br><span class="line">	fileName := newMetadataFile(n.getOpts())</span><br><span class="line">	<span class="comment">// old metadata filename with ID, maintained in parallel to enable roll-back</span></span><br><span class="line">	fileNameID := oldMetadataFile(n.getOpts())</span><br><span class="line"></span><br><span class="line">	n.logf(LOG_INFO, <span class="string">"NSQ: persisting topic/channel metadata to %s"</span>, fileName)</span><br><span class="line"></span><br><span class="line">	js := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">	topics := []<span class="keyword">interface</span>&#123;&#125;&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> _, topic := <span class="keyword">range</span> n.topicMap &#123;</span><br><span class="line">		<span class="keyword">if</span> topic.ephemeral &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		topicData := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">		topicData[<span class="string">"name"</span>] = topic.name</span><br><span class="line">		topicData[<span class="string">"paused"</span>] = topic.IsPaused()</span><br><span class="line">		channels := []<span class="keyword">interface</span>&#123;&#125;&#123;&#125;</span><br><span class="line">		topic.Lock()</span><br><span class="line">		<span class="keyword">for</span> _, channel := <span class="keyword">range</span> topic.channelMap &#123;</span><br><span class="line">			channel.Lock()</span><br><span class="line">			<span class="keyword">if</span> channel.ephemeral &#123;</span><br><span class="line">				channel.Unlock()</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			channelData := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">			channelData[<span class="string">"name"</span>] = channel.name</span><br><span class="line">			channelData[<span class="string">"paused"</span>] = channel.IsPaused()</span><br><span class="line">			channels = <span class="built_in">append</span>(channels, channelData)</span><br><span class="line">			channel.Unlock()</span><br><span class="line">		&#125;</span><br><span class="line">		topic.Unlock()</span><br><span class="line">		topicData[<span class="string">"channels"</span>] = channels</span><br><span class="line">		topics = <span class="built_in">append</span>(topics, topicData)</span><br><span class="line">	&#125;</span><br><span class="line">	js[<span class="string">"version"</span>] = version.Binary</span><br><span class="line">	js[<span class="string">"topics"</span>] = topics</span><br><span class="line"></span><br><span class="line">	data, err := json.Marshal(&amp;js)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tmpFileName := fmt.Sprintf(<span class="string">"%s.%d.tmp"</span>, fileName, rand.Int())</span><br><span class="line"></span><br><span class="line">	err = writeSyncFile(tmpFileName, data)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	err = os.Rename(tmpFileName, fileName)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// technically should fsync DataPath here</span></span><br><span class="line"></span><br><span class="line">	stat, err := os.Lstat(fileNameID)</span><br><span class="line">	<span class="keyword">if</span> err == <span class="literal">nil</span> &amp;&amp; stat.Mode()&amp;os.ModeSymlink != <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// if no symlink (yet), race condition:</span></span><br><span class="line">	<span class="comment">// crash right here may cause next startup to see metadata conflict and abort</span></span><br><span class="line"></span><br><span class="line">	tmpFileNameID := fmt.Sprintf(<span class="string">"%s.%d.tmp"</span>, fileNameID, rand.Int())</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> runtime.GOOS != <span class="string">"windows"</span> &#123;</span><br><span class="line">		err = os.Symlink(fileName, tmpFileNameID)</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// on Windows need Administrator privs to Symlink</span></span><br><span class="line">		<span class="comment">// instead write copy every time</span></span><br><span class="line">		err = writeSyncFile(tmpFileNameID, data)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	err = os.Rename(tmpFileNameID, fileNameID)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// technically should fsync DataPath here</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="根据nsqd-结构获取对应的topic和channel"><a href="#根据nsqd-结构获取对应的topic和channel" class="headerlink" title="根据nsqd 结构获取对应的topic和channel"></a>根据nsqd 结构获取对应的topic和channel</h4><h4 id="将topic和channel-持久化到文件中"><a href="#将topic和channel-持久化到文件中" class="headerlink" title="将topic和channel 持久化到文件中"></a>将topic和channel 持久化到文件中</h4><h2 id="nsqd-Main"><a href="#nsqd-Main" class="headerlink" title="nsqd.Main"></a>nsqd.Main</h2><p>从图1可以看到, 在nsqd的Main函数中开启了监听处理tcp和http两个服务的goroutine, 同时在nsqlookupd中了解到, nsqd会定时向nsqlookupd发送心跳表明自己还活着, 所以还需要开启一个goroutine来定时发送心跳(lookupLoop), 另外还有 queueScanLoop 和 statsdLoop两个goroutine.</p>
+<p>同样调用的tcpServer过程和nsqlookupd过程一样, 然后调用protocol.IOLoop(clientConn)处理具体的连接. 这里看下处理对应连接的代码.</p>
+<h3 id="protocolV2-IOLoop"><a href="#protocolV2-IOLoop" class="headerlink" title="protocolV2.IOLoop"></a>protocolV2.IOLoop</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *protocolV2)</span> <span class="title">IOLoop</span><span class="params">(conn net.Conn)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	<span class="keyword">var</span> line []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">var</span> zeroTime time.Time</span><br><span class="line"></span><br><span class="line">	clientID := atomic.AddInt64(&amp;p.ctx.nsqd.clientIDSequence, <span class="number">1</span>)</span><br><span class="line">	client := newClientV2(clientID, conn, p.ctx)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// synchronize the startup of messagePump in order</span></span><br><span class="line">	<span class="comment">// to guarantee that it gets a chance to initialize</span></span><br><span class="line">	<span class="comment">// goroutine local state derived from client attributes</span></span><br><span class="line">	<span class="comment">// and avoid a potential race with IDENTIFY (where a client</span></span><br><span class="line">    <span class="comment">// could have changed or disabled said attributes)</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// **1**</span></span><br><span class="line">    <span class="comment">// 通过MessagePump channel把消息投递给clien </span></span><br><span class="line">	messagePumpStartedChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">	<span class="keyword">go</span> p.messagePump(client, messagePumpStartedChan)</span><br><span class="line">	&lt;-messagePumpStartedChan</span><br><span class="line"></span><br><span class="line">    <span class="comment">// consumer和nsqd交互</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> client.HeartbeatInterval &gt; <span class="number">0</span> &#123;</span><br><span class="line">			client.SetReadDeadline(time.Now().Add(client.HeartbeatInterval * <span class="number">2</span>))</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			client.SetReadDeadline(zeroTime)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// ReadSlice does not allocate new space for the data each request</span></span><br><span class="line">		<span class="comment">// ie. the returned slice is only valid until the next call to it</span></span><br><span class="line">		line, err = client.Reader.ReadSlice(<span class="string">'\n'</span>)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">				err = <span class="literal">nil</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				err = fmt.Errorf(<span class="string">"failed to read command - %s"</span>, err)</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// trim the '\n'</span></span><br><span class="line">		line = line[:<span class="built_in">len</span>(line)<span class="number">-1</span>]</span><br><span class="line">		<span class="comment">// optionally trim the '\r'</span></span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(line) &gt; <span class="number">0</span> &amp;&amp; line[<span class="built_in">len</span>(line)<span class="number">-1</span>] == <span class="string">'\r'</span> &#123;</span><br><span class="line">			line = line[:<span class="built_in">len</span>(line)<span class="number">-1</span>]</span><br><span class="line">		&#125;</span><br><span class="line">		params := bytes.Split(line, separatorBytes) <span class="comment">// 解析producer投递的消息参数</span></span><br><span class="line"></span><br><span class="line">		p.ctx.nsqd.logf(LOG_DEBUG, <span class="string">"PROTOCOL(V2): [%s] %s"</span>, client, params)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> response []<span class="keyword">byte</span></span><br><span class="line">		response, err = p.Exec(client, params)  <span class="comment">// 在Exec中执行具体的函数.</span></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			ctx := <span class="string">""</span></span><br><span class="line">			<span class="keyword">if</span> parentErr := err.(protocol.ChildErr).Parent(); parentErr != <span class="literal">nil</span> &#123;</span><br><span class="line">				ctx = <span class="string">" - "</span> + parentErr.Error()</span><br><span class="line">			&#125;</span><br><span class="line">			p.ctx.nsqd.logf(LOG_ERROR, <span class="string">"[%s] - %s%s"</span>, client, err, ctx)</span><br><span class="line"></span><br><span class="line">			sendErr := p.Send(client, frameTypeError, []<span class="keyword">byte</span>(err.Error()))</span><br><span class="line">			<span class="keyword">if</span> sendErr != <span class="literal">nil</span> &#123;</span><br><span class="line">				p.ctx.nsqd.logf(LOG_ERROR, <span class="string">"[%s] - %s%s"</span>, client, sendErr, ctx)</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="comment">// errors of type FatalClientErr should forceably close the connection</span></span><br><span class="line">			<span class="keyword">if</span> _, ok := err.(*protocol.FatalClientErr); ok &#123;</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> response != <span class="literal">nil</span> &#123;</span><br><span class="line">			err = p.Send(client, frameTypeResponse, response)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				err = fmt.Errorf(<span class="string">"failed to send response - %s"</span>, err)</span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	p.ctx.nsqd.logf(LOG_INFO, <span class="string">"PROTOCOL(V2): [%s] exiting ioloop"</span>, client)</span><br><span class="line">	conn.Close() <span class="comment">// 关闭连接</span></span><br><span class="line">	<span class="built_in">close</span>(client.ExitChan)</span><br><span class="line">	<span class="keyword">if</span> client.Channel != <span class="literal">nil</span> &#123;</span><br><span class="line">		client.Channel.RemoveClient(client.ID)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到, 完成基本的验证后, 最终将处理连接的过程转交给Exec函数 <code>response, err = p.Exec(client, params)</code></p>
+<h3 id="protocolV2-Exec"><a href="#protocolV2-Exec" class="headerlink" title="protocolV2.Exec"></a>protocolV2.Exec</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *protocolV2)</span> <span class="title">Exec</span><span class="params">(client *clientV2, params [][]<span class="keyword">byte</span>)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"IDENTIFY"</span>)) &#123;</span><br><span class="line">		<span class="keyword">return</span> p.IDENTIFY(client, params)</span><br><span class="line">	&#125;</span><br><span class="line">	err := enforceTLSPolicy(client, p, params[<span class="number">0</span>])</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">switch</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"FIN"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.FIN(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"RDY"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.RDY(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"REQ"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.REQ(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"PUB"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.PUB(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"MPUB"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.MPUB(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"DPUB"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.DPUB(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"NOP"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.NOP(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"TOUCH"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.TOUCH(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"SUB"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.SUB(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"CLS"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.CLS(client, params)</span><br><span class="line">	<span class="keyword">case</span> bytes.Equal(params[<span class="number">0</span>], []<span class="keyword">byte</span>(<span class="string">"AUTH"</span>)):</span><br><span class="line">		<span class="keyword">return</span> p.AUTH(client, params)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(<span class="literal">nil</span>, <span class="string">"E_INVALID"</span>, fmt.Sprintf(<span class="string">"invalid command %s"</span>, params[<span class="number">0</span>]))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里共有12种情形, 对应的就是nsqd支持的12个命令.</p>
+<p>对于producer来说, 最常用的是pub命令. 这里也只看下这个命令的方法</p>
+<h3 id="protocolV2-PUB"><a href="#protocolV2-PUB" class="headerlink" title="protocolV2.PUB"></a>protocolV2.PUB</h3><p>发布一个消息, 官网的示例是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -d &quot;&lt;message&gt;&quot; http://127.0.0.1:4151/pub?topic=name</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *protocolV2)</span> <span class="title">PUB</span><span class="params">(client *clientV2, params [][]<span class="keyword">byte</span>)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(params) &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(<span class="literal">nil</span>, <span class="string">"E_INVALID"</span>, <span class="string">"PUB insufficient number of parameters"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	topicName := <span class="keyword">string</span>(params[<span class="number">1</span>]) <span class="comment">// 获取对应的topic名称, 即为第二个参数</span></span><br><span class="line">	<span class="keyword">if</span> !protocol.IsValidTopicName(topicName) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(<span class="literal">nil</span>, <span class="string">"E_BAD_TOPIC"</span>,</span><br><span class="line">			fmt.Sprintf(<span class="string">"PUB topic name %q is not valid"</span>, topicName))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	bodyLen, err := readLen(client.Reader, client.lenSlice) <span class="comment">// 消息长度</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(err, <span class="string">"E_BAD_MESSAGE"</span>, <span class="string">"PUB failed to read message body size"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> bodyLen &lt;= <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(<span class="literal">nil</span>, <span class="string">"E_BAD_MESSAGE"</span>,</span><br><span class="line">			fmt.Sprintf(<span class="string">"PUB invalid message body size %d"</span>, bodyLen))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">int64</span>(bodyLen) &gt; p.ctx.nsqd.getOpts().MaxMsgSize &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(<span class="literal">nil</span>, <span class="string">"E_BAD_MESSAGE"</span>,</span><br><span class="line">			fmt.Sprintf(<span class="string">"PUB message too big %d &gt; %d"</span>, bodyLen, p.ctx.nsqd.getOpts().MaxMsgSize))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	messageBody := <span class="built_in">make</span>([]<span class="keyword">byte</span>, bodyLen)  <span class="comment">// 消息体</span></span><br><span class="line">	_, err = io.ReadFull(client.Reader, messageBody)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(err, <span class="string">"E_BAD_MESSAGE"</span>, <span class="string">"PUB failed to read message body"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := p.CheckAuth(client, <span class="string">"PUB"</span>, topicName, <span class="string">""</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	topic := p.ctx.nsqd.GetTopic(topicName) <span class="comment">// 获取对应的消息实例</span></span><br><span class="line">	msg := NewMessage(topic.GenerateID(), messageBody)  <span class="comment">// 封装为msg</span></span><br><span class="line">	err = topic.PutMessage(msg) <span class="comment">// 投递消息</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, protocol.NewFatalClientErr(err, <span class="string">"E_PUB_FAILED"</span>, <span class="string">"PUB failed "</span>+err.Error())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> okBytes, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到, PUB主要完成对消息的获取, 并封装为一个message实例, 然后使用PutMessage投递消息. </p>
+<p>对于GetTopic函数，如果topic实例已经存在，则直接获取，否则新建一个，这也就说明了NSQ的topic是在投递第一条消息时创建的</p>
+<h3 id="topic-PutMessage"><a href="#topic-PutMessage" class="headerlink" title="topic.PutMessage"></a>topic.PutMessage</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *Topic)</span> <span class="title">PutMessage</span><span class="params">(m *Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	t.RLock()</span><br><span class="line">	<span class="keyword">defer</span> t.RUnlock()</span><br><span class="line">	<span class="keyword">if</span> atomic.LoadInt32(&amp;t.exitFlag) == <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">"exiting"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	err := t.put(m)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	atomic.AddUint64(&amp;t.messageCount, <span class="number">1</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *Topic)</span> <span class="title">put</span><span class="params">(m *Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> t.memoryMsgChan &lt;- m:</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		b := bufferPoolGet()</span><br><span class="line">		err := writeMessageToBackend(b, m, t.backend)</span><br><span class="line">		bufferPoolPut(b)</span><br><span class="line">		t.ctx.nsqd.SetHealth(err)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			t.ctx.nsqd.logf(LOG_ERROR,</span><br><span class="line">				<span class="string">"TOPIC(%s) ERROR: failed to write message to backend - %s"</span>,</span><br><span class="line">				t.name, err)</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>put操作将Message写入channel，优先使用内存(memoryMsgChan),如果该topic的memoryMsgChan长度满了，则通过default逻辑，写入buffer中. 这样消息就投递成功了.</p>
+<h3 id="GetTopic"><a href="#GetTopic" class="headerlink" title="GetTopic"></a>GetTopic</h3><p>之前说过, 对于一个topic, 会先从已存在的topic中取寻找, 如果topic不存在, 将会创建一个新的topic. </p>
+<h3 id="NewTopic"><a href="#NewTopic" class="headerlink" title="NewTopic"></a>NewTopic</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewTopic</span><span class="params">(topicName <span class="keyword">string</span>, ctx *context, deleteCallback <span class="keyword">func</span>(*Topic)</span>) *<span class="title">Topic</span></span> &#123;</span><br><span class="line">	t := &amp;Topic&#123;</span><br><span class="line">		name:              topicName,</span><br><span class="line">		channelMap:        <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]*Channel),</span><br><span class="line">		memoryMsgChan:     <span class="built_in">make</span>(<span class="keyword">chan</span> *Message, ctx.nsqd.getOpts().MemQueueSize),</span><br><span class="line">		exitChan:          <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>),</span><br><span class="line">		channelUpdateChan: <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>),</span><br><span class="line">		ctx:               ctx,</span><br><span class="line">		pauseChan:         <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>),</span><br><span class="line">		deleteCallback:    deleteCallback,</span><br><span class="line">		idFactory:         NewGUIDFactory(ctx.nsqd.getOpts().ID),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> strings.HasSuffix(topicName, <span class="string">"#ephemeral"</span>) &#123;</span><br><span class="line">		t.ephemeral = <span class="literal">true</span></span><br><span class="line">		t.backend = newDummyBackendQueue()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		dqLogf := <span class="function"><span class="keyword">func</span><span class="params">(level diskqueue.LogLevel, f <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">			opts := ctx.nsqd.getOpts()</span><br><span class="line">			lg.Logf(opts.Logger, opts.logLevel, lg.LogLevel(level), f, args...)</span><br><span class="line">		&#125;</span><br><span class="line">		t.backend = diskqueue.New(</span><br><span class="line">			topicName,</span><br><span class="line">			ctx.nsqd.getOpts().DataPath,</span><br><span class="line">			ctx.nsqd.getOpts().MaxBytesPerFile,</span><br><span class="line">			<span class="keyword">int32</span>(minValidMsgLength),</span><br><span class="line">			<span class="keyword">int32</span>(ctx.nsqd.getOpts().MaxMsgSize)+minValidMsgLength,</span><br><span class="line">			ctx.nsqd.getOpts().SyncEvery,</span><br><span class="line">			ctx.nsqd.getOpts().SyncTimeout,</span><br><span class="line">			dqLogf,</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	t.waitGroup.Wrap(<span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; t.messagePump() &#125;)</span><br><span class="line"></span><br><span class="line">	t.ctx.nsqd.Notify(t)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> t</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在生成一个新的topic时, <code>t.waitGroup.Wrap(func() { t.messagePump() })</code> 这里是消息的分发函数</p>
+<h3 id="topic-messagePump"><a href="#topic-messagePump" class="headerlink" title="topic.messagePump"></a>topic.messagePump</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *Topic)</span> <span class="title">messagePump</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> msg *Message</span><br><span class="line">	<span class="keyword">var</span> buf []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	<span class="keyword">var</span> chans []*Channel</span><br><span class="line">	<span class="keyword">var</span> memoryMsgChan <span class="keyword">chan</span> *Message</span><br><span class="line">	<span class="keyword">var</span> backendChan <span class="keyword">chan</span> []<span class="keyword">byte</span></span><br><span class="line"></span><br><span class="line">    t.RLock()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 取得所有的channel</span></span><br><span class="line">	<span class="keyword">for</span> _, c := <span class="keyword">range</span> t.channelMap &#123;</span><br><span class="line">		chans = <span class="built_in">append</span>(chans, c)</span><br><span class="line">	&#125;</span><br><span class="line">	t.RUnlock()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(chans) &gt; <span class="number">0</span> &#123;</span><br><span class="line">		memoryMsgChan = t.memoryMsgChan</span><br><span class="line">		backendChan = t.backend.ReadChan()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> msg = &lt;-memoryMsgChan:</span><br><span class="line">		<span class="keyword">case</span> buf = &lt;-backendChan:</span><br><span class="line">			msg, err = decodeMessage(buf)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				t.ctx.nsqd.logf(LOG_ERROR, <span class="string">"failed to decode message - %s"</span>, err)</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">		<span class="keyword">case</span> &lt;-t.channelUpdateChan:</span><br><span class="line">			chans = chans[:<span class="number">0</span>]</span><br><span class="line">			t.RLock()</span><br><span class="line">			<span class="keyword">for</span> _, c := <span class="keyword">range</span> t.channelMap &#123;</span><br><span class="line">				chans = <span class="built_in">append</span>(chans, c)</span><br><span class="line">			&#125;</span><br><span class="line">			t.RUnlock()</span><br><span class="line">			<span class="keyword">if</span> <span class="built_in">len</span>(chans) == <span class="number">0</span> || t.IsPaused() &#123;</span><br><span class="line">				memoryMsgChan = <span class="literal">nil</span></span><br><span class="line">				backendChan = <span class="literal">nil</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				memoryMsgChan = t.memoryMsgChan</span><br><span class="line">				backendChan = t.backend.ReadChan()</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		<span class="keyword">case</span> pause := &lt;-t.pauseChan:</span><br><span class="line">			<span class="keyword">if</span> pause || <span class="built_in">len</span>(chans) == <span class="number">0</span> &#123;</span><br><span class="line">				memoryMsgChan = <span class="literal">nil</span></span><br><span class="line">				backendChan = <span class="literal">nil</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				memoryMsgChan = t.memoryMsgChan</span><br><span class="line">				backendChan = t.backend.ReadChan()</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		<span class="keyword">case</span> &lt;-t.exitChan:</span><br><span class="line">			<span class="keyword">goto</span> exit</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> i, channel := <span class="keyword">range</span> chans &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 复制每个消息，分发给每个channel</span></span><br><span class="line">			chanMsg := msg</span><br><span class="line">			<span class="comment">// copy the message because each channel</span></span><br><span class="line">			<span class="comment">// needs a unique instance but...</span></span><br><span class="line">			<span class="comment">// fastpath to avoid copy if its the first channel</span></span><br><span class="line">			<span class="comment">// (the topic already created the first copy)</span></span><br><span class="line">			<span class="keyword">if</span> i &gt; <span class="number">0</span> &#123;</span><br><span class="line">				chanMsg = NewMessage(msg.ID, msg.Body)</span><br><span class="line">				chanMsg.Timestamp = msg.Timestamp</span><br><span class="line">				chanMsg.deferred = msg.deferred</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> chanMsg.deferred != <span class="number">0</span> &#123;</span><br><span class="line">				channel.PutMessageDeferred(chanMsg, chanMsg.deferred)</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			err := channel.PutMessage(chanMsg)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				t.ctx.nsqd.logf(LOG_ERROR,</span><br><span class="line">					<span class="string">"TOPIC(%s) ERROR: failed to put msg(%s) to channel(%s) - %s"</span>,</span><br><span class="line">					t.name, msg.ID, channel.name, err)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">exit:</span><br><span class="line">	t.ctx.nsqd.logf(LOG_INFO, <span class="string">"TOPIC(%s): closing ... messagePump"</span>, t.name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此, 消息投递的过程相关代码大致看完. 总结下流程就是:</p>
+<blockquote>
+<p>producer连接nsqd, 然后像nsqd投递消息, 然后nsqd查找对应的topic, 然后将消息传入memoryMsgChan, 最后分发给对应topic的所有channel</p>
+</blockquote>
+<h1 id="消费消息"><a href="#消费消息" class="headerlink" title="消费消息"></a>消费消息</h1><p>在messagePump中, 执行完分发消息后, 对应的channel也有一个PutMessage过程</p>
+<h2 id="channel-PutMessage"><a href="#channel-PutMessage" class="headerlink" title="channel.PutMessage"></a>channel.PutMessage</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PutMessage writes a Message to the queue</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Channel)</span> <span class="title">PutMessage</span><span class="params">(m *Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	c.RLock()</span><br><span class="line">	<span class="keyword">defer</span> c.RUnlock()</span><br><span class="line">	<span class="keyword">if</span> c.Exiting() &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">"exiting"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	err := c.put(m)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	atomic.AddUint64(&amp;c.messageCount, <span class="number">1</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Channel)</span> <span class="title">put</span><span class="params">(m *Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> c.memoryMsgChan &lt;- m:</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		b := bufferPoolGet()</span><br><span class="line">		err := writeMessageToBackend(b, m, c.backend)</span><br><span class="line">		bufferPoolPut(b)</span><br><span class="line">		c.ctx.nsqd.SetHealth(err)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			c.ctx.nsqd.logf(LOG_ERROR, <span class="string">"CHANNEL(%s): failed to write message to backend - %s"</span>,</span><br><span class="line">				c.name, err)</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样, 优先将消息发送给内存channel(<code>memoryMsgChan</code>)</p>
+<p>consumer和producer连接nsqd的代码逻辑是一样的，最终consumer也是处于protocolV2.IOLoop函数中. 在之前的代码中1出有指出相应的部分, 这里截取如下</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[protocolV2.IOLoop]</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">	messagePumpStartedChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">	<span class="keyword">go</span> p.messagePump(client, messagePumpStartedChan)</span><br><span class="line">	&lt;-messagePumpStartedChan</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>在这里开启了一个新的goroutine. 我们看下这个goroutine</p>
+<h2 id="protocolV2-messagePump"><a href="#protocolV2-messagePump" class="headerlink" title="protocolV2.messagePump"></a>protocolV2.messagePump</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *protocolV2)</span> <span class="title">messagePump</span><span class="params">(client *clientV2, startedChan <span class="keyword">chan</span> <span class="keyword">bool</span>)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	<span class="keyword">var</span> memoryMsgChan <span class="keyword">chan</span> *Message</span><br><span class="line">	<span class="keyword">var</span> backendMsgChan <span class="keyword">chan</span> []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">var</span> subChannel *Channel</span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> `flusherChan` is used to bound message latency for</span></span><br><span class="line">	<span class="comment">// the pathological case of a channel on a low volume topic</span></span><br><span class="line">	<span class="comment">// with &gt;1 clients having &gt;1 RDY counts</span></span><br><span class="line">	<span class="keyword">var</span> flusherChan &lt;-<span class="keyword">chan</span> time.Time</span><br><span class="line">	<span class="keyword">var</span> sampleRate <span class="keyword">int32</span></span><br><span class="line"></span><br><span class="line">	subEventChan := client.SubEventChan</span><br><span class="line">	identifyEventChan := client.IdentifyEventChan</span><br><span class="line">	outputBufferTicker := time.NewTicker(client.OutputBufferTimeout)</span><br><span class="line">	heartbeatTicker := time.NewTicker(client.HeartbeatInterval)</span><br><span class="line">	heartbeatChan := heartbeatTicker.C</span><br><span class="line">	msgTimeout := client.MsgTimeout</span><br><span class="line"></span><br><span class="line">	<span class="comment">// v2 opportunistically buffers data to clients to reduce write system calls</span></span><br><span class="line">	<span class="comment">// we force flush in two cases:</span></span><br><span class="line">	<span class="comment">//    1. when the client is not ready to receive messages</span></span><br><span class="line">	<span class="comment">//    2. we're buffered and the channel has nothing left to send us</span></span><br><span class="line">	<span class="comment">//       (ie. we would block in this loop anyway)</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	flushed := <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// signal to the goroutine that started the messagePump</span></span><br><span class="line">	<span class="comment">// that we've started up</span></span><br><span class="line">	<span class="built_in">close</span>(startedChan)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> subChannel == <span class="literal">nil</span> || !client.IsReadyForMessages() &#123;</span><br><span class="line">			<span class="comment">// the client is not ready to receive messages...</span></span><br><span class="line">			memoryMsgChan = <span class="literal">nil</span></span><br><span class="line">			backendMsgChan = <span class="literal">nil</span></span><br><span class="line">			flusherChan = <span class="literal">nil</span></span><br><span class="line">			<span class="comment">// force flush</span></span><br><span class="line">			client.writeLock.Lock()</span><br><span class="line">			err = client.Flush()</span><br><span class="line">			client.writeLock.Unlock()</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">goto</span> exit</span><br><span class="line">			&#125;</span><br><span class="line">			flushed = <span class="literal">true</span></span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> flushed &#123;</span><br><span class="line">			<span class="comment">// last iteration we flushed...</span></span><br><span class="line">			<span class="comment">// do not select on the flusher ticker channel</span></span><br><span class="line">			memoryMsgChan = subChannel.memoryMsgChan</span><br><span class="line">			backendMsgChan = subChannel.backend.ReadChan()</span><br><span class="line">			flusherChan = <span class="literal">nil</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// we're buffered (if there isn't any more data we should flush)...</span></span><br><span class="line">			<span class="comment">// select on the flusher ticker channel, too</span></span><br><span class="line">			memoryMsgChan = subChannel.memoryMsgChan</span><br><span class="line">			backendMsgChan = subChannel.backend.ReadChan()</span><br><span class="line">			flusherChan = outputBufferTicker.C</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> &lt;-flusherChan:</span><br><span class="line">			<span class="comment">// if this case wins, we're either starved</span></span><br><span class="line">			<span class="comment">// or we won the race between other channels...</span></span><br><span class="line">			<span class="comment">// in either case, force flush</span></span><br><span class="line">			client.writeLock.Lock()</span><br><span class="line">			err = client.Flush()</span><br><span class="line">			client.writeLock.Unlock()</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">goto</span> exit</span><br><span class="line">			&#125;</span><br><span class="line">			flushed = <span class="literal">true</span></span><br><span class="line">		<span class="keyword">case</span> &lt;-client.ReadyStateChan:</span><br><span class="line">		<span class="keyword">case</span> subChannel = &lt;-subEventChan:</span><br><span class="line">			<span class="comment">// you can't SUB anymore</span></span><br><span class="line">			subEventChan = <span class="literal">nil</span></span><br><span class="line">		<span class="keyword">case</span> identifyData := &lt;-identifyEventChan:</span><br><span class="line">			<span class="comment">// you can't IDENTIFY anymore</span></span><br><span class="line">			identifyEventChan = <span class="literal">nil</span></span><br><span class="line"></span><br><span class="line">			outputBufferTicker.Stop()</span><br><span class="line">			<span class="keyword">if</span> identifyData.OutputBufferTimeout &gt; <span class="number">0</span> &#123;</span><br><span class="line">				outputBufferTicker = time.NewTicker(identifyData.OutputBufferTimeout)</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			heartbeatTicker.Stop()</span><br><span class="line">			heartbeatChan = <span class="literal">nil</span></span><br><span class="line">			<span class="keyword">if</span> identifyData.HeartbeatInterval &gt; <span class="number">0</span> &#123;</span><br><span class="line">				heartbeatTicker = time.NewTicker(identifyData.HeartbeatInterval)</span><br><span class="line">				heartbeatChan = heartbeatTicker.C</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> identifyData.SampleRate &gt; <span class="number">0</span> &#123;</span><br><span class="line">				sampleRate = identifyData.SampleRate</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			msgTimeout = identifyData.MsgTimeout</span><br><span class="line">		<span class="keyword">case</span> &lt;-heartbeatChan:</span><br><span class="line">			err = p.Send(client, frameTypeResponse, heartbeatBytes)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">goto</span> exit</span><br><span class="line">            &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 1 具体处理消息</span></span><br><span class="line">		<span class="keyword">case</span> b := &lt;-backendMsgChan:</span><br><span class="line">			<span class="keyword">if</span> sampleRate &gt; <span class="number">0</span> &amp;&amp; rand.Int31n(<span class="number">100</span>) &gt; sampleRate &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			msg, err := decodeMessage(b)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				p.ctx.nsqd.logf(LOG_ERROR, <span class="string">"failed to decode message - %s"</span>, err)</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			msg.Attempts++</span><br><span class="line"></span><br><span class="line">			subChannel.StartInFlightTimeout(msg, client.ID, msgTimeout) <span class="comment">// 先把消息放到InFlightQueue</span></span><br><span class="line">            client.SendingMessage() <span class="comment">// 计数</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            func (c *clientV2) SendingMessage() &#123;</span></span><br><span class="line"><span class="comment">                    atomic.AddInt64(&amp;c.InFlightCount, 1)</span></span><br><span class="line"><span class="comment">                    atomic.AddUint64(&amp;c.MessageCount, 1)</span></span><br><span class="line"><span class="comment">                &#125;</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line"></span><br><span class="line">			err = p.SendMessage(client, msg) <span class="comment">// 真正的消息发送</span></span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">goto</span> exit</span><br><span class="line">			&#125;</span><br><span class="line">			flushed = <span class="literal">false</span></span><br><span class="line">		<span class="keyword">case</span> msg := &lt;-memoryMsgChan:</span><br><span class="line">			<span class="keyword">if</span> sampleRate &gt; <span class="number">0</span> &amp;&amp; rand.Int31n(<span class="number">100</span>) &gt; sampleRate &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			msg.Attempts++</span><br><span class="line"></span><br><span class="line">			subChannel.StartInFlightTimeout(msg, client.ID, msgTimeout)</span><br><span class="line">			client.SendingMessage()</span><br><span class="line">			err = p.SendMessage(client, msg)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">goto</span> exit</span><br><span class="line">			&#125;</span><br><span class="line">			flushed = <span class="literal">false</span></span><br><span class="line">		<span class="keyword">case</span> &lt;-client.ExitChan:</span><br><span class="line">			<span class="keyword">goto</span> exit</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">exit:</span><br><span class="line">	p.ctx.nsqd.logf(LOG_INFO, <span class="string">"PROTOCOL(V2): [%s] exiting messagePump"</span>, client)</span><br><span class="line">	heartbeatTicker.Stop()</span><br><span class="line">	outputBufferTicker.Stop()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		p.ctx.nsqd.logf(LOG_ERROR, <span class="string">"PROTOCOL(V2): [%s] messagePump error - %s"</span>, client, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里可以看到, 发送消息的过程是先处理磁盘中的消息, 处理完磁盘的消息才会处理内存中的消息. </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/nsq学习/">nsq学习</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/源码阅读/">源码阅读</a><a href="/tags/nsqd/">nsqd</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2018/06/13/nsq源码阅读-nsqd/" data-title="nsq源码阅读(nsqd) | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2018/06/20/IO复用select-poll/" title="IO复用select,poll">
+  <strong>上一篇：</strong><br/>
+  <span>
+  IO复用select,poll</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/06/12/go包管理/"  title="go包管理">
+ <strong>下一篇：</strong><br/> 
+ <span>go包管理
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#投递消息"><span class="toc-number">1.</span> <span class="toc-text">投递消息</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#启动"><span class="toc-number">1.1.</span> <span class="toc-text">启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#start"><span class="toc-number">1.2.</span> <span class="toc-text">start()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sync-atomic-加锁"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">sync/atomic 加锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#读取node-id文件-对比并从中获取数据"><span class="toc-number">1.2.0.2.</span> <span class="toc-text">读取node.id文件, 对比并从中获取数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#将data以-json-解析出-meta-结构"><span class="toc-number">1.2.0.3.</span> <span class="toc-text">将data以 json 解析出 meta 结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#遍历meta，获取topic-name以及chanel-name，对需要暂停的topic-chanel-进行暂停操作"><span class="toc-number">1.2.0.4.</span> <span class="toc-text">遍历meta，获取topic name以及chanel name，对需要暂停的topic/chanel 进行暂停操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PersistMetadata"><span class="toc-number">1.2.1.</span> <span class="toc-text">PersistMetadata()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#根据nsqd-结构获取对应的topic和channel"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">根据nsqd 结构获取对应的topic和channel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#将topic和channel-持久化到文件中"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">将topic和channel 持久化到文件中</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nsqd-Main"><span class="toc-number">1.3.</span> <span class="toc-text">nsqd.Main</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-IOLoop"><span class="toc-number">1.3.1.</span> <span class="toc-text">protocolV2.IOLoop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-Exec"><span class="toc-number">1.3.2.</span> <span class="toc-text">protocolV2.Exec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#protocolV2-PUB"><span class="toc-number">1.3.3.</span> <span class="toc-text">protocolV2.PUB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#topic-PutMessage"><span class="toc-number">1.3.4.</span> <span class="toc-text">topic.PutMessage</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetTopic"><span class="toc-number">1.3.5.</span> <span class="toc-text">GetTopic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NewTopic"><span class="toc-number">1.3.6.</span> <span class="toc-text">NewTopic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#topic-messagePump"><span class="toc-number">1.3.7.</span> <span class="toc-text">topic.messagePump</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#消费消息"><span class="toc-number">2.</span> <span class="toc-text">消费消息</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#channel-PutMessage"><span class="toc-number">2.1.</span> <span class="toc-text">channel.PutMessage</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#protocolV2-messagePump"><span class="toc-number">2.2.</span> <span class="toc-text">protocolV2.messagePump</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>

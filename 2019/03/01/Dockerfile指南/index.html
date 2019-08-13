@@ -1,0 +1,753 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  
+    <title>Dockerfile指南 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令 builddocker build 可以通过 Dockerfile 和context 构建镜像. 这里的context指的是特定PATH和URL中的Dockerfile的集合. PATH是本地系统的一个目录,URL是一个git地址 build 是由Docker daemon 运行的, 而不是 C">
+<meta name="keywords" content="读书笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dockerfile指南">
+<meta property="og:url" content="http://sksun.com.cn/2019/03/01/Dockerfile指南/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令 builddocker build 可以通过 Dockerfile 和context 构建镜像. 这里的context指的是特定PATH和URL中的Dockerfile的集合. PATH是本地系统的一个目录,URL是一个git地址 build 是由Docker daemon 运行的, 而不是 C">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://supcoder.net/Docker_logo.png">
+<meta property="og:updated_time" content="2019-08-06T04:46:54.262Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dockerfile指南">
+<meta name="twitter:description" content="一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令 builddocker build 可以通过 Dockerfile 和context 构建镜像. 这里的context指的是特定PATH和URL中的Dockerfile的集合. PATH是本地系统的一个目录,URL是一个git地址 build 是由Docker daemon 运行的, 而不是 C">
+<meta name="twitter:image" content="http://supcoder.net/Docker_logo.png">
+
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:sksun.com.cn">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/03/01/Dockerfile指南/" title="Dockerfile指南" itemprop="url">Dockerfile指南</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2019-03-01T07:08:39.000Z" itemprop="datePublished"> Published 2019-03-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#build"><span class="toc-number">1.</span> <span class="toc-text">build</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parser-directives"><span class="toc-number">2.</span> <span class="toc-text">Parser directives</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#申明环境变量-Environment-replacement"><span class="toc-number">3.</span> <span class="toc-text">申明环境变量(Environment replacement)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FROM"><span class="toc-number">4.</span> <span class="toc-text">FROM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RUN"><span class="toc-number">5.</span> <span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD"><span class="toc-number">6.</span> <span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LBAEL"><span class="toc-number">7.</span> <span class="toc-text">LBAEL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EXPOSE"><span class="toc-number">8.</span> <span class="toc-text">EXPOSE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENV"><span class="toc-number">9.</span> <span class="toc-text">ENV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-number">10.</span> <span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-number">11.</span> <span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VOLUME"><span class="toc-number">12.</span> <span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#USER"><span class="toc-number">13.</span> <span class="toc-text">USER</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WORKDIR"><span class="toc-number">14.</span> <span class="toc-text">WORKDIR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ARG"><span class="toc-number">15.</span> <span class="toc-text">ARG</span></a></li></ol>
+		
+		</div>
+		
+		<p><img src="http://supcoder.net/Docker_logo.png" alt></p>
+<p>一般的，Dockerfile 分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令</p>
+<h2 id="build"><a href="#build" class="headerlink" title="build"></a>build</h2><p><code>docker build</code> 可以通过 <code>Dockerfile</code> 和<code>context</code> 构建镜像. 这里的<code>context</code>指的是特定<code>PATH</code>和<code>URL</code>中的Dockerfile的集合. PATH是本地系统的一个目录,<br>URL是一个git地址</p>
+<p>build 是由Docker daemon 运行的, 而不是 CLI. 当运行 docker build 的时候, docker 进程首先将指定 context 的所有文件发送到 daemon. 因此, 不要使用根<br>目录作为 PATH, 这会将宿主机的所有文件导入到 daemon 中.</p>
+<p>一般来说, Dockerfile 位于 context 的根. 可以使用 -f 指定特定位置的 Dockerfile; -t 指定生成的镜像保存位置</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -f /<span class="built_in">path</span>/to/a/Dockerfile .</span><br><span class="line">docker build -t shykes/myapp .</span><br></pre></td></tr></table></figure>
+
+<p>也可以一次指定多个 repo 和 tag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t shykes/myapp:1.0.2 -t shykes/myapp:latest .</span><br></pre></td></tr></table></figure>
+
+<p>在构建镜像之前, Docker deamon 会首先检查 Dockerfile 是否有语法错误. 需要注意的是 Dockerfile 中的每一步构建都是相互独立的, 也就是说类似<code>RUN cd/tmp</code><br>这样的命令对下一步构建不会产生任何作用</p>
+<p>为了加快构建速度, Docker 会尽可能的复用一些缓存镜像. </p>
+<h2 id="Parser-directives"><a href="#Parser-directives" class="headerlink" title="Parser directives"></a>Parser directives</h2><p>Parser directives 是可选的, 用于提示解释器做特殊的处理. 如果需要定义 Parser directives, 需要在 Dockerfile 的第一行定义. 当前, Parser directives<br>只支持转义字符. 默认的在 Unix-like 中转义字符为<code>\</code>, 如果是在 Windows 系统中, 需要修改, 推荐为 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> escape=`</span><br></pre></td></tr></table></figure>
+
+<h2 id="申明环境变量-Environment-replacement"><a href="#申明环境变量-Environment-replacement" class="headerlink" title="申明环境变量(Environment replacement)"></a>申明环境变量(Environment replacement)</h2><p>在 Dockerfile 中可以通过 <code>ENV</code> 申明一个环境变量, 然后在 Dockerfile 中使用 <code>${variable_name}</code></p>
+<p>在同一个指令中, 变量共享同一个值. 所以在下面的例子中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ENV abc=hello</span><br><span class="line">ENV abc=bye def=$abc</span><br><span class="line">ENV ghi=$abc</span><br></pre></td></tr></table></figure>
+
+<p><code>def</code> 的值为<code>hello</code>, 而<code>ghi</code> 的值为<code>bye</code></p>
+<h2 id="FROM"><a href="#FROM" class="headerlink" title="FROM"></a>FROM</h2><p><code>FROM</code> 初始化一层镜像, 并将其设置为接下来的构建的 <code>Base Image</code>. 因此, 一个 Dockerfile 的第一句可执行的指令一般都是是 FROM.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM &lt;image&gt; [AS &lt;name&gt;]</span><br><span class="line">FROM &lt;image&gt;[:&lt;tag&gt;] [AS &lt;name&gt;]</span><br><span class="line">FROM &lt;image&gt;[@&lt;digest&gt;] [AS &lt;name&gt;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>ARG</code> 是唯一有可能先于 FROM 的指令</li>
+<li>在一个 Dockerfile 中, FROM 可以多次出现, 每个 FROM 都会清除之前构建命令的所有状态</li>
+<li>可以通过 AS 对一个镜像指定别名, 这个别名可以在接下来的<code>FROM</code> <code>CPOY</code>命令中使用</li>
+<li>可选的 <code>TAG</code> / <code>digest</code></li>
+</ul>
+<h2 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h2><p>RUN 会在当前镜像的顶层执行任何命令，并commit成新的（中间）镜像，提交的镜像会在后面继续用到. 两种格式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RUN &lt;command&gt;：shell格式</span><br><span class="line">RUN ["executable", "param1", "param2"]：exec格式</span><br></pre></td></tr></table></figure>
+
+<p><strong>exec</strong> 格式的 RUN 命令将命令解析为 JSON 格式, 所以应该使用双引号</p>
+<h2 id="CMD"><a href="#CMD" class="headerlink" title="CMD"></a>CMD</h2><p>一个 Dockerfile 中只能有一个 CMD 命令, 多个 CMD 命令只有最后一个生效. <strong>用来指定容器启动时运行的命令。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CMD [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;]：exec格式</span><br><span class="line">CMD command param1 param2：shell格式</span><br><span class="line">CMD [&quot;param1&quot;, &quot;param2&quot;]：省略可执行文件的exec格式，这种写法使CMD中的参数当做ENTRYPOINT的默认参数</span><br></pre></td></tr></table></figure>
+
+<h2 id="LBAEL"><a href="#LBAEL" class="headerlink" title="LBAEL"></a>LBAEL</h2><p>给构建的镜像打标签</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...</span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPOSE"><a href="#EXPOSE" class="headerlink" title="EXPOSE"></a>EXPOSE</h2><p>为构建的镜像设置监听端口，使容器在运行时监听</p>
+<h2 id="ENV"><a href="#ENV" class="headerlink" title="ENV"></a>ENV</h2><p>设置环境变量, 供后续的指令使用. 可以在 RUN 时替换镜像中设置的环境变量 <code>docker run --env &lt;key&gt;=&lt;value&gt;</code></p>
+<h2 id="ADD"><a href="#ADD" class="headerlink" title="ADD"></a>ADD</h2><p>复制上下文中的文件到目标镜像内</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ADD &lt;src&gt;... &lt;dest&gt;</span><br><span class="line">ADD [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>src 文件、目录，也可以是文件URL. 可以指定多个<src>，必须是在上下文目录和子目录中</src></li>
+<li>可以是绝对路径，也可以是相对WORKDIR目录的相对路径。所有文件的UID和GID都是0</li>
+</ul>
+<h2 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENTRYPOINT [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;] (exec form, preferred)</span><br><span class="line">ENTRYPOINT command param1 param2 (shell form)</span><br></pre></td></tr></table></figure>
+
+<p>指定镜像的执行程序，只有最后一条ENTRYPOINT指令有效</p>
+<h2 id="VOLUME"><a href="#VOLUME" class="headerlink" title="VOLUME"></a>VOLUME</h2><p>指定镜像内的目录为数据卷</p>
+<h2 id="USER"><a href="#USER" class="headerlink" title="USER"></a>USER</h2><p>为接下来的Dockerfile 指令指定用户</p>
+<h2 id="WORKDIR"><a href="#WORKDIR" class="headerlink" title="WORKDIR"></a>WORKDIR</h2><h2 id="ARG"><a href="#ARG" class="headerlink" title="ARG"></a>ARG</h2><p>指定了用户在docker build –build-arg <varname>=<value>时可以使用的参数</value></varname></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/Docker/">Docker</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/读书笔记/">读书笔记</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://sksun.com.cn/2019/03/01/Dockerfile指南/" data-title="Dockerfile指南 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/03/05/打家劫舍/" title="打家劫舍">
+  <strong>上一篇：</strong><br/>
+  <span>
+  打家劫舍</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2019/02/19/pathSum/"  title="pathSum">
+ <strong>下一篇：</strong><br/> 
+ <span>pathSum
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#build"><span class="toc-number">1.</span> <span class="toc-text">build</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Parser-directives"><span class="toc-number">2.</span> <span class="toc-text">Parser directives</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#申明环境变量-Environment-replacement"><span class="toc-number">3.</span> <span class="toc-text">申明环境变量(Environment replacement)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FROM"><span class="toc-number">4.</span> <span class="toc-text">FROM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RUN"><span class="toc-number">5.</span> <span class="toc-text">RUN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CMD"><span class="toc-number">6.</span> <span class="toc-text">CMD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LBAEL"><span class="toc-number">7.</span> <span class="toc-text">LBAEL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EXPOSE"><span class="toc-number">8.</span> <span class="toc-text">EXPOSE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENV"><span class="toc-number">9.</span> <span class="toc-text">ENV</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ADD"><span class="toc-number">10.</span> <span class="toc-text">ADD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ENTRYPOINT"><span class="toc-number">11.</span> <span class="toc-text">ENTRYPOINT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VOLUME"><span class="toc-number">12.</span> <span class="toc-text">VOLUME</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#USER"><span class="toc-number">13.</span> <span class="toc-text">USER</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WORKDIR"><span class="toc-number">14.</span> <span class="toc-text">WORKDIR</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ARG"><span class="toc-number">15.</span> <span class="toc-text">ARG</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/tools/Atom使用经验/" title="Atom使用经验">Atom使用经验<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/" title="Django">Django<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/Django学习/" title="Django学习">Django学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Docker/" title="Docker">Docker<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Java/" title="Java">Java<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux/" title="Linux">Linux<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Linux配置/" title="Linux配置">Linux配置<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/" title="Python">Python<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/Python/" title="Python">Python<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/Python网络编程/" title="Python网络编程">Python网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/React/" title="React">React<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Django/Web/" title="Web">Web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/centos装机/" title="centos装机">centos装机<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang/" title="golang">golang<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/golang学习/" title="golang学习">golang学习<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/go学习/" title="go学习">go学习<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux踩坑记录/" title="linux踩坑记录">linux踩坑记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nginx/" title="nginx">nginx<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/nsq学习/" title="nsq学习">nsq学习<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/play2/" title="play2">play2<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/redis/" title="redis">redis<sup>7</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala/" title="scala">scala<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/scala类型系统/" title="scala类型系统">scala类型系统<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/tools/" title="tools">tools<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web/" title="web">web<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/web基础/" title="web基础">web基础<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/windwos/" title="windwos">windwos<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/并发/" title="并发">并发<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/" title="开源框架">开源框架<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/效率/" title="效率">效率<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>5</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/消息队列/" title="消息队列">消息队列<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/源码/" title="源码">源码<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/算法/" title="算法">算法<sup>15</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/系统调优/" title="系统调优">系统调优<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/网络编程/" title="网络编程">网络编程<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Python/开源框架/翻译/" title="翻译">翻译<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/" title="读书笔记">读书笔记<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/面试/" title="面试">面试<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/驱动安装/" title="驱动安装">驱动安装<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/读书笔记/高性能MySQL/" title="高性能MySQL">高性能MySQL<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/LeetCode/" title="LeetCode">LeetCode<sup>13</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/动态规划/" title="动态规划">动态规划<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/读书笔记/" title="读书笔记">读书笔记<sup>5</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Django/" title="Django">Django<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/字符串/" title="字符串">字符串<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/缓存/" title="缓存">缓存<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/MySQL/" title="MySQL">MySQL<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/链表/" title="链表">链表<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Java/" title="Java">Java<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/集合框架/" title="集合框架">集合框架<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/翻译/" title="翻译">翻译<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/源码阅读/" title="源码阅读">源码阅读<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/web/" title="web">web<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/drf/" title="drf">drf<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/实战/" title="实战">实战<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'silves';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
