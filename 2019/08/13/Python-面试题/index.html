@@ -4,25 +4,25 @@
 <head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
   
-    <title>Python 面试题 | Hexo</title>
+    <title>Python 面试题 | 随笔小记</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
-    <meta name="author" content="John Doe">
+    <meta name="author" content="sksun">
     
 
     
-    <meta name="description" content="＃ 1.python全局解释器锁＃＃ GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 ＃＃ CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展">
+    <meta name="description" content="1.python全局解释器锁GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展更容易：除非手动">
 <meta name="keywords" content="cheatsheet">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python 面试题">
 <meta property="og:url" content="http://sksun.com.cn/2019/08/13/Python-面试题/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="＃ 1.python全局解释器锁＃＃ GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 ＃＃ CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展">
+<meta property="og:site_name" content="随笔小记">
+<meta property="og:description" content="1.python全局解释器锁GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展更容易：除非手动">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-08-13T03:04:44.680Z">
+<meta property="og:updated_time" content="2019-08-13T04:56:22.043Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python 面试题">
-<meta name="twitter:description" content="＃ 1.python全局解释器锁＃＃ GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 ＃＃ CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展">
+<meta name="twitter:description" content="1.python全局解释器锁GIL的优点在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的 CPython为什么存在GILCPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。 主要考虑到以下几点：  单线程情况下更快 瓶颈在于I/O的多线程情况下更快 CPU耗时操作，在调用C库的时候更快 编写C扩展更容易：除非手动">
 
     
     
@@ -41,7 +41,7 @@
 <div>
 		
 			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h1 class="site-name"><a href="/" title="随笔小记">随笔小记</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
 			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
@@ -80,7 +80,7 @@
   </h1>
   <p class="article-author">By
        
-		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		<a href="/about" title="sksun" target="_blank" itemprop="author">sksun</a>
 		
   <p class="article-time">
     <time datetime="2019-08-13T02:06:36.000Z" itemprop="datePublished"> Published 2019-08-13</time>
@@ -92,12 +92,12 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-python全局解释器锁"><span class="toc-number">1.</span> <span class="toc-text">1.python全局解释器锁</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#GIL的优点"><span class="toc-number">1.1.</span> <span class="toc-text">GIL的优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPython为什么存在GIL"><span class="toc-number">1.2.</span> <span class="toc-text">CPython为什么存在GIL</span></a></li></ol></li></ol>
 		
 		</div>
 		
-		<p>＃ 1.python全局解释器锁<br>＃＃ GIL的优点<br>在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的</p>
-<p>＃＃ CPython为什么存在GIL<br>CPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。</p>
+		<h1 id="1-python全局解释器锁"><a href="#1-python全局解释器锁" class="headerlink" title="1.python全局解释器锁"></a>1.python全局解释器锁</h1><h2 id="GIL的优点"><a href="#GIL的优点" class="headerlink" title="GIL的优点"></a>GIL的优点</h2><p>在单线程的情况下更快， 易于和C库结合， 而大部分情况下， 这并不是线程安全的</p>
+<h2 id="CPython为什么存在GIL"><a href="#CPython为什么存在GIL" class="headerlink" title="CPython为什么存在GIL"></a>CPython为什么存在GIL</h2><p>CPython的内存管理并不是线程安全的， 因此需要GIL来保证多个原生线程不会并发执行Python字节码。</p>
 <p>主要考虑到以下几点：</p>
 <ul>
 <li>单线程情况下更快</li>
@@ -128,7 +128,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://sksun.com.cn/2019/08/13/Python-面试题/" data-title="Python 面试题 | Hexo" data-tsina="" class="share clearfix">
+	  <div data-url="http://sksun.com.cn/2019/08/13/Python-面试题/" data-title="Python 面试题 | 随笔小记" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -168,7 +168,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-python全局解释器锁"><span class="toc-number">1.</span> <span class="toc-text">1.python全局解释器锁</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#GIL的优点"><span class="toc-number">1.1.</span> <span class="toc-text">GIL的优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPython为什么存在GIL"><span class="toc-number">1.2.</span> <span class="toc-text">CPython为什么存在GIL</span></a></li></ol></li></ol>
  
   </div>
 
@@ -418,6 +418,10 @@
 			
 		
 			
+				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/包管理/" title="包管理">包管理<sup>2</sup></a></li>
 			
 		
@@ -426,7 +430,7 @@
 			
 		
 			
-				<li><a href="/tags/数组/" title="数组">数组<sup>2</sup></a></li>
+				<li><a href="/tags/Atom/" title="Atom">Atom<sup>1</sup></a></li>
 			
 		
 			
@@ -442,15 +446,11 @@
 			
 		
 			
+				<li><a href="/tags/go关键字/" title="go关键字">go关键字<sup>1</sup></a></li>
+			
+		
+			
 				<li><a href="/tags/tag/" title="tag">tag<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/表单/" title="表单">表单<sup>1</sup></a></li>
-			
-		
-			
-				<li><a href="/tags/虚拟化技术/" title="虚拟化技术">虚拟化技术<sup>1</sup></a></li>
 			
 		
 		</ul>
@@ -481,7 +481,7 @@
 		<p class="copyright">
 		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2019 
 		
-		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		<a href="/about" target="_blank" title="sksun">sksun</a>
 		
 		
 		</p>
